@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hms/screens/main_dashboard.dart';
+
+import '../main_dashboard.dart';
 
 class PatientDashboard extends StatefulWidget {
   const PatientDashboard({super.key});
@@ -165,7 +166,7 @@ class _Sidebar extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MainDashboard(),
+                  builder: (context) => const MainDashboard(),
                 ),
               );
             },

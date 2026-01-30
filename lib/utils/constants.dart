@@ -11,17 +11,19 @@ class AppConstants {
 
 class AppColors {
   // Primary Colors
-  static const Color primary =
-      Color(0xFF2383E2); // Updated to match doctor color
+  static const Color primary = Color(0xFF2383E2); // Updated to match doctor color
   static const Color secondary = Color(0xFFED8936);
   static const Color background = Color(0xFFF7FAFC);
   static const Color cardBackground = Colors.white;
   static const Color border = Color(0xFFE2E8F0);
+  static const Color solitude = Color(0xffEAF8FF);
+  static const Color sushi = Color(0xff7EA839);
 
   // Text Colors
   static const Color textPrimary = Color(0xFF2D3748);
   static const Color textSecondary = Color(0xFF718096);
   static const Color textTertiary = Color(0xFFA0AEC0);
+  static const Color greyText = Color(0xFF676767);
 
   // Status Colors
   static const Color success = Color(0xFF38A169);

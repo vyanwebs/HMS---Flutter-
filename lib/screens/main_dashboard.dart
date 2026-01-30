@@ -1,8 +1,17 @@
-import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:hms/screens/module_login_screen.dart';
-import 'package:hms/utils/constants.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../helper_resposive_class/responsive_layout.dart';
+import '../models/hospital_panel_model.dart';
+import '../models/operation_step_model.dart';
+import '../utils/buttons.dart';
+import '../utils/constants.dart';
+import '../utils/images.dart';
+import '../utils/text.dart';
+import '../widgets/arrow_step_card.dart';
+import '../widgets/helper_widgets.dart';
+import '../widgets/info_card.dart';
+import '../widgets/panel_card.dart';
 
 class MainDashboard extends StatefulWidget {
   const MainDashboard({super.key});
@@ -12,963 +21,476 @@ class MainDashboard extends StatefulWidget {
 }
 
 class _MainDashboardState extends State<MainDashboard> {
-  late DateTime _currentTime;
-  late Timer _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentTime = DateTime.now().toUtc().add(
-        const Duration(hours: 5, minutes: 30)); // Indian Standard Time (IST)
-    _startTimer();
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-
-  void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        _currentTime = DateTime.now()
-            .toUtc()
-            .add(const Duration(hours: 5, minutes: 30)); // IST = UTC+5:30
-      });
-    });
-  }
-
-  String _formatTime(DateTime time) {
-    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
-  }
-
-  String _formatDate(DateTime time) {
-    final months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ];
-    return '${time.day} ${months[time.month - 1]} ${time.year}';
-  }
-
-  String _formatDay(DateTime time) {
-    final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    return days[time.weekday - 1];
-  }
-
   @override
   Widget build(BuildContext context) {
-    final currentHour = _currentTime.hour;
-    final currentMinute = _currentTime.minute;
-    final currentSecond = _currentTime.second;
-
-    // Calculate clock hands angles
-    final hourAngle = (currentHour % 12 + currentMinute / 60) * 30 * (pi / 180);
-    final minuteAngle = (currentMinute + currentSecond / 60) * 6 * (pi / 180);
-    final secondAngle = currentSecond * 6 * (pi / 180);
-
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: _buildAppBar(_currentTime),
-      body: Column(
-        children: [
-          _buildStatusBar(),
-          Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final width = constraints.maxWidth;
-                final height = constraints.maxHeight;
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            bool isDesktop = constraints.maxWidth > 900;
 
-                // Large desktop - 3 columns
-                if (width >= 1400) {
-                  return Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // LEFT COLUMN: Brand + Quote (25%)
-                        SizedBox(
-                          width: width * 0.25,
-                          child: Column(
-                            children: [
-                              SizedBox(height: 220, child: _buildBrandCard()),
-                              const SizedBox(height: 16),
-                              Expanded(child: _buildQuoteCard()),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-
-                        // CENTER COLUMN: Clock (27%) - Increased height
-                        SizedBox(
-                          width: width * 0.27,
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                  height: 320,
-                                  child: _buildClockCard(_currentTime,
-                                      hourAngle, minuteAngle, secondAngle)),
-                              const SizedBox(height: 16),
-                              Expanded(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(16),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.10),
-                                        blurRadius: 12,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      'System Status: All Normal',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.green[700],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-
-                        // RIGHT COLUMN: Apps + Discover + Features (48%)
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildApplicationsHeader(),
-                                const SizedBox(height: 12),
-                                SizedBox(
-                                  height: height * 0.40, // Increased height
-                                  child: _buildApplicationsGrid(context),
-                                ),
-                                const SizedBox(height: 12),
-                                _buildDiscoverStrip(),
-                                const SizedBox(height: 12),
-                                SizedBox(
-                                  height: 360, // INCREASED HEIGHT
-                                  child: _buildFeaturesGrid(),
-                                ),
-                                const SizedBox(height: 16), // Bottom padding
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                // Medium screens - 2 columns
-                if (width >= 900) {
-                  return Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // LEFT COLUMN (55%)
-                        Expanded(
-                          flex: 5,
-                          child: Column(
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: SizedBox(
-                                      height: 220,
-                                      child: _buildBrandCard(),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: SizedBox(
-                                      height: 320,
-                                      child: _buildClockCard(_currentTime,
-                                          hourAngle, minuteAngle, secondAngle),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              Expanded(child: _buildQuoteCard()),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-
-                        // RIGHT COLUMN (45%) - With Scroll
-                        Expanded(
-                          flex: 4,
-                          child: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildApplicationsHeader(),
-                                const SizedBox(height: 12),
-                                SizedBox(
-                                  height: height * 0.35,
-                                  child: _buildApplicationsGrid(context),
-                                ),
-                                const SizedBox(height: 12),
-                                _buildDiscoverStrip(),
-                                const SizedBox(height: 12),
-                                SizedBox(
-                                  height: 360, // INCREASED HEIGHT
-                                  child: _buildFeaturesGrid(),
-                                ),
-                                const SizedBox(height: 16), // Bottom padding
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                // Tablet - Single column with adjusted heights
-                if (width >= 600) {
-                  return SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              flex: 2,
-                              child: SizedBox(
-                                height: 200,
-                                child: _buildBrandCard(),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              flex: 1,
-                              child: SizedBox(
-                                height: 280,
-                                child: _buildClockCard(_currentTime, hourAngle,
-                                    minuteAngle, secondAngle),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        _buildQuoteCard(),
-                        const SizedBox(height: 16),
-                        _buildApplicationsHeader(),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          height: 380, // Increased height
-                          child: _buildApplicationsGrid(
-                            context,
-                            shrinkForSmall: true,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        _buildDiscoverStrip(),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          height: 380, // INCREASED HEIGHT
-                          child: _buildFeaturesGrid(crossAxisForSmall: 2),
-                        ),
-                        const SizedBox(height: 16), // Bottom padding
-                      ],
-                    ),
-                  );
-                }
-
-                // Mobile - Compact single column
-                return SingleChildScrollView(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 170, child: _buildBrandCard()),
-                      const SizedBox(height: 12),
-                      SizedBox(
-                          height: 260,
-                          child: _buildClockCard(_currentTime, hourAngle,
-                              minuteAngle, secondAngle)),
-                      const SizedBox(height: 12),
-                      _buildQuoteCard(),
-                      const SizedBox(height: 16),
-                      _buildApplicationsHeader(),
-                      const SizedBox(height: 8),
-                      SizedBox(
-                        height: 380, // Increased height
-                        child: _buildApplicationsGrid(
-                          context,
-                          shrinkForSmall: true,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      _buildDiscoverStrip(),
-                      const SizedBox(height: 12),
-                      SizedBox(
-                        height: 440, // INCREASED HEIGHT
-                        child: _buildFeaturesGrid(crossAxisForSmall: 1),
-                      ),
-                      const SizedBox(height: 16), // Bottom padding
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+            return isDesktop ? desktopHero(constraints) : mobileHero();
+          },
+        ),
       ),
     );
   }
 
-  // APP BAR -------------------------------------------------------------------
-  PreferredSizeWidget _buildAppBar(DateTime currentTime) {
-    return AppBar(
-      backgroundColor: const Color(0xFF2D3748),
-      elevation: 0,
-      titleSpacing: 16,
-      title: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(
-              Icons.medical_services,
-              color: Color(0xFF3182CE),
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 12),
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppConstants.appName,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              Text(
-                AppConstants.appTagline,
-                style: TextStyle(
-                  fontSize: 9,
-                  color: Colors.white70,
-                ),
-              ),
+  // ================= DESKTOP =================
+
+  Widget desktopHero(BoxConstraints constraints) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(40),
+          decoration: BoxDecoration(
+            color: AppColors.solitude,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 20,
+                spreadRadius: 2,
+              )
             ],
           ),
-        ],
-      ),
-      actions: [
-        Container(
-          margin: const EdgeInsets.only(right: 12),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: Colors.green,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: const Row(
-            mainAxisSize: MainAxisSize.min,
+          child: Column(
             children: [
-              Icon(Icons.circle, size: 8, color: Colors.white),
-              SizedBox(width: 4),
-              Text(
-                'Online',
-                style: TextStyle(fontSize: 11, color: Colors.white),
+              topContent(),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10,),
+                  Expanded(flex: 5, child: leftContent()),
+                  const SizedBox(width: 40),
+                  Expanded(flex: 4, child: rightImage()),
+                ],
               ),
             ],
           ),
         ),
+        const SizedBox(height: 50,),
         Padding(
-          padding: const EdgeInsets.only(right: 16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                _formatTime(currentTime),
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              Text(
-                _formatDate(currentTime),
-                style: const TextStyle(fontSize: 11, color: Colors.white70),
-              ),
-            ],
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+          child: fieldOfOperationsDesktopLayout(),
+        ),
+        const SizedBox(height: 60,),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+          child: hospitalPanel(),
+        ),
+        const SizedBox(height: 60,),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+          child: coreSystem(),
+        ),
+        const SizedBox(height: 60,),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+          child: usp(constraints),
+        ),
+        const SizedBox(height: 60,),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+          child: problemsSolves(constraints),
+        ),
+        const SizedBox(height: 20,),
+      ],
+    );
+  }
+
+  // ================= MOBILE/TABLET =================
+
+  Widget mobileHero() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        topContent(),
+        rightImage(),
+        const SizedBox(height: 30),
+        leftContent(center: true),
+      ],
+    );
+  }
+
+  // ============== Top Content =================
+
+  Widget topContent() {
+    return Row(
+      children: [
+        Image.asset(appLogo, scale: 12,),
+        const SizedBox(width: 12,),
+        const Text(
+          'Docnex',
+          style: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
           ),
         ),
       ],
     );
   }
 
-  // TOP STATUS BAR ------------------------------------------------------------
-  Widget _buildStatusBar() {
-    return Container(
-      color: const Color(0xFFEDF2F7),
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: const Center(
-        child: Text(
-          '© v4.1 | NRAX Complaint • Explore',
-          style: TextStyle(
-            fontSize: 11,
-            color: Color(0xFF718096),
-          ),
-        ),
-      ),
-    );
-  }
+  // ================= LEFT SIDE =================
 
-  // BRAND CARD ----------------------------------------------------------------
-  Widget _buildBrandCard() {
-    return Container(
-      clipBehavior: Clip.hardEdge,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.12),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.15),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                'assets/images/splash_logo.png',
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  color: const Color(0xFF3182CE),
-                  child: const Icon(
-                    Icons.medical_services,
-                    color: Colors.white,
-                    size: 30,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'DocNex.care',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1A202C),
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 2),
-          const Text(
-            '24x7 Healthcare System',
-            style: TextStyle(
-              fontSize: 12,
-              color: Color(0xFF718096),
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const Spacer(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+  Widget leftContent({bool center = false}) {
+    return Column(
+      crossAxisAlignment: center ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 100),
+        Text.rich(
+          TextSpan(
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF48BB78).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.circle, size: 8, color: Color(0xFF48BB78)),
-                    SizedBox(width: 4),
-                    Text(
-                      'Online',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Color(0xFF2F855A),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+              TextSpan(
+                text: "Docnex",
+                style: GoogleFonts.poppins(
+                  fontSize: 42,
+                  fontWeight: FontWeight.bold,
+                  height: 1.2,
+                  color: const Color(0xff2383E2)
                 ),
               ),
-              const SizedBox(width: 6),
-              const Text(
-                'All services operational',
-                style: TextStyle(
-                  fontSize: 10,
-                  color: Color(0xFF718096),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'v2.4.1 | HIPAA Compliant',
-            style: TextStyle(
-              fontSize: 9,
-              color: Color(0xFFA0AEC6),
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  // CLOCK CARD ----------------------------------------------------------------
-  Widget _buildClockCard(DateTime currentTime, double hourAngle,
-      double minuteAngle, double secondAngle) {
-    return Container(
-      clipBehavior: Clip.hardEdge,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.12),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            'DocNex.care',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1A202C),
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // REAL-TIME CLOCK
-          SizedBox(
-            height: 140,
-            child: Center(
-              child: Container(
-                width: 140,
-                height: 140,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: const Color(0xFF3182CE),
-                    width: 8,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF3182CE).withOpacity(0.3),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // Hour hand
-                    Transform.rotate(
-                      angle: hourAngle,
-                      child: Container(
-                        width: 4,
-                        height: 40,
-                        color: const Color(0xFF2B6CB0),
-                      ),
-                    ),
-                    // Minute hand
-                    Transform.rotate(
-                      angle: minuteAngle,
-                      child: Container(
-                        width: 3,
-                        height: 50,
-                        color: const Color(0xFFED8936),
-                      ),
-                    ),
-                    // Second hand (thin red hand)
-                    Transform.rotate(
-                      angle: secondAngle,
-                      child: Container(
-                        width: 1,
-                        height: 55,
-                        color: Colors.red,
-                      ),
-                    ),
-                    // Center dot
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF3182CE),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    // Clock numbers
-                    ..._buildClockNumbers(),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            _formatTime(currentTime),
-            style: const TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF2D3748),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '${_formatDay(currentTime)}, ${_formatDate(currentTime)}',
-            style: const TextStyle(
-              fontSize: 12,
-              color: Color(0xFF718096),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'IST (UTC+5:30)',
-            style: TextStyle(
-              fontSize: 10,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Helper method to build clock numbers
-  List<Widget> _buildClockNumbers() {
-    List<Widget> numbers = [];
-    for (int i = 1; i <= 12; i++) {
-      final angle = (i * 30) * (pi / 180);
-      final radius = 48.0;
-      final offsetX = radius * sin(angle);
-      final offsetY = -radius * cos(angle);
-
-      numbers.add(
-        Transform.translate(
-          offset: Offset(offsetX, offsetY),
-          child: Text(
-            i.toString(),
-            style: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF4A5568),
-            ),
-          ),
+              TextSpan(
+                text: " Healthcare\nEcosystem",
+                style: GoogleFonts.poppins(
+                  fontSize: 42,
+                  fontWeight: FontWeight.bold,
+                  height: 1.2,
+                  color: const Color(0xff7EA839)
+                )
+              )
+            ]
+          )
         ),
-      );
-    }
-    return numbers;
-  }
 
-  // QUOTE CARD ----------------------------------------------------------------
-  Widget _buildQuoteCard() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.10),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(24),
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'TODAY\'S QUOTE',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF4A5568),
-              letterSpacing: 1,
-            ),
-          ),
-          SizedBox(height: 12),
-          Text(
-            '"Take a break and fuel by happy thoughts."',
-            style: TextStyle(
-              fontSize: 18,
-              fontStyle: FontStyle.italic,
-              color: Color(0xFF2D3748),
-              height: 1.4,
-            ),
-          ),
-          SizedBox(height: 8),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              '- Wellness Journal',
-              style: TextStyle(
-                fontSize: 12,
-                color: Color(0xFF718096),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+        const SizedBox(height: 20),
 
-  // DISCOVER STRIP ------------------------------------------------------------
-  Widget _buildDiscoverStrip() {
-    return Container(
-      height: 70,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF3182CE), Color(0xFF805AD5)],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF3182CE).withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      child: const Row(
-        children: [
-          Icon(Icons.star, color: Colors.white, size: 20),
-          SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              'Discover What\'s Inside\nWe Provide You With The Best',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.white,
-                height: 1.3,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          SizedBox(width: 12),
-          Chip(
-            label: Text(
-              'PREMIUM',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2D3748),
-              ),
-            ),
-            backgroundColor: Colors.white,
-          ),
-        ],
-      ),
-    );
-  }
-
-  // APPLICATIONS HEADER -------------------------------------------------------
-  Widget _buildApplicationsHeader() {
-    return Row(
-      children: const [
         Text(
-          'APPLICATIONS',
+          "Reinventing Hospitals with Intelligence, Speed & Automation\n\nA complete hospital operating system designed for Indian healthcare realities — where doctors are overloaded, staff is undertrained, documentation is weak, and revenue leaks silently.",
+          textAlign: center ? TextAlign.center : TextAlign.left,
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            color: AppColors.greyText,
+            height: 1.6,
+          ),
+        ),
+
+        const SizedBox(height: 30),
+
+        Wrap(
+          spacing: 16,
+          runSpacing: 16,
+          alignment: center ? WrapAlignment.center : WrapAlignment.start,
+          children: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+                backgroundColor: AppColors.info
+              ),
+              onPressed: () {},
+              child: const Text("Join for free"),
+            ),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent
+              ),
+              icon: const Icon(Icons.play_circle, color: Colors.black, size: 30,),
+              onPressed: () {},
+              label: const Text(
+                "Watch how it works",
+                style: TextStyle(
+                  color: Colors.black
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  // ================= RIGHT SIDE =================
+
+  Widget rightImage() {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        AspectRatio(
+          aspectRatio: 1,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              image: const DecorationImage(
+                fit: BoxFit.cover,
+                image: AssetImage(doctorImage)
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          left: -200,
+          bottom: 150,
+          child: InfoCard(
+            title: "150+ Hospitals Digitized",
+            subtitle: "Across India",
+            leading: imageAvatar("https://images.unsplash.com/photo-1586773860418-d37222d8fce3"),
+            buttonText: "Join Now",
+            onPressed: () {},
+          )
+        ),
+        Positioned(
+          top: 100,
+          left: -40,
+          child: InfoCard(
+            title: "1,200+ Doctors Using Docnex",
+            subtitle: "Across Multi-Speciality Hospitals",
+            leading: imageAvatar("https://images.unsplash.com/photo-1559839734-2b71ea197ec2"),
+          )
+        ),
+        Positioned(
+          top: 180,
+          right: -20,
+          child: InfoCard(
+            title: "4x Faster Clinical Documentation",
+            subtitle: "With AI + Voice Automation",
+            leading: featureIcon(Icons.auto_awesome, Colors.orange),
+            trailing: const Icon(Icons.verified, color: Colors.green, size: 18),
+          )
+        ),
+      ],
+    );
+  }
+
+  // ================== Field Of Operations ==============
+
+  final List<OperationStep> steps = [
+    OperationStep(
+      number: "01",
+      title: "Registration",
+      imagePath: step1,
+      icon: step1Overlay
+    ),
+    OperationStep(
+      number: "02",
+      title: "Documentation",
+      imagePath: step2,
+      icon: step2Overlay
+    ),
+    OperationStep(
+      number: "03",
+      title: "Hospital Control",
+      imagePath: step3,
+      icon: step3Overlay
+    ),
+    OperationStep(
+      number: "04",
+      title: "Dashboard Access",
+      imagePath: step4,
+      icon: step4Overlay
+    ),
+  ];
+
+  Widget fieldOfOperationsDesktopLayout() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        // LEFT TEXT
+        SizedBox(
+          width: 320,
+          child: leftText(),
+        ),
+
+        // RIGHT STEPS
+        Wrap(
+          spacing: 0,
+          runSpacing: 30,
+          alignment: WrapAlignment.spaceBetween,
+          children: steps.map((e) => ArrowStepCard(step: e)).toList(),
+        ),
+      ],
+    );
+  }
+
+  // ================= MOBILE / TABLET =================
+
+  Widget fieldOfOperationsMobileLayout() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        leftText(center: true),
+        const SizedBox(height: 40),
+
+        Wrap(
+          spacing: 24,
+          runSpacing: 30,
+          alignment: WrapAlignment.center,
+          children: steps.map((e) => ArrowStepCard(step: e)).toList(),
+        ),
+      ],
+    );
+  }
+
+  // ================= LEFT TEXT =================
+
+  Widget leftText({bool center = false}) {
+    return Column(
+      crossAxisAlignment: center ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      children: [
+        Text(
+          "How Docnex Operates?",
+          textAlign: center ? TextAlign.center : TextAlign.left,
+          style: const TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w700,
+            color: Color(0xff1E88FF),
+          ),
+        ),
+        const SizedBox(height: 14),
+        Text(
+          "Seeing, Understanding, Acting: How this works in 4 steps",
+          textAlign: center ? TextAlign.center : TextAlign.left,
           style: TextStyle(
             fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF4A5568),
-            letterSpacing: 1,
+            height: 1.6,
+            color: Colors.grey.shade600,
           ),
-        ),
-        Spacer(),
-        Chip(
-          label: Text(
-            'Premium',
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF744210),
-            ),
-          ),
-          backgroundColor: Color(0xFFFEEBC8),
         ),
       ],
     );
   }
 
-  // APPLICATIONS GRID ---------------------------------------------------------
-  Widget _buildApplicationsGrid(BuildContext context,
-      {bool shrinkForSmall = false}) {
-    final crossAxisCount = shrinkForSmall ? 2 : 3;
+  final List<HospitalPanel> panels = [
+    HospitalPanel(
+      title: "External Doctor Panel",
+      image: externalDoctor,
+      totalRegistrations: 16,
+      rating: 4,
+      module: 'External Doctor',
+    ),
+    HospitalPanel(
+      title: "Reception Panel",
+      image: receptionPanel,
+      totalRegistrations: 16,
+      rating: 3,
+      module: 'Reception',
+    ),
+    HospitalPanel(
+      title: "Doctor Panel",
+      image: doctorPanel,
+      totalRegistrations: 16,
+      rating: 3,
+      module: 'Doctor',
+    ),
+    HospitalPanel(
+      title: "Nurse Panel",
+      image: nursePanel,
+      totalRegistrations: 16,
+      rating: 3,
+      module: 'Nurses',
+    ),
+    HospitalPanel(
+      title: "Pharmacy Panel",
+      image: pharmacyPanel,
+      totalRegistrations: 16,
+      rating: 3,
+      module: 'Pharmacy',
+    ),
+    HospitalPanel(
+      title: "Patient Panel",
+      image: patientPanel,
+      totalRegistrations: 16,
+      rating: 3,
+      module: 'Patient',
+    ),
+    HospitalPanel(
+      title: "Admin Panel",
+      image: adminPanel,
+      totalRegistrations: 16,
+      rating: 3,
+      module: 'Admin',
+    ),
+    HospitalPanel(
+      title: "Insurance Panel",
+      image: insurancePanel,
+      totalRegistrations: 16,
+      rating: 3,
+      module: 'Insurance',
+    ),
+    HospitalPanel(
+      title: "Laboratory Panel",
+      image: laboratoryPanel,
+      totalRegistrations: 16,
+      rating: 3,
+      module: 'Laboratory',
+    ),
+    HospitalPanel(
+      title: "Diagnostic Panel",
+      image: diagnosticPanel,
+      totalRegistrations: 16,
+      rating: 3,
+      module: 'Diagnostics',
+    ),
+    HospitalPanel(
+      title: "Dialysis Panel",
+      image: dialysisPanel,
+      totalRegistrations: 16,
+      rating: 3,
+      module: 'Dialysis'
+    ),
+  ];
 
-    return SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      child: GridView.count(
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        crossAxisCount: crossAxisCount,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: shrinkForSmall ? 2.1 : 3.5,
-        children: [
-          _buildPremiumCard(context, 'External Doctor', Icons.people_alt_outlined,
-              AppColors.externalDoctor),
-          _buildPremiumCard(context, 'Reception', Icons.desktop_mac_outlined,
-              AppColors.reception),
-          _buildPremiumCard(
-              context, 'Doctor', Icons.person_outline, AppColors.doctor),
-          _buildPremiumCard(context, 'Nurses', Icons.medical_services_outlined,
-              AppColors.nurses),
-          _buildPremiumCard(context, 'Pharmacy', Icons.local_pharmacy_outlined,
-              AppColors.pharmacy),
-          _buildPremiumCard(context, 'Laboratory', Icons.science_outlined,
-              AppColors.laboratory),
-          _buildPremiumCard(
-              context, 'Insurance', Icons.security_outlined, AppColors.insurance),
-          _buildPremiumCard(context, 'Diagnostics', Icons.monitor_heart_outlined,
-              AppColors.diagnostics),
-          _buildPremiumCard(
-              context, 'Dialysis', Icons.water_drop_outlined, AppColors.dialysis),
-          _buildPremiumCard(
-              context, 'Patient', Icons.accessible_outlined, AppColors.patient),
-          _buildPremiumCard(context, 'Admin', Icons.admin_panel_settings_outlined,
-              AppColors.admin),
-        ],
-      ),
-    );
-  }
-
-  // FEATURES GRID - PERFECTLY FIXED WITH INCREASED HEIGHTS -------------------
-  Widget _buildFeaturesGrid({int? crossAxisForSmall}) {
+  Widget hospitalPanel() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final width = constraints.maxWidth;
-        int crossAxisCount;
+        int crossAxisCount = 4;
 
-        if (crossAxisForSmall != null) {
-          crossAxisCount = crossAxisForSmall;
-        } else if (width > 900) {
-          crossAxisCount = 3;
-        } else if (width > 600) {
-          crossAxisCount = 2;
-        } else {
-          crossAxisCount = 1;
-        }
+        if (constraints.maxWidth < 1200) crossAxisCount = 3;
+        if (constraints.maxWidth < 800) crossAxisCount = 2;
+        if (constraints.maxWidth < 450) crossAxisCount = 1;
 
-        // PERFECT childAspectRatio for 5 items to show ALL properly
-        double childAspectRatio;
-        if (crossAxisCount == 1) {
-          childAspectRatio = 4.8; // Perfect for mobile single column
-        } else if (crossAxisCount == 2) {
-          childAspectRatio = 4.0; // Perfect for 2 columns (2+3 layout)
-        } else {
-          childAspectRatio = 3.2; // Perfect for 3 columns (2+2+1 layout)
-        }
-
-        return Container(
-          height: double.infinity,
-          child: GridView.count(
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: crossAxisCount,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: childAspectRatio,
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 80),
+          child: Column(
             children: [
-              _buildFeatureCard(
-                'AI Diagnostics',
-                'Coming Soon',
-                'Robot powered medical diagnostics',
-                Icons.psychology_outlined,
-                const Color(0xFF4299E1),
+              const Text(
+                "Complete Hospital Ecosystem",
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xff1E88FF),
+                ),
               ),
-              _buildFeatureCard(
-                'Mobile App',
-                'Online',
-                'Access records from smartphones',
-                Icons.phone_android_outlined,
-                const Color(0xFF48BB78),
+
+              const SizedBox(height: 8),
+
+              Text(
+                "11 Integrated Panels for Every Department",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey.shade600,
+                ),
               ),
-              _buildFeatureCard(
-                'Smart Reports',
-                'Advanced',
-                'Advanced insights & analytics',
-                Icons.analytics_outlined,
-                const Color(0xFFED8936),
-              ),
-              _buildFeatureCard(
-                'Cloud Backup',
-                'Secure',
-                'Automatic data backup & recovery',
-                Icons.cloud_outlined,
-                const Color(0xFF9F7AEA),
-              ),
-              _buildFeatureCard(
-                'Telemedicine',
-                'Go Digital',
-                'Connect with patients virtually',
-                Icons.video_call_outlined,
-                const Color(0xFFF56565),
+
+              const SizedBox(height: 40),
+
+              GridView.builder(
+                shrinkWrap: true,
+                itemCount: panels.length,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: 24,
+                  mainAxisSpacing: 24,
+                  childAspectRatio: 0.89,
+                ),
+                itemBuilder: (context, index) {
+                  return HospitalPanelCard(panel: panels[index]);
+                },
               ),
             ],
           ),
@@ -977,191 +499,253 @@ class _MainDashboardState extends State<MainDashboard> {
     );
   }
 
-  // FEATURE CARD - PERFECTLY FIXED VERSION ------------------------------------
-  Widget _buildFeatureCard(String title, String status, String description,
-      IconData icon, Color color) {
-    return Container(
-      margin: const EdgeInsets.all(2),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.10),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+  Widget coreSystem() {
+    return ResponsiveLayout(
+      mobile: mobileViewCoreSystem(),
+      tablet: tabViewCoreSystem(),
+      desktop: desktopViewCoreSystem(),
+    );
+  }
+
+  Widget mobileViewCoreSystem() {
+    return Container();
+  }
+
+  Widget tabViewCoreSystem() {
+    return Container();
+  }
+
+  Widget desktopViewCoreSystem() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 80),
+      child: Column(
+        children: [
+          const Text(
+            "Core System Features",
+            style: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.w700,
+              color: Color(0xff1E88FF),
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          Text(
+            "Advanced capabilities that power the entire ecosystem",
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey.shade600,
+            ),
+          ),
+          const SizedBox(height: 40),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(coreFeatures, width: MediaQuery.of(context).size.width*0.4,),
+              const SizedBox(width: 100,),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.22,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    // MAIN CONTENT
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "What's coming next",
+                          style: TextStyle(
+                            fontSize: 28,
+                            color: AppColors.doctor,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          "Docnex brings efficiency, intelligence, and reliability to hospitals.",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.greyText,
+                            height: 1.6,
+                          ),
+                        ),
+                        const SizedBox(height: 25),
+
+                        // BUTTON
+                        AppButton(
+                          onPressed: () {},
+                          text: 'Discover',
+                          fontSize: 12,
+                          icon: Icons.arrow_forward_ios_rounded,
+                          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 22),
+                          borderRadius: 8,
+                          iconSize: 12,
+                        ),
+                      ],
+                    ),
+
+                    // ================= FLOATING ARROW =================
+                    Positioned(
+                      right: 140,
+                      bottom: 0,
+                      child: Image.asset(
+                        arrowImage,
+                        width: MediaQuery.of(context).size.width * 0.04,
+                      ),
+                    ),
+
+                    // ================= FLOATING PILL =================
+                    Positioned(
+                      right: 100,
+                      bottom: 20,
+                      child: Image.asset(
+                        pillShapeImage,
+                        width: MediaQuery.of(context).size.width * 0.05,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget usp(BoxConstraints constraints) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: "OUR USP ",
+                    style: GoogleFonts.poppins(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  TextSpan(
+                    text: "(Why Docnex is Different)",
+                    style: GoogleFonts.poppins(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.sushi,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 14),
+
+            const AppText(
+              "Docnex Is Not Just Software —\nIt Is the Operating System of Your Hospital",
+              fontSize: 14,
+              color: AppColors.greyText,
+            ),
+
+            const SizedBox(height: 30),
+
+            const AppText(
+              "Benefits :",
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+
+            const SizedBox(height: 18),
+
+            uspPoint("Ultra-Fast Clinical Workflow (Quick Bars + Voice + AI)"),
+            uspPoint("100% Documentation Accuracy & Zero Data Loss"),
+            uspPoint("Built for Indian Hospitals"),
+            uspPoint("Single Connected Ecosystem"),
+            uspPoint("High Intelligence, Low Effort System"),
+
+            const Padding(
+              padding: EdgeInsets.only(left: 26),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SubPoint("AI lab report reading"),
+                  SubPoint("AI diagnosis suggestions"),
+                  SubPoint("AI RMO clinical automation"),
+                  SubPoint("Voice command workflows"),
+                ],
+              ),
+            ),
+          ],
+        ),
+        SizedBox(width: constraints.maxWidth*0.1),
+        Image.asset(uspSectionImage, width: constraints.maxWidth*0.4,),
+      ],
+    );
+  }
+
+  Widget uspPoint(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.check_circle, color: AppColors.sushi, size: 20),
+          const SizedBox(width: 10),
+          AppText(
+            text,
+            fontSize: 14,
+            color: AppColors.greyText,
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16), // Increased padding
-        child: Row(
+    );
+  }
+
+  Widget problemsSolves(BoxConstraints constraints) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 44, // Slightly larger icon
-              height: 44,
-              margin: const EdgeInsets.only(right: 12, top: 2),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, color: color, size: 24), // Larger icon
+            AppText(
+              "What problems Docnex Solves",
+              fontSize: 28,
+              color: AppColors.doctor,
             ),
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title row with status badge
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          title,
-                          style: const TextStyle(
-                            fontSize: 15, // Slightly larger
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF2D3748),
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        constraints: const BoxConstraints(minWidth: 55),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: color.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: color.withOpacity(0.3)),
-                        ),
-                        child: Text(
-                          status,
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: color,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  // Description with proper spacing
-                  Expanded(
-                    child: Text(
-                      description,
-                      style: const TextStyle(
-                        fontSize: 12, // Slightly larger
-                        color: Color(0xFF718096),
-                        height: 1.3,
-                      ),
-                      maxLines: 4, // Increased lines
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
+            SizedBox(height: 15,),
+            AppText(
+              "Docnex Is Not Just Software —\nIt Is the Operating System of Your Hospital",
+              fontSize: 14,
+              color: AppColors.greyText,
             ),
           ],
         ),
-      ),
+        SizedBox(width: constraints.maxWidth*0.1),
+        Image.asset(problemSolvesImage, width: constraints.maxWidth*0.4,)
+      ],
     );
   }
 
-  // PREMIUM CARD --------------------------------------------------------------
-  Widget _buildPremiumCard(
-      BuildContext context, String title, IconData icon, Color color) {
-    return GestureDetector(
-      onTap: () => _navigateToModule(context, title),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [color.withOpacity(0.9), color],
-          ),
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, color: Colors.white, size: 20),
-            ),
-            const SizedBox(width: 8),
-            Flexible(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Flexible(
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Text(
-                      'PREMIUM',
-                      style: TextStyle(
-                        fontSize: 9,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+}
 
-  // NAVIGATION ----------------------------------------------------------------
-  void _navigateToModule(BuildContext context, String module) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ModuleLoginScreen(module: module),
+class SubPoint extends StatelessWidget {
+  final String text;
+  const SubPoint(this.text, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: AppText(
+        "• $text",
+        fontSize: 13,
+        color: AppColors.greyText,
       ),
     );
   }

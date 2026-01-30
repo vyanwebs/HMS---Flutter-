@@ -159,7 +159,7 @@ class _ModuleLoginScreenState extends State<ModuleLoginScreen> {
       case 'Nurses':
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => NurseDashboard()),
+          MaterialPageRoute(builder: (context) => const NurseDashboard()),
         );
         break;
       case 'Pharmacy':

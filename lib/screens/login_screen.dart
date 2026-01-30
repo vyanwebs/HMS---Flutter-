@@ -115,19 +115,19 @@ class _LoginScreenState extends State<LoginScreen> {
                               hintText: 'Email address',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(6),
-                                borderSide: BorderSide(
+                                borderSide: const BorderSide(
                                   color: AppColors.border,
                                 ),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(6),
-                                borderSide: BorderSide(
+                                borderSide: const BorderSide(
                                   color: AppColors.border,
                                 ),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(6),
-                                borderSide: BorderSide(
+                                borderSide: const BorderSide(
                                   color: AppColors.primary,
                                   width: 1.5,
                                 ),
@@ -156,19 +156,19 @@ class _LoginScreenState extends State<LoginScreen> {
                               hintText: 'Password',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(6),
-                                borderSide: BorderSide(
+                                borderSide: const BorderSide(
                                   color: AppColors.border,
                                 ),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(6),
-                                borderSide: BorderSide(
+                                borderSide: const BorderSide(
                                   color: AppColors.border,
                                 ),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(6),
-                                borderSide: BorderSide(
+                                borderSide: const BorderSide(
                                   color: AppColors.primary,
                                   width: 1.5,
                                 ),
@@ -219,8 +219,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: Checkbox(
                                   value: false,
                                   onChanged: (_) {},
-                                  materialTapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
+                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                 ),
                               ),
                               const SizedBox(width: 6),
@@ -248,7 +247,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   tapTargetSize:
                                       MaterialTapTargetSize.shrinkWrap,
                                 ),
-                                child: Text(
+                                child: const Text(
                                   'Forgot password',
                                   style: TextStyle(
                                     fontSize: 12,
@@ -280,9 +279,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       height: 18,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                                Colors.white),
+                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                       ),
                                     )
                                   : const Text(
@@ -302,7 +299,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 16),
 
-                Center(
+                const Center(
                   child: Text(
                     '© Docklex.care v4.1 | HIPAA Compliant',
                     style: TextStyle(

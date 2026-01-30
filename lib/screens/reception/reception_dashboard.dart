@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hms/screens/main_dashboard.dart';
 import 'package:hms/screens/reception/patient_directory.dart';
 import 'package:hms/screens/reception/ipd_screen.dart';
 import 'package:hms/screens/reception/opd_screen.dart';
@@ -14,6 +13,8 @@ import 'package:hms/screens/reception/admission_requests.dart';
 import 'package:hms/screens/reception/appointments_screen.dart';
 import 'package:hms/widgets/quick_action_button.dart';
 import 'package:hms/utils/constants.dart';
+
+import '../main_dashboard.dart';
 
 class ReceptionDashboard extends StatefulWidget {
   const ReceptionDashboard({super.key});

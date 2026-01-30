@@ -9,7 +9,8 @@ import 'package:hms/screens/nurse/ipd_pharmacy_orders_screen.dart';
 import 'package:hms/screens/nurse/geo_attendance_screen.dart';
 import 'package:hms/screens/nurse/admin_profile_screen.dart';
 import 'package:hms/screens/nurse/settings_screen.dart';
-import 'package:hms/screens/main_dashboard.dart';
+
+import '../main_dashboard.dart';
 
 class NurseDashboard extends StatefulWidget {
   const NurseDashboard({super.key});

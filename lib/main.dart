@@ -1,10 +1,20 @@
+import 'package:device_preview/device_preview.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hms/screens/splash_screen.dart';
 import 'package:hms/screens/main_dashboard.dart';
 import 'package:hms/screens/module_login_screen.dart';
 import 'package:hms/screens/doctor/doctor_dashboard.dart';
 import 'package:hms/screens/reception/reception_dashboard.dart';
 import 'package:hms/utils/constants.dart';
+
+// void main() => runApp(
+//   DevicePreview(
+//     enabled: !kReleaseMode,
+//     builder: (context) => const MyApp(),
+//   ),
+// );
 
 void main() {
   runApp(const MyApp());
@@ -15,9 +25,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
+      // useInheritedMediaQuery: true,
+      // locale: DevicePreview.locale(context),
+      // builder: DevicePreview.appBuilder,
       theme: ThemeData(
         primaryColor: AppColors.primary,
         primarySwatch: Colors.blue,

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hms/screens/main_dashboard.dart';
 import 'package:hms/screens/doctor/opd_ipd_appointments.dart';
@@ -12,6 +13,9 @@ import 'package:hms/screens/doctor/doctor_profile.dart';
 import 'package:hms/screens/doctor/add_appointment.dart';
 import 'package:hms/screens/doctor/doctor_inbox.dart';
 import 'package:hms/utils/constants.dart';
+
+import '../../utils/images.dart';
+import '../../utils/text.dart';
 
 class DoctorDashboard extends StatefulWidget {
   const DoctorDashboard({super.key});
@@ -73,8 +77,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
               children: [
                 // Header with Logo
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
                   child: Row(
                     children: [
                       // App Logo from assets
@@ -96,8 +99,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                                   color: const Color(0xFF2383E2),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: const Icon(Icons.medical_services,
-                                    color: Colors.white, size: 24),
+                                child: const Icon(Icons.medical_services, color: Colors.white, size: 24),
                               );
                             },
                           ),
@@ -117,31 +119,17 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                 ),
 
                 const SizedBox(height: 10),
+                _buildSidebarItem('Home', icon: Icons.home_outlined),
+                _buildSidebarItem('Inbox', icon: Icons.email_outlined),
+                _buildSidebarItem('Dashboard', icon: Icons.dashboard_outlined),
 
-                // Name Section
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    'Name',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFFA0AEC0),
-                      letterSpacing: 1,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                _buildSidebarItem('Inbox', Icons.email_outlined),
-                _buildSidebarItem('Dashboard', Icons.dashboard_outlined),
-
-                const SizedBox(height: 30),
+                const Divider(height: 35),
 
                 // NATURE Section Header
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20),
                   child: Text(
-                    'NATURE',
+                    'PATIENT CARE',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -151,12 +139,10 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                _buildSidebarItem(
-                    'Assigned patients (24)', Icons.group_outlined),
-                _buildSidebarItem(
-                    'Telecommunication', Icons.video_call_outlined),
+                _buildSidebarItem('Assigned patients (24)', icon: Icons.group_outlined),
+                _buildSidebarItem('Telecommunication', icon: Icons.video_call_outlined),
 
-                const SizedBox(height: 30),
+                const Divider(height: 35),
 
                 // CLINICAL RECORDS Section Header
                 const Padding(
@@ -172,18 +158,16 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                _buildSidebarItem(
-                    'Laboratory results (24)', Icons.science_outlined),
-                _buildSidebarItem(
-                    'Patients Database (24)', Icons.storage_outlined),
+                _buildSidebarItem('Laboratory results (24)', icon: Icons.science_outlined),
+                _buildSidebarItem('Patients Database (24)', icon: Icons.storage_outlined),
 
-                const SizedBox(height: 30),
+                const Divider(height: 35),
 
                 // LATE PATIENT MANAGEMENT Section Header
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20),
                   child: Text(
-                    'LATE PATIENT MANAGEMENT',
+                    'IN-PATIENT MANAGEMENT',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -193,12 +177,10 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                _buildSidebarItem(
-                    'IPD Management', Icons.local_hospital_outlined),
-                _buildSidebarItem(
-                    'Discharge Summary', Icons.exit_to_app_outlined),
-                _buildSidebarItem('Profile', Icons.person_outlined),
-                _buildSidebarItem('Setting', Icons.settings_outlined),
+                _buildSidebarItem('Broadcasting', imagePath: mageBroadcastIcon),
+                _buildSidebarItem('Analysis', imagePath: analysisIcon),
+                _buildSidebarItem('Profile', icon: Icons.person_outlined),
+                _buildSidebarItem('Setting', icon: Icons.settings_outlined),
 
                 const SizedBox(height: 20),
               ],
@@ -220,26 +202,20 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
               // Simple logout button
               InkWell(
                 onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const MainDashboard()),
-                  );
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainDashboard()));
                 },
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                child: const Padding(
+                  padding: EdgeInsets.all(8.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.logout, color: Colors.grey.shade600, size: 22),
-                      const SizedBox(width: 10),
-                      const Text(
-                        'Logout',
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Color(0xFF2D3748),
-                          fontWeight: FontWeight.w500,
-                        ),
+                      Icon(Icons.arrow_back, color: AppColors.doctor, size: 22),
+                      SizedBox(width: 10),
+                      AppText(
+                        'Back',
+                        fontSize: 15,
+                        color: AppColors.doctor,
+                        fontWeight: FontWeight.w500,
                       ),
                     ],
                   ),
@@ -252,8 +228,35 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
     );
   }
 
-  Widget _buildSidebarItem(String title, IconData icon) {
+  Widget _buildSidebarItem(
+    String title, {
+    IconData? icon,
+    String? imagePath,
+  }) {
+    assert(
+      (icon != null && imagePath == null) ||
+          (icon == null && imagePath != null),
+      'You must provide either an icon or an imagePath, but not both.',
+    );
+
     final isSelected = _selectedNavItem == title;
+
+    Widget leadingWidget;
+
+    if (icon != null) {
+      leadingWidget = Icon(
+        icon,
+        size: 20,
+        color: isSelected ? Colors.white : const Color(0xFF718096),
+      );
+    } else {
+      leadingWidget = Image.asset(
+        imagePath!,
+        width: 20,
+        color: isSelected ? Colors.white : const Color(0xFF718096),
+      );
+    }
+
     return InkWell(
       onTap: () {
         if (title == 'Home') {
@@ -276,11 +279,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
         ),
         child: Row(
           children: [
-            Icon(
-              icon,
-              size: 20,
-              color: isSelected ? Colors.white : const Color(0xFF718096),
-            ),
+            leadingWidget,
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -362,7 +361,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
               children: [
                 // Today's Schedule and Broadcasting
                 Expanded(
-                  flex: 5,
+                  flex: 3,
                   child: Column(
                     children: [
                       _buildTodaysSchedule(),
@@ -431,7 +430,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
   Widget _buildStatsCards(bool isMobile) {
     final statsData = [
       {
-        'title': 'Today\'s Appointments',
+        'title': "Today's Appointments",
         'value': '24',
         'gradient': const LinearGradient(
           begin: Alignment.topCenter,
@@ -536,24 +535,19 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 // Value (24) at the top - Changed color to #000000
-                Text(
+                AppText(
                   value,
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-
-                    color: Color(0xFF000000), // Changed to #000000
-                  ),
+                  fontSize: 28,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF000000),
                 ),
                 const SizedBox(height: 50),
                 // Title text at the bottom - Changed color to #757575
-                Text(
+                AppText(
                   title,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF757575), // Changed to #757575
-                    fontWeight: FontWeight.w500,
-                  ),
+                  fontSize: 16,
+                  color: const Color(0xFF757575),
+                  fontWeight: FontWeight.w500,
                 ),
               ],
             ),
@@ -611,7 +605,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -794,20 +788,18 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
 
   List<Widget> _buildScheduleItems() {
     final scheduleItems = [
-      _buildScheduleItem('Mann Sharma', '9.00 A.M.', 'OPD', 'Confirmed'),
-      _buildScheduleItem('Mann Sharma', '9.00 A.M.', 'Follow-up', 'Confirmed'),
-      _buildScheduleItem('Mann Sharma', '9.00 A.M.', 'OPD', 'Confirmed'),
-      _buildScheduleItem(
-          'Mann Sharma', '9.00 A.M.', 'Teleconsultation', 'Confirmed'),
-      _buildScheduleItem('Mann Sharma', '9.00 A.M.', 'OPD', 'Confirmed'),
-      _buildScheduleItem('Mann Sharma', '9.00 A.M.', 'IPD Review', 'Confirmed'),
+      _buildScheduleItem('Mann Sharma', '9.00 A.M.', 'OPD', 'Confirmed', userImage),
+      _buildScheduleItem('Mann Sharma', '9.00 A.M.', 'Follow-up', 'Confirmed', userImage),
+      _buildScheduleItem('Mann Sharma', '9.00 A.M.', 'OPD', 'Confirmed', userImage),
+      _buildScheduleItem('Mann Sharma', '9.00 A.M.', 'Teleconsultation', 'Confirmed', userImage),
+      _buildScheduleItem('Mann Sharma', '9.00 A.M.', 'OPD', 'Confirmed', userImage),
+      _buildScheduleItem('Mann Sharma', '9.00 A.M.', 'IPD Review', 'Confirmed', userImage),
     ];
 
     return scheduleItems;
   }
 
-  Widget _buildScheduleItem(
-      String patient, String time, String type, String status) {
+  Widget _buildScheduleItem(String patient, String time, String type, String status, String image) {
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -817,22 +809,19 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF7FAFC),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
-        ),
         child: Row(
           children: [
             Container(
-              width: 44,
-              height: 44,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
-                color: const Color(0xFF2383E2).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.greyText),
+                image: const DecorationImage(
+                  image: AssetImage(userImage),
+                  fit: BoxFit.cover
+                )
               ),
-              child:
-                  Icon(Icons.person, color: const Color(0xFF2383E2), size: 22),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -849,7 +838,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '$time • $type',
+                    type,
                     style: const TextStyle(
                       fontSize: 12,
                       color: Color(0xFF718096),
@@ -858,22 +847,31 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                 ],
               ),
             ),
-            Container(
-              constraints: const BoxConstraints(minWidth: 70),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                color: _getStatusColor(status).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Text(
-                status,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: _getStatusColor(status),
-                  fontWeight: FontWeight.w500,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                AppText(
+                  time,
+                  fontSize: 12,
+                  color: const Color(0xFF718096),
                 ),
-                textAlign: TextAlign.center,
-              ),
+                const SizedBox(height: 4,),
+                Container(
+                  constraints: const BoxConstraints(minWidth: 70),
+                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: _getStatusColor(status).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: AppText(
+                    status,
+                    fontSize: 11,
+                    color: _getStatusColor(status),
+                    fontWeight: FontWeight.w500,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -937,16 +935,11 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  _buildRecentPatientItem(
-                      'Mann Sharma', 'Hypertension', 'Stable', '2 days ago'),
-                  _buildRecentPatientItem(
-                      'Mann Sharma', 'Hypertension', 'Stable', '2 days ago'),
-                  _buildRecentPatientItem(
-                      'Mann Sharma', 'Hypertension', 'Stable', '2 days ago'),
-                  _buildRecentPatientItem(
-                      'Mann Sharma', 'Hypertension', 'Stable', '2 days ago'),
-                  _buildRecentPatientItem(
-                      'Mann Sharma', 'Hypertension', 'Stable', '2 days ago'),
+                  _buildRecentPatientItem('Mann Sharma', 'Hypertension', 'Stable', '2 days ago'),
+                  _buildRecentPatientItem('Mann Sharma', 'Hypertension', 'Stable', '2 days ago'),
+                  _buildRecentPatientItem('Mann Sharma', 'Hypertension', 'Stable', '2 days ago'),
+                  _buildRecentPatientItem('Mann Sharma', 'Hypertension', 'Stable', '2 days ago'),
+                  _buildRecentPatientItem('Mann Sharma', 'Hypertension', 'Stable', '2 days ago'),
                 ],
               ),
             ),
@@ -956,8 +949,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
     );
   }
 
-  Widget _buildRecentPatientItem(
-      String name, String condition, String status, String time) {
+  Widget _buildRecentPatientItem(String name, String condition, String status, String time) {
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -975,14 +967,16 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
         child: Row(
           children: [
             Container(
-              width: 36,
-              height: 36,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
-                color: const Color(0xFF2383E2).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(18),
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.greyText),
+                image: const DecorationImage(
+                  image: AssetImage(userImage),
+                  fit: BoxFit.cover
+                )
               ),
-              child:
-                  const Icon(Icons.person, color: Color(0xFF2383E2), size: 20),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -998,12 +992,16 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
+                  AppText(
                     condition,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF718096),
-                    ),
+                    fontSize: 12,
+                    color: const Color(0xFF718096),
+                  ),
+                  const SizedBox(height: 4),
+                  AppText(
+                    time,
+                    fontSize: 12,
+                    color: const Color(0xFF718096),
                   ),
                 ],
               ),
@@ -1012,10 +1010,9 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF38A169).withOpacity(0.1),
+                    color: const Color(0xFF38A169).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(

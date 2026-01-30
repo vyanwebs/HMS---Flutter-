@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hms/screens/patient/patient_dashboard.dart';
-import 'package:hms/screens/main_dashboard.dart';
+
+import '../main_dashboard.dart';
 
 class PatientSettingsScreen extends StatelessWidget {
   const PatientSettingsScreen({super.key});
