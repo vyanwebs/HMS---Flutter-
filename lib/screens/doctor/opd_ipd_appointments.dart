@@ -388,12 +388,12 @@ class _OpdIpdAppointmentsState extends State<OpdIpdAppointments> {
     }).toList();
   }
 
-  List<TableRow> _buildTeleRows(List<TeleconsultationQueueModel> patients) {
-    if (patients.isEmpty) {
+  List<TableRow> _buildTeleRows(List<TeleconsultationQueueModel> telePatients) {
+    if (telePatients.isEmpty) {
       return [_emptyRow()];
     }
 
-    return patients.map((tele) {
+    return telePatients.map((tele) {
       return TableRow(
         decoration: const BoxDecoration(
           border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
@@ -411,17 +411,21 @@ class _OpdIpdAppointmentsState extends State<OpdIpdAppointments> {
           _cell(Row(
             children: [
               AppButton(
+                onPressed: () {
+                  assignedPatientsControllers.updateTeleconsultationStatus(callId: tele.id, status: TeleconsultationStatus.ongoing);
+                },
                 text: 'Accept',
                 icon: Icons.check,
                 backgroundColor: AppColors.info,
-                onPressed: () {},
               ),
               const SizedBox(width: 10),
               AppButton(
+                onPressed: () {
+                  assignedPatientsControllers.updateTeleconsultationStatus(callId: tele.id, status: TeleconsultationStatus.cancelled);
+                },
                 text: 'Reject',
                 icon: Icons.cancel_outlined,
                 backgroundColor: AppColors.error,
-                onPressed: () {},
               ),
             ],
           )),
@@ -489,27 +493,7 @@ class _OpdIpdAppointmentsState extends State<OpdIpdAppointments> {
         );
 
       case PatientTabType.teleconsultation:
-        return Row(
-          children: [
-            AppButton(
-              onPressed: () {
-
-              },
-              text: 'Accept',
-              icon: Icons.check,
-              backgroundColor: AppColors.info,
-            ),
-            const SizedBox(width: 10),
-            AppButton(
-              onPressed: () {
-                
-              },
-              text: 'Reject',
-              icon: Icons.cancel_outlined,
-              backgroundColor: AppColors.error,
-            ),
-          ],
-        );
+        return Container();
     }
   }
 

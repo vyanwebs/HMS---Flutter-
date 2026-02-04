@@ -13,6 +13,7 @@ import '../../utils/buttons.dart';
 import '../../utils/constants.dart';
 import '../../utils/enums.dart';
 import '../../utils/images.dart';
+import '../../utils/keyboard_intents.dart';
 import '../../utils/text.dart';
 import '../main_dashboard.dart';
 import 'patient_details_investigation.dart';
@@ -592,7 +593,11 @@ class PatientDetails extends StatelessWidget {
           label: "Admit",
           color: Colors.purple,
           onTap: () {
-            debugPrint("Bed Assign clicked");
+            showDialog(
+              context: Get.context!,
+              barrierDismissible: false,
+              builder: (_) => AdmitPatientDialog(patient: patient),
+            );
           },
         ),
 
@@ -614,7 +619,11 @@ class PatientDetails extends StatelessWidget {
           label: "Investigation",
           color: Colors.pinkAccent,
           onTap: () {
-            debugPrint("Investigations clicked");
+            showDialog(
+              context: Get.context!,
+              barrierDismissible: false,
+              builder: (_) => InvestigationRequestDialog(patient: patient),
+            );
           },
         ),
       ],
@@ -1294,7 +1303,17 @@ class DosageMiniChip extends StatelessWidget {
 class AddVitalDialog extends StatelessWidget {
   final PatientModel patient;
 
-  const AddVitalDialog({super.key, required this.patient});
+  AddVitalDialog({super.key, required this.patient});
+
+  final patientDetailsController = Get.find<PatientDetailsControllers>();
+  final _formKey = GlobalKey<FormState>();
+  final focusNode = FocusNode();
+
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      patientDetailsController.createVital(patient: patient);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1385,68 +1404,91 @@ class AddVitalDialog extends StatelessWidget {
 
   // ================= RIGHT FORM =================
   Widget _vitalsForm(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const AppText(
-              'Add Vitals',
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-            const SizedBox(height: 6),
-            AppText(
-              'Add vital details for ${patient.name}',
-              fontSize: 12,
-              color: AppColors.greyText,
-            ),
-            const SizedBox(height: 20),
-            
-            _input(label: 'BP'),
-            const SizedBox(height: 16),
-            
-            Row(
-              children: [
-                Expanded(child: _input(label: 'Pulse')),
-                const SizedBox(width: 16),
-                Expanded(child: _input(label: 'Temperature')),
-              ],
-            ),
-            
-            const SizedBox(height: 16),
-            _input(label: 'SpO₂'),
-            
-            const SizedBox(height: 30),
-          ],
-        ),
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const AppText(
+                'Add Vitals',
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+              const SizedBox(height: 6),
 
-        // ================= ACTIONS =================
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            TextButton(
-              onPressed: () => Get.back(),
-              child: const Text('Close'),
-            ),
-            const SizedBox(width: 20),
-            AppButton(
-              text: 'Add',
-              onPressed: () {
-                // TODO: controller.addVitals()
-                Get.back();
-              },
-              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-            ),
-          ],
-        )
-      ],
+              _input(
+                label: 'BP',
+                controller: patientDetailsController.bpCtrl,
+              ),
+
+              const SizedBox(height: 16),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: _input(
+                      label: 'Pulse',
+                      controller: patientDetailsController.pulseCtrl,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _input(
+                      label: 'Temperature',
+                      controller: patientDetailsController.tempCtrl,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 16),
+
+              _input(
+                label: 'SpO₂',
+                controller: patientDetailsController.spo2Ctrl,
+                isLast: true,
+                onSubmit: _submitForm,
+              ),
+            ],
+          ),
+
+          /// ACTIONS
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: () => Get.back(),
+                child: const Text('Close'),
+              ),
+              const SizedBox(width: 20),
+              AppButton(
+                text: 'Add',
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    patientDetailsController.createVital(patient: patient);
+                  }
+                },
+                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+              ),
+            ],
+          )
+        ],
+      ),
     );
   }
 
-  Widget _input({required String label}) {
+  Widget _input(
+    {
+      required String label,
+      required TextEditingController controller,
+      bool isLast = false,
+      VoidCallback? onSubmit,
+    }
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1457,10 +1499,23 @@ class AddVitalDialog extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         TextFormField(
+          controller: controller,
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return '$label is required';
+            }
+            return null;
+          },
+          onFieldSubmitted: (_) {
+            if (isLast) {
+              onSubmit?.call();
+            } else {
+              FocusScope.of(Get.context!).nextFocus();
+            }
+          },
           decoration: InputDecoration(
             hintText: label,
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -1468,6 +1523,577 @@ class AddVitalDialog extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(color: Colors.grey.shade300),
             ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+enum WardType { general, icu, others }
+
+class AdmitPatientDialog extends StatefulWidget {
+  final PatientModel patient;
+
+  const AdmitPatientDialog({super.key, required this.patient});
+
+  @override
+  State<AdmitPatientDialog> createState() => _AdmitPatientDialogState();
+}
+
+class _AdmitPatientDialogState extends State<AdmitPatientDialog> {
+  WardType selectedWard = WardType.general;
+  final instructionCtrl = TextEditingController();
+
+  final controller = Get.find<PatientDetailsControllers>();
+
+  @override
+  Widget build(BuildContext context) {
+    return BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+      child: Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        backgroundColor: Colors.white,
+        insetPadding: const EdgeInsets.all(24),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 520),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+
+                /// Patient Header
+                _patientHeader(),
+
+                const SizedBox(height: 20),
+
+                /// Admit section
+                const AppText(
+                  "Admit patient",
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+
+                const SizedBox(height: 6),
+                const AppText(
+                  "Specify where patient",
+                  fontSize: 13,
+                  color: Colors.grey,
+                ),
+
+                const SizedBox(height: 12),
+
+                _wardOption(WardType.general, "General ward"),
+                _wardOption(WardType.icu, "ICU"),
+                _wardOption(WardType.others, "Others"),
+
+                const SizedBox(height: 18),
+
+                const AppText(
+                  "Add instructions",
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+
+                const SizedBox(height: 8),
+
+                TextField(
+                  controller: instructionCtrl,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    hintText: "Add instructions here",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                /// Actions
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    AppButton(
+                      text: "Close",
+                      backgroundColor: Colors.grey.shade600,
+                      onPressed: () => Get.back(),
+                    ),
+                    const SizedBox(width: 12),
+                    AppButton(
+                      text: "Admit",
+                      onPressed: _submit,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _patientHeader() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.info.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 22,
+            backgroundColor: AppColors.info.withValues(alpha: 0.2),
+            child: Text(widget.patient.initials),
+          ),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AppText(
+                widget.patient.name,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+              ),
+              AppText(
+                "ID:${widget.patient.patientId} · Age-${widget.patient.age} · ${widget.patient.gender}",
+                fontSize: 12,
+                color: Colors.grey,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _wardOption(WardType type, String title) {
+    final isSelected = selectedWard == type;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: InkWell(
+        onTap: () => setState(() => selectedWard = type),
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isSelected ? AppColors.info : Colors.grey.shade300,
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
+                color: AppColors.info,
+              ),
+              const SizedBox(width: 12),
+              AppText(title),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _submit() {
+
+    controller.makeAdmitRequest(
+      patient: widget.patient,
+      wardType: selectedWard,
+      instructions: instructionCtrl.text,
+    );
+  }
+}
+
+class InvestigationRequestDialog extends StatefulWidget {
+  final PatientModel patient;
+
+  const InvestigationRequestDialog({super.key, required this.patient});
+
+  @override
+  State<InvestigationRequestDialog> createState() => _InvestigationRequestDialogState();
+}
+
+class _InvestigationRequestDialogState extends State<InvestigationRequestDialog> {
+  final _formKey = GlobalKey<FormState>();
+
+  final investigationCtrl = TextEditingController(text: "X-Ray");
+  final priorityCtrl = TextEditingController(text: "Routine");
+  final scheduleCtrl = TextEditingController();
+  final reasonCtrl = TextEditingController();
+  final historyCtrl = TextEditingController();
+
+  @override
+  void dispose() {
+    investigationCtrl.dispose();
+    priorityCtrl.dispose();
+    scheduleCtrl.dispose();
+    reasonCtrl.dispose();
+    historyCtrl.dispose();
+    super.dispose();
+  }
+  
+  final controller = Get.find<PatientDetailsControllers>();
+
+  DateTime? selectedDateTime;
+
+  Future<void> _pickDateTime() async {
+    final now = DateTime.now();
+
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(now.year + 5),
+    );
+
+    if (pickedDate == null) return;
+
+    final pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(now),
+    );
+
+    if (pickedTime == null) return;
+
+    final combined = DateTime(
+      pickedDate.year,
+      pickedDate.month,
+      pickedDate.day,
+      pickedTime.hour,
+      pickedTime.minute,
+    );
+
+    selectedDateTime = combined;
+
+    /// 👀 UI FORMAT
+    scheduleCtrl.text = _formatForDisplay(combined);
+  }
+
+  String _formatForDisplay(DateTime dateTime) {
+    final date = "${_monthName(dateTime.month)} ${dateTime.day.toString().padLeft(2, '0')}, ${dateTime.year}";
+    final time = TimeOfDay.fromDateTime(dateTime).format(context);
+    return "$date – $time";
+  }
+
+  String _monthName(int month) {
+    const months = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+    return months[month - 1];
+  }
+
+  String toIsoWithoutMilliseconds(DateTime dateTime) {
+    final two = (int n) => n.toString().padLeft(2, '0');
+
+    final offset = dateTime.timeZoneOffset;
+    final sign = offset.isNegative ? '-' : '+';
+    final hours = two(offset.inHours.abs());
+    final minutes = two(offset.inMinutes.abs() % 60);
+
+    return
+      '${dateTime.year}-'
+      '${two(dateTime.month)}-'
+      '${two(dateTime.day)}T'
+      '${two(dateTime.hour)}:'
+      '${two(dateTime.minute)}:'
+      '${two(dateTime.second)}'
+      '$sign$hours:$minutes';
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Shortcuts(
+      shortcuts: {
+        LogicalKeySet(LogicalKeyboardKey.escape): const ActivateIntent(),
+        LogicalKeySet(LogicalKeyboardKey.enter): const SubmitIntent(),
+        LogicalKeySet(
+          LogicalKeyboardKey.control,
+          LogicalKeyboardKey.enter,
+        ): const SubmitIntent(),
+        LogicalKeySet(
+          LogicalKeyboardKey.meta,
+          LogicalKeyboardKey.enter,
+        ): const SubmitIntent(),
+      },
+      child: Actions(
+        actions: {
+          ActivateIntent: CallbackAction(
+            onInvoke: (_) => Get.back(),
+          ),
+          SubmitIntent: CallbackAction(
+            onInvoke: (_) => _submit(),
+          ),
+        },
+        child: Dialog(
+          insetPadding: const EdgeInsets.all(32),
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          child: SizedBox(
+            width: 980,
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _patientCard(),
+                  const SizedBox(width: 30),
+                  Expanded(child: _form()),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ================= LEFT PATIENT CARD =================
+  Widget _patientCard() {
+    return Container(
+      width: 260,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircleAvatar(
+            radius: 55,
+            backgroundColor: AppColors.info.withValues(alpha: 0.15),
+            child: Text(
+              widget.patient.initials,
+              style: const TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          AppText(
+            widget.patient.name,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+          const SizedBox(height: 4),
+          AppText(
+            "Pat Id : ${widget.patient.patientId}",
+            fontSize: 12,
+            color: AppColors.greyText,
+          ),
+          const SizedBox(height: 12),
+          AppText("Gender : ${widget.patient.gender}", fontSize: 12),
+          AppText("Age : ${widget.patient.age} years", fontSize: 12),
+        ],
+      ),
+    );
+  }
+
+  // ================= RIGHT FORM =================
+  Widget _form() {
+    return Form(
+      key: _formKey,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const AppText(
+                "New investigation request",
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
+              const SizedBox(height: 20),
+
+              /// Investigation + Priority
+              Row(
+                children: [
+                  Expanded(
+                    child: _dropdown(
+                      label: "Investigation type",
+                      value: investigationCtrl.text,
+                      items: const [
+                        "X-Ray",
+                        "MRI",
+                        "CT Scan",
+                        "Ultrasound",
+                        "CT PNS",
+                        "Nasal Endoscopy",
+                        "Laryngoscopy",
+                        "Glucose Tolerance Test",
+                        "DEXA Scan",
+                        "VEP",
+                        "SSEP",
+                        "BAER",
+                        "Breath Test",
+                        "Blood Test",
+                        "Urine Test",
+                        "Other",
+                      ],
+                      onChanged: (v) => investigationCtrl.text = v!,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _dropdown(
+                      label: "Priority",
+                      value: priorityCtrl.text,
+                      items: const ["Routine", "Urgent", "STAT"],
+                      onChanged: (v) => priorityCtrl.text = v!,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 16),
+
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const AppText(
+                    "Schedule date and time",
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  const SizedBox(height: 6),
+                  TextFormField(
+                    controller: scheduleCtrl,
+                    readOnly: true,
+                    validator: (v) => v == null || v.isEmpty ? "Schedule date and time is required" : null,
+                    onTap: _pickDateTime,
+                    decoration: InputDecoration(
+                      hintText: "Select date & time",
+                      suffixIcon: const Icon(Icons.calendar_today_outlined),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 16),
+
+              _input(
+                label: "Reason for investigation",
+                controller: reasonCtrl,
+                hint: "Enter reason",
+              ),
+
+              const SizedBox(height: 16),
+
+              _input(
+                label: "Clinical history",
+                controller: historyCtrl,
+                hint: "Enter clinical history",
+                maxLines: 3,
+              ),
+            ],
+          ),
+
+          /// ACTIONS
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              AppButton(
+                text: "Close",
+                backgroundColor: Colors.grey.shade600,
+                onPressed: () => Get.back(),
+              ),
+              const SizedBox(width: 12),
+              AppButton(
+                text: "Create investigation",
+                onPressed: _submit,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================= SUBMIT =================
+  void _submit() {
+    if (!_formKey.currentState!.validate()) return;
+
+    controller.createInvestigation(
+      patientId: widget.patient.id,
+      investigationType: investigationCtrl.text,
+      priority: priorityCtrl.text,
+      scheduledDateTime: toIsoWithoutMilliseconds(selectedDateTime!),
+      reasonForInvestigation: reasonCtrl.text,
+      clinicalHistory: historyCtrl.text,
+    );
+  }
+
+  // ================= INPUT HELPERS =================
+  Widget _input({
+    required String label,
+    required TextEditingController controller,
+    String? hint,
+    int maxLines = 1,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppText(label, fontSize: 13, fontWeight: FontWeight.w500),
+        const SizedBox(height: 6),
+        TextFormField(
+          controller: controller,
+          maxLines: maxLines,
+          validator: (v) => v == null || v.trim().isEmpty ? "$label is required" : null,
+          textInputAction: maxLines == 1 ? TextInputAction.next : TextInputAction.done,
+          onFieldSubmitted: (_) => _submit(),
+          decoration: InputDecoration(
+            hintText: hint,
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _dropdown({
+    required String label,
+    required String value,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppText(label, fontSize: 13, fontWeight: FontWeight.w500),
+        const SizedBox(height: 6),
+        DropdownButtonFormField<String>(
+          initialValue: value,
+          items: items.map(
+            (e) => DropdownMenuItem(
+              value: e,
+              child: Text(e),
+            ),
+          ).toList(),
+          onChanged: onChanged,
+          borderRadius: BorderRadius.circular(10),
+          menuMaxHeight: 400,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
         ),
       ],

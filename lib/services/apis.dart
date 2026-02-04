@@ -16,3 +16,7 @@ String getIPDPatientsApi = "$baseUrl/api/doctor/ipd-patients";
 String getTelePatientsApi = "$baseUrl/api/doctor/teleconsultation-patients";
 String makeAdmitRequestApi = "$baseUrl/api/doctor/make-admit-request";
 String makeDischargeRequestApi = "$baseUrl/api/doctor/make-discharge-request";
+String makeTeleStatusApi = "$baseUrl/api/doctor/teleconsultation-status";
+String addVitalsApi = "$baseUrl/api/vital/create-vital";
+String admitPatientApi = "$baseUrl/api/admission/admit-patient";
+String createInvestigationApi = "$baseUrl/api/investigation/create";

@@ -48,3 +48,20 @@ enum PatientTabType {
   ipd,
   teleconsultation,
 }
+
+enum TeleconsultationStatus {
+  ongoing,
+  cancelled,
+}
+
+extension TeleconsultationStatusX on TeleconsultationStatus {
+  String get value {
+    switch (this) {
+      case TeleconsultationStatus.ongoing:
+        return 'ONGOING';
+      case TeleconsultationStatus.cancelled:
+        return 'CANCELLED';
+    }
+  }
+}
+

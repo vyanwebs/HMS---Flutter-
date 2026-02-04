@@ -6,6 +6,7 @@ import '../models/patient_model.dart';
 import '../models/teleconsultation_queue_model.dart';
 import '../services/api_service.dart';
 import '../services/apis.dart';
+import '../utils/enums.dart';
 import '../utils/overlay.dart';
 import '../utils/snackbar.dart';
 
@@ -200,6 +201,61 @@ class AssignedPatientsControllers extends GetxController {
       AppSnackbar.show(
         title: "Error",
         message: "Network error",
+        type: AppSnackType.error,
+      );
+      LoadingOverlayService.hide();
+    } finally {
+      LoadingOverlayService.hide();
+    }
+  }
+
+  Future<void> updateTeleconsultationStatus({
+    required String callId,
+    required TeleconsultationStatus status,
+  }) async {
+    try {
+      LoadingOverlayService.show(
+        message: status == TeleconsultationStatus.ongoing
+            ? 'Accepting call...'
+            : 'Cancelling call...',
+      );
+
+      final api = NetworkHelper(url: makeTeleStatusApi);
+
+      final response = await api.patch(
+        auth: true,
+        isFormData: true,
+        body: {
+          'callId': callId,
+          'status': status.value,
+        },
+      );
+
+      if (response['success'] == true) {
+        AppSnackbar.show(
+          title: "Success",
+          message: response['message'] ?? (status == TeleconsultationStatus.ongoing
+            ? "Teleconsultation accepted"
+            : "Teleconsultation cancelled"),
+          type: AppSnackType.success,
+        );
+
+        await Future.wait([
+          fetchTelePatients(),
+          fetchStatCardData(),
+        ]);
+      } else {
+        AppSnackbar.show(
+          title: "Failed",
+          message: response['message'] ?? "Unable to update status",
+          type: AppSnackType.error,
+        );
+      }
+    } catch (e, s) {
+      log('❌ updateTeleconsultationStatus failed', error: e, stackTrace: s);
+      AppSnackbar.show(
+        title: "Error",
+        message: "Something went wrong",
         type: AppSnackType.error,
       );
       LoadingOverlayService.hide();
