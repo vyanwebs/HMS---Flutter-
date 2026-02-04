@@ -6,6 +6,7 @@ import '../models/hospital_panel_model.dart';
 import '../models/operation_step_model.dart';
 import '../utils/buttons.dart';
 import '../utils/constants.dart';
+import '../utils/enums.dart';
 import '../utils/images.dart';
 import '../utils/text.dart';
 import '../widgets/arrow_step_card.dart';
@@ -370,77 +371,77 @@ class _MainDashboardState extends State<MainDashboard> {
       image: externalDoctor,
       totalRegistrations: 16,
       rating: 4,
-      module: 'External Doctor',
+      panel: UserPanel.externalDoctor,
     ),
     HospitalPanel(
       title: "Reception Panel",
       image: receptionPanel,
       totalRegistrations: 16,
       rating: 3,
-      module: 'Reception',
+      panel: UserPanel.reception,
     ),
     HospitalPanel(
       title: "Doctor Panel",
       image: doctorPanel,
       totalRegistrations: 16,
       rating: 3,
-      module: 'Doctor',
+      panel: UserPanel.doctor,
     ),
     HospitalPanel(
       title: "Nurse Panel",
       image: nursePanel,
       totalRegistrations: 16,
       rating: 3,
-      module: 'Nurses',
+      panel: UserPanel.nurse,
     ),
     HospitalPanel(
       title: "Pharmacy Panel",
       image: pharmacyPanel,
       totalRegistrations: 16,
       rating: 3,
-      module: 'Pharmacy',
+      panel: UserPanel.pharmacy,
     ),
     HospitalPanel(
       title: "Patient Panel",
       image: patientPanel,
       totalRegistrations: 16,
       rating: 3,
-      module: 'Patient',
+      panel: UserPanel.patient,
     ),
     HospitalPanel(
       title: "Admin Panel",
       image: adminPanel,
       totalRegistrations: 16,
       rating: 3,
-      module: 'Admin',
+      panel: UserPanel.admin,
     ),
     HospitalPanel(
       title: "Insurance Panel",
       image: insurancePanel,
       totalRegistrations: 16,
       rating: 3,
-      module: 'Insurance',
+      panel: UserPanel.insurance,
     ),
     HospitalPanel(
       title: "Laboratory Panel",
       image: laboratoryPanel,
       totalRegistrations: 16,
       rating: 3,
-      module: 'Laboratory',
+      panel: UserPanel.laboratory,
     ),
     HospitalPanel(
       title: "Diagnostic Panel",
       image: diagnosticPanel,
       totalRegistrations: 16,
       rating: 3,
-      module: 'Diagnostics',
+      panel: UserPanel.diagnostics,
     ),
     HospitalPanel(
       title: "Dialysis Panel",
       image: dialysisPanel,
       totalRegistrations: 16,
       rating: 3,
-      module: 'Dialysis'
+      panel: UserPanel.dialysis,
     ),
   ];
 

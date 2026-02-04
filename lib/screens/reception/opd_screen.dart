@@ -522,7 +522,7 @@ class _OPDScreenContentState extends State<_OPDScreenContent> {
                                 ),
                                 decoration: BoxDecoration(
                                   color: _getStatusColor(appointment.status)
-                                      .withOpacity(0.1),
+                                      .withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
@@ -721,9 +721,9 @@ class _OPDScreenContentState extends State<_OPDScreenContent> {
       width: 200,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -775,7 +775,7 @@ class _OPDScreenContentState extends State<_OPDScreenContent> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFF4299E1).withOpacity(0.1),
+              color: const Color(0xFF4299E1).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(Icons.local_hospital,
@@ -815,7 +815,7 @@ class _OPDScreenContentState extends State<_OPDScreenContent> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
-              color: availabilityColor.withOpacity(0.1),
+              color: availabilityColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -856,7 +856,7 @@ class _OPDScreenContentState extends State<_OPDScreenContent> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFF48BB78).withOpacity(0.1),
+              color: const Color(0xFF48BB78).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: const Icon(Icons.person, color: Color(0xFF48BB78), size: 20),
@@ -903,7 +903,7 @@ class _OPDScreenContentState extends State<_OPDScreenContent> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.1),
+              color: statusColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -933,7 +933,7 @@ class _OPDScreenContentState extends State<_OPDScreenContent> {
           border: Border.all(color: const Color(0xFFE2E8F0)),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
               blurRadius: 5,
               offset: const Offset(0, 2),
             ),
@@ -945,7 +945,7 @@ class _OPDScreenContentState extends State<_OPDScreenContent> {
               width: 50,
               height: 50,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(25),
               ),
               child: Icon(icon, color: color, size: 24),
@@ -1169,7 +1169,7 @@ class _OPDScreenContentState extends State<_OPDScreenContent> {
                       trailing: Chip(
                         label: Text(doctor.currentStatus),
                         backgroundColor: _getStatusColor(doctor.currentStatus)
-                            .withOpacity(0.1),
+                            .withValues(alpha: 0.1),
                         labelStyle: TextStyle(
                             color: _getStatusColor(doctor.currentStatus)),
                       ),

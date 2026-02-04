@@ -182,7 +182,7 @@ class DoctorSettings extends StatelessWidget {
       width: 36,
       height: 36,
       decoration: BoxDecoration(
-        color: (color ?? const Color(0xFF2563EB)).withOpacity(0.1),
+        color: (color ?? const Color(0xFF2563EB)).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Icon(
@@ -200,7 +200,7 @@ class DoctorSettings extends StatelessWidget {
       border: Border.all(color: const Color(0xFFE2E8F0)),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.05),
+          color: Colors.black.withValues(alpha: 0.05),
           blurRadius: 10,
           offset: const Offset(0, 4),
         ),

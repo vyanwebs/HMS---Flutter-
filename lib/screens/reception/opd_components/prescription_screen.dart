@@ -218,7 +218,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 5,
             offset: const Offset(0, 2),
           ),
@@ -230,7 +230,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: const Color(0xFF4299E1).withOpacity(0.1),
+              color: const Color(0xFF4299E1).withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -305,7 +305,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 5,
             offset: const Offset(0, 2),
           ),
@@ -394,7 +394,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFF48BB78).withOpacity(0.1),
+              color: const Color(0xFF48BB78).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(
@@ -549,7 +549,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFFED8936).withOpacity(0.1),
+              color: const Color(0xFFED8936).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(

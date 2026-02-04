@@ -75,6 +75,10 @@ class HospitalPanelCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     ElevatedButton(
+                      onPressed: () => Get.to(
+                        () => ModuleLoginScreen(panel: panel.panel),
+                        transition: Transition.rightToLeft
+                      ),
                       style: ElevatedButton.styleFrom(
                         elevation: 0,
                         backgroundColor: AppColors.info,
@@ -86,7 +90,6 @@ class HospitalPanelCard extends StatelessWidget {
                           vertical: 10,
                         ),
                       ),
-                      onPressed: () => Get.to(() => ModuleLoginScreen(module: panel.module)),
                       child: const Row(
                         children: [
                           Text(
@@ -98,7 +101,7 @@ class HospitalPanelCard extends StatelessWidget {
                       ),
                     ),
 
-                    _rating(panel.rating),
+                    _rating(panel.rating.toDouble()),
                   ],
                 ),
               ],

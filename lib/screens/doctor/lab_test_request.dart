@@ -348,7 +348,7 @@ class _LabTestRequestState extends State<LabTestRequest> {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
+                color: Colors.grey.withValues(alpha: 0.1),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -858,7 +858,7 @@ class _LabTestRequestState extends State<LabTestRequest> {
                           horizontal: 6, vertical: 3),
                       decoration: BoxDecoration(
                         color: _getPriorityColor(request['priority'])
-                            .withOpacity(0.1),
+                            .withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
@@ -881,7 +881,7 @@ class _LabTestRequestState extends State<LabTestRequest> {
                           horizontal: 6, vertical: 3),
                       decoration: BoxDecoration(
                         color:
-                            _getStatusColor(request['status']).withOpacity(0.1),
+                            _getStatusColor(request['status']).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
@@ -917,12 +917,12 @@ class _LabTestRequestState extends State<LabTestRequest> {
                             style: IconButton.styleFrom(
                               padding: const EdgeInsets.all(5),
                               backgroundColor:
-                                  const Color(0xFF38A169).withOpacity(0.1),
+                                  const Color(0xFF38A169).withValues(alpha: 0.1),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5),
                                 side: BorderSide(
                                   color:
-                                      const Color(0xFF38A169).withOpacity(0.3),
+                                      const Color(0xFF38A169).withValues(alpha: 0.3),
                                   width: 1,
                                 ),
                               ),
@@ -944,12 +944,12 @@ class _LabTestRequestState extends State<LabTestRequest> {
                             style: IconButton.styleFrom(
                               padding: const EdgeInsets.all(5),
                               backgroundColor:
-                                  const Color(0xFF2383E2).withOpacity(0.1),
+                                  const Color(0xFF2383E2).withValues(alpha: 0.1),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5),
                                 side: BorderSide(
                                   color:
-                                      const Color(0xFF2383E2).withOpacity(0.3),
+                                      const Color(0xFF2383E2).withValues(alpha: 0.3),
                                   width: 1,
                                 ),
                               ),
@@ -970,12 +970,12 @@ class _LabTestRequestState extends State<LabTestRequest> {
                             style: IconButton.styleFrom(
                               padding: const EdgeInsets.all(5),
                               backgroundColor:
-                                  const Color(0xFFED8936).withOpacity(0.1),
+                                  const Color(0xFFED8936).withValues(alpha: 0.1),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5),
                                 side: BorderSide(
                                   color:
-                                      const Color(0xFFED8936).withOpacity(0.3),
+                                      const Color(0xFFED8936).withValues(alpha: 0.3),
                                   width: 1,
                                 ),
                               ),
@@ -1029,7 +1029,7 @@ class _LabTestRequestState extends State<LabTestRequest> {
                           const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color:
-                            _getStatusColor(request['status']).withOpacity(0.1),
+                            _getStatusColor(request['status']).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -1084,7 +1084,7 @@ class _LabTestRequestState extends State<LabTestRequest> {
                           const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: _getPriorityColor(request['priority'])
-                            .withOpacity(0.1),
+                            .withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -1119,11 +1119,11 @@ class _LabTestRequestState extends State<LabTestRequest> {
                           style: IconButton.styleFrom(
                             padding: const EdgeInsets.all(6),
                             backgroundColor:
-                                const Color(0xFF38A169).withOpacity(0.1),
+                                const Color(0xFF38A169).withValues(alpha: 0.1),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(6),
                               side: BorderSide(
-                                color: const Color(0xFF38A169).withOpacity(0.3),
+                                color: const Color(0xFF38A169).withValues(alpha: 0.3),
                                 width: 1,
                               ),
                             ),
@@ -1145,11 +1145,11 @@ class _LabTestRequestState extends State<LabTestRequest> {
                           style: IconButton.styleFrom(
                             padding: const EdgeInsets.all(6),
                             backgroundColor:
-                                const Color(0xFF2383E2).withOpacity(0.1),
+                                const Color(0xFF2383E2).withValues(alpha: 0.1),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(6),
                               side: BorderSide(
-                                color: const Color(0xFF2383E2).withOpacity(0.3),
+                                color: const Color(0xFF2383E2).withValues(alpha: 0.3),
                                 width: 1,
                               ),
                             ),
@@ -1170,11 +1170,11 @@ class _LabTestRequestState extends State<LabTestRequest> {
                           style: IconButton.styleFrom(
                             padding: const EdgeInsets.all(6),
                             backgroundColor:
-                                const Color(0xFFED8936).withOpacity(0.1),
+                                const Color(0xFFED8936).withValues(alpha: 0.1),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(6),
                               side: BorderSide(
-                                color: const Color(0xFFED8936).withOpacity(0.3),
+                                color: const Color(0xFFED8936).withValues(alpha: 0.3),
                                 width: 1,
                               ),
                             ),
@@ -1242,7 +1242,7 @@ class _LabTestRequestState extends State<LabTestRequest> {
                   width: 50,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFED8936).withOpacity(0.1),
+                    color: const Color(0xFFED8936).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -1582,7 +1582,7 @@ class _LabTestRequestState extends State<LabTestRequest> {
             width: 120,
             height: 90,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Center(

@@ -161,7 +161,7 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF4299E1).withOpacity(0.1),
+                          color: const Color(0xFF4299E1).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child:
@@ -621,7 +621,7 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
+                      color: Colors.grey.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -680,7 +680,7 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
+                      color: Colors.grey.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -798,7 +798,7 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
+                      color: Colors.grey.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -908,7 +908,7 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
+                      color: Colors.grey.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -965,7 +965,7 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
+                      color: Colors.grey.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -1033,13 +1033,13 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.3),
+                    color: Colors.white.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(icon, color: Colors.white, size: 24),
                 ),
                 Icon(Icons.arrow_forward_ios,
-                    color: Colors.white.withOpacity(0.8), size: 16),
+                    color: Colors.white.withValues(alpha: 0.8), size: 16),
               ],
             ),
             const SizedBox(height: 20),
@@ -1056,7 +1056,7 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
               title,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha: 0.9),
               ),
             ),
           ],
@@ -1182,7 +1182,7 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, size: 20, color: color),
@@ -1217,7 +1217,7 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -1271,7 +1271,7 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFF4299E1).withOpacity(0.1),
+              color: const Color(0xFF4299E1).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: const Icon(Icons.email, color: Color(0xFF4299E1)),

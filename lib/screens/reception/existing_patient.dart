@@ -64,7 +64,7 @@ class _ExistingPatientScreenState extends State<ExistingPatientScreen> {
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
+                    color: Colors.grey.withValues(alpha: 0.1),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -175,7 +175,7 @@ class _ExistingPatientScreenState extends State<ExistingPatientScreen> {
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
+                    color: Colors.grey.withValues(alpha: 0.1),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -234,7 +234,7 @@ class _ExistingPatientScreenState extends State<ExistingPatientScreen> {
         child: Row(
           children: [
             CircleAvatar(
-              backgroundColor: const Color(0xFF4299E1).withOpacity(0.1),
+              backgroundColor: const Color(0xFF4299E1).withValues(alpha: 0.1),
               child: const Icon(
                 Icons.person_outline,
                 color: Color(0xFF4299E1),

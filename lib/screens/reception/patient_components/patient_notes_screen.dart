@@ -207,7 +207,7 @@ class _PatientNotesScreenState extends State<PatientNotesScreen> {
                     Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: typeColor.withOpacity(0.1),
+                        color: typeColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Icon(
@@ -274,7 +274,7 @@ class _PatientNotesScreenState extends State<PatientNotesScreen> {
                       width: 30,
                       height: 30,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF4299E1).withOpacity(0.1),
+                        color: const Color(0xFF4299E1).withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(

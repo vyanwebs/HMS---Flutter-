@@ -12,7 +12,6 @@ class ResponsiveLayout extends StatelessWidget {
     required this.desktop,
   });
 
-  // You can centralize breakpoints
   static const double mobileBreakpoint = 450;
   static const double tabletBreakpoint = 800;
 

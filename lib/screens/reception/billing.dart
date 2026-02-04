@@ -53,7 +53,7 @@ class _BillingScreenState extends State<BillingScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -294,8 +294,8 @@ class _BillingScreenState extends State<BillingScreen> {
                               ),
                               decoration: BoxDecoration(
                                 color: item.type == 'IPD'
-                                    ? const Color(0xFF4299E1).withOpacity(0.1)
-                                    : const Color(0xFF48BB78).withOpacity(0.1),
+                                    ? const Color(0xFF4299E1).withValues(alpha: 0.1)
+                                    : const Color(0xFF48BB78).withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
@@ -318,10 +318,10 @@ class _BillingScreenState extends State<BillingScreen> {
                               ),
                               decoration: BoxDecoration(
                                 color: item.status == 'Paid'
-                                    ? const Color(0xFF48BB78).withOpacity(0.1)
+                                    ? const Color(0xFF48BB78).withValues(alpha: 0.1)
                                     : item.status == 'Pending'
-                                        ? const Color(0xFFED8936).withOpacity(0.1)
-                                        : const Color(0xFF9F7AEA).withOpacity(0.1),
+                                        ? const Color(0xFFED8936).withValues(alpha: 0.1)
+                                        : const Color(0xFF9F7AEA).withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
@@ -465,9 +465,9 @@ class _BillingScreenState extends State<BillingScreen> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.2)),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -510,7 +510,7 @@ class _BillingScreenState extends State<BillingScreen> {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: color, size: 24),
@@ -590,7 +590,7 @@ class _BillingScreenState extends State<BillingScreen> {
                   gradient: LinearGradient(
                     colors: [
                       const Color(0xFF4299E1),
-                      const Color(0xFF4299E1).withOpacity(0.7),
+                      const Color(0xFF4299E1).withValues(alpha: 0.7),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(3),

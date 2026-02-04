@@ -207,7 +207,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -616,10 +616,10 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                               ),
                               decoration: BoxDecoration(
                                 color: appointment.type == 'OPD'
-                                    ? const Color(0xFF4299E1).withOpacity(0.1)
+                                    ? const Color(0xFF4299E1).withValues(alpha: 0.1)
                                     : appointment.type == 'Follow-up'
-                                    ? const Color(0xFF48BB78).withOpacity(0.1)
-                                    : const Color(0xFFED8936).withOpacity(0.1),
+                                    ? const Color(0xFF48BB78).withValues(alpha: 0.1)
+                                    : const Color(0xFFED8936).withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
@@ -644,15 +644,15 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                               ),
                               decoration: BoxDecoration(
                                 color: appointment.status == 'Confirmed'
-                                    ? const Color(0xFF48BB78).withOpacity(0.1)
+                                    ? const Color(0xFF48BB78).withValues(alpha: 0.1)
                                     : appointment.status == 'Waiting'
                                         ? const Color(0xFFED8936)
-                                            .withOpacity(0.1)
+                                            .withValues(alpha: 0.1)
                                         : appointment.status == 'Scheduled'
                                             ? const Color(0xFF4299E1)
-                                                .withOpacity(0.1)
+                                                .withValues(alpha: 0.1)
                                             : const Color(0xFFF56565)
-                                                .withOpacity(0.1),
+                                                .withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
@@ -1012,9 +1012,9 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.2)),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1058,7 +1058,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(Icons.person, color: color, size: 20),
@@ -1096,7 +1096,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
-              color: const Color(0xFF48BB78).withOpacity(0.1),
+              color: const Color(0xFF48BB78).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: const Text(
@@ -1130,7 +1130,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(icon, color: color, size: 20),

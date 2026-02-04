@@ -355,9 +355,9 @@ class _PatientHistoryScreenState extends State<PatientHistoryScreen> {
                                     decoration: BoxDecoration(
                                       color: patient.status == 'Active'
                                           ? const Color(0xFF48BB78)
-                                              .withOpacity(0.1)
+                                              .withValues(alpha: 0.1)
                                           : const Color(0xFFF56565)
-                                              .withOpacity(0.1),
+                                              .withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
@@ -421,9 +421,9 @@ class _PatientHistoryScreenState extends State<PatientHistoryScreen> {
       width: 180,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
@@ -534,7 +534,7 @@ class _PatientHistoryScreenState extends State<PatientHistoryScreen> {
                                     horizontal: 8, vertical: 2),
                                 decoration: BoxDecoration(
                                   color:
-                                      const Color(0xFF48BB78).withOpacity(0.1),
+                                      const Color(0xFF48BB78).withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(

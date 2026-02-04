@@ -373,7 +373,7 @@ class _PatientAdmissionScreenState extends State<PatientAdmissionScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF4299E1).withOpacity(0.1),
+        color: const Color(0xFF4299E1).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(

@@ -169,7 +169,7 @@ class _DiagnosticsDashboardState extends State<DiagnosticsDashboard> {
       child: Container(
         margin: const EdgeInsets.only(bottom: 6),
         decoration: BoxDecoration(
-          color: active ? AppColors.primary.withOpacity(0.1) : null,
+          color: active ? AppColors.primary.withValues(alpha: 0.1) : null,
           borderRadius: BorderRadius.circular(8),
         ),
         child: ListTile(
@@ -385,7 +385,7 @@ class _DiagnosticsDashboardState extends State<DiagnosticsDashboard> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: color, size: 24),
@@ -428,7 +428,7 @@ class _DiagnosticsDashboardState extends State<DiagnosticsDashboard> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: const Text(
@@ -924,7 +924,7 @@ class _Status extends StatelessWidget {
             decoration: BoxDecoration(
               color: bg,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: fg.withOpacity(0.3)),
+              border: Border.all(color: fg.withValues(alpha: 0.3)),
             ),
             child: Text(
               status,

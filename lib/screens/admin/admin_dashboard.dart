@@ -322,7 +322,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       child: Container(
         margin: const EdgeInsets.only(bottom: 6),
         decoration: BoxDecoration(
-          color: active ? AppColors.primary.withOpacity(0.12) : null,
+          color: active ? AppColors.primary.withValues(alpha: 0.12) : null,
           borderRadius: BorderRadius.circular(8),
         ),
         child: ListTile(
@@ -386,7 +386,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Icon(Icons.person, color: AppColors.primary),
@@ -713,11 +713,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [color.withOpacity(0.6), color],
+            colors: [color.withValues(alpha: 0.6), color],
           ),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.3),
+              color: color.withValues(alpha: 0.3),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -734,7 +734,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.3),
+                    color: Colors.white.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -745,7 +745,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 ),
                 Icon(
                   Icons.arrow_forward_ios,
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                   size: 16,
                 ),
               ],
@@ -766,7 +766,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   label,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                   ),
                 ),
               ],
@@ -1022,7 +1022,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         border: Border.all(color: AppColors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -1129,7 +1129,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       right: 0,
                       child: Container(
                         height: 1,
-                        color: AppColors.border.withOpacity(0.3),
+                        color: AppColors.border.withValues(alpha: 0.3),
                       ),
                     ),
                     Positioned(
@@ -1138,7 +1138,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       right: 0,
                       child: Container(
                         height: 1,
-                        color: AppColors.border.withOpacity(0.3),
+                        color: AppColors.border.withValues(alpha: 0.3),
                       ),
                     ),
                     Positioned(
@@ -1147,7 +1147,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       right: 0,
                       child: Container(
                         height: 1,
-                        color: AppColors.border.withOpacity(0.3),
+                        color: AppColors.border.withValues(alpha: 0.3),
                       ),
                     ),
                     Positioned(
@@ -1156,7 +1156,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       right: 0,
                       child: Container(
                         height: 1,
-                        color: AppColors.border.withOpacity(0.3),
+                        color: AppColors.border.withValues(alpha: 0.3),
                       ),
                     ),
                     

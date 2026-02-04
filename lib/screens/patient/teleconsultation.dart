@@ -62,7 +62,7 @@ class TeleconsultationScreen extends StatelessWidget {
                           width: 120,
                           height: 120,
                           decoration: BoxDecoration(
-                            color: PatientDashboard.primary.withOpacity(0.1),
+                            color: PatientDashboard.primary.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
@@ -135,7 +135,7 @@ class TeleconsultationScreen extends StatelessWidget {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: PatientDashboard.primary.withOpacity(0.1),
+              color: PatientDashboard.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(25),
             ),
             child: Icon(Icons.person, color: PatientDashboard.primary),

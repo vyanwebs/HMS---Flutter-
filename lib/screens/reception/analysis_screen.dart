@@ -20,7 +20,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -371,7 +371,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(icon, color: color, size: 20),
@@ -380,8 +380,8 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: change.startsWith('+')
-                      ? const Color(0xFF48BB78).withOpacity(0.1)
-                      : const Color(0xFFF56565).withOpacity(0.1),
+                      ? const Color(0xFF48BB78).withValues(alpha: 0.1)
+                      : const Color(0xFFF56565).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
@@ -535,7 +535,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                 width: (percentage / 100) * 300,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [color, color.withOpacity(0.7)],
+                    colors: [color, color.withValues(alpha: 0.7)],
                   ),
                   borderRadius: BorderRadius.circular(4),
                 ),
@@ -563,7 +563,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: color, size: 24),

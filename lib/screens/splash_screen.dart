@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hms/utils/constants.dart';
+import 'package:get/get.dart';
+
+import '../utils/constants.dart';
+import 'main_dashboard.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -18,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void _navigateToNext() async {
     await Future.delayed(const Duration(seconds: 2));
     if (mounted) {
-      Navigator.pushReplacementNamed(context, AppRoutes.mainDashboard);
+      Get.to(() => const MainDashboard());
     }
   }
 

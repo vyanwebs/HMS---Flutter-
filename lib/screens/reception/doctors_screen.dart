@@ -71,7 +71,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -270,7 +270,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                                         ),
                                         decoration: BoxDecoration(
                                           color: const Color(0xFF4299E1)
-                                              .withOpacity(0.1),
+                                              .withValues(alpha: 0.1),
                                           borderRadius:
                                               BorderRadius.circular(20),
                                         ),
@@ -294,9 +294,9 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                                           color: doctor.availability ==
                                                   'Available'
                                               ? const Color(0xFF48BB78)
-                                                  .withOpacity(0.1)
+                                                  .withValues(alpha: 0.1)
                                               : const Color(0xFFED8936)
-                                                  .withOpacity(0.1),
+                                                  .withValues(alpha: 0.1),
                                           borderRadius:
                                               BorderRadius.circular(20),
                                         ),
@@ -514,9 +514,9 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.2)),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -569,8 +569,8 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           decoration: BoxDecoration(
             color: type == 'OPD'
-                ? const Color(0xFF4299E1).withOpacity(0.1)
-                : const Color(0xFFED8936).withOpacity(0.1),
+                ? const Color(0xFF4299E1).withValues(alpha: 0.1)
+                : const Color(0xFFED8936).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
@@ -603,7 +603,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: color, size: 20),
@@ -637,7 +637,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(Icons.local_hospital, color: color, size: 24),

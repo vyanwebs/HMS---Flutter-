@@ -27,3 +27,4 @@ const String problemSolvesImage = 'assets/images/problems_solves_image.png';
 const String mageBroadcastIcon = 'assets/images/mage_broadcast.png';
 const String analysisIcon = 'assets/images/analysis_icon.png';
 const String userImage = 'assets/images/user_image.jpg';
+const String surgicalNotes = 'assets/images/surgical_notes.png';

@@ -140,7 +140,7 @@ class _OPDBillingScreenState extends State<OPDBillingScreen> {
                                     width: 40,
                                     height: 40,
                                     decoration: BoxDecoration(
-                                      color: _getCategoryColor(service.category).withOpacity(0.1),
+                                      color: _getCategoryColor(service.category).withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Icon(
@@ -316,7 +316,7 @@ class _OPDBillingScreenState extends State<OPDBillingScreen> {
                                                     width: 24,
                                                     height: 24,
                                                     decoration: BoxDecoration(
-                                                      color: const Color(0xFFF56565).withOpacity(0.1),
+                                                      color: const Color(0xFFF56565).withValues(alpha: 0.1),
                                                       borderRadius: BorderRadius.circular(4),
                                                     ),
                                                     child: const Icon(Icons.remove, size: 14, color: Color(0xFFF56565)),
@@ -335,7 +335,7 @@ class _OPDBillingScreenState extends State<OPDBillingScreen> {
                                                     width: 24,
                                                     height: 24,
                                                     decoration: BoxDecoration(
-                                                      color: const Color(0xFF48BB78).withOpacity(0.1),
+                                                      color: const Color(0xFF48BB78).withValues(alpha: 0.1),
                                                       borderRadius: BorderRadius.circular(4),
                                                     ),
                                                     child: const Icon(Icons.add, size: 14, color: Color(0xFF48BB78)),
@@ -381,7 +381,7 @@ class _OPDBillingScreenState extends State<OPDBillingScreen> {
                             border: Border.all(color: const Color(0xFFE2E8F0)),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.grey.withOpacity(0.1),
+                                color: Colors.grey.withValues(alpha: 0.1),
                                 blurRadius: 5,
                                 offset: const Offset(0, 2),
                               ),
@@ -556,7 +556,7 @@ class _OPDBillingScreenState extends State<OPDBillingScreen> {
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 5,
             offset: const Offset(0, 2),
           ),
@@ -568,7 +568,7 @@ class _OPDBillingScreenState extends State<OPDBillingScreen> {
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: const Color(0xFF4299E1).withOpacity(0.1),
+              color: const Color(0xFF4299E1).withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -596,7 +596,7 @@ class _OPDBillingScreenState extends State<OPDBillingScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF48BB78).withOpacity(0.1),
+                        color: const Color(0xFF48BB78).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: const Text(

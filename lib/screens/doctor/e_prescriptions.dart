@@ -108,10 +108,10 @@ class _EPrescriptionsState extends State<EPrescriptions> {
                       height: 44,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(999),
                         border:
-                            Border.all(color: Colors.white.withOpacity(0.3)),
+                            Border.all(color: Colors.white.withValues(alpha: 0.3)),
                       ),
                       child: Row(
                         children: [
@@ -435,7 +435,7 @@ class _EPrescriptionsState extends State<EPrescriptions> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -860,7 +860,7 @@ class _EPrescriptionsState extends State<EPrescriptions> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -919,7 +919,7 @@ class _EPrescriptionsState extends State<EPrescriptions> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

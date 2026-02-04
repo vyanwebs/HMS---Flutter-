@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/text.dart';
+
 class PatientHistory extends StatefulWidget {
   const PatientHistory({super.key});
 
@@ -177,13 +179,11 @@ class _PatientHistoryState extends State<PatientHistory> {
 
         // Desktop header
         if (!isMobile)
-          const Text(
+          const AppText(
             'CLINICAL RECORDS >> Patient History',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF718096),
-            ),
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF718096),
           ),
 
         if (!isMobile) const SizedBox(height: 20),
@@ -593,7 +593,7 @@ class _PatientHistoryState extends State<PatientHistory> {
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF16A34A).withOpacity(0.1),
+                    color: const Color(0xFF16A34A).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(

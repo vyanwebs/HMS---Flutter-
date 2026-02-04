@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:hms/screens/doctor/doctor_dashboard.dart';
-import 'package:hms/utils/constants.dart';
+import 'package:get/get.dart';
+
+import '../../controllers/assigned_patients_controllers.dart';
+import '../../models/patient_model.dart';
+import '../../models/teleconsultation_queue_model.dart';
+import '../../utils/buttons.dart';
+import '../../utils/constants.dart';
+import '../../utils/date_formatter.dart';
+import '../../utils/enums.dart';
+import '../../utils/text.dart';
+import '../../widgets/custom_table_widget.dart';
+import '../../widgets/doctor_panel/stat_card_widget.dart';
 
 class OpdIpdAppointments extends StatefulWidget {
   const OpdIpdAppointments({super.key});
@@ -10,6 +20,8 @@ class OpdIpdAppointments extends StatefulWidget {
 }
 
 class _OpdIpdAppointmentsState extends State<OpdIpdAppointments> {
+
+  final assignedPatientsControllers = Get.put(AssignedPatientsControllers());
   // Sample patient data
   final List<Map<String, dynamic>> _patients = [
     {
@@ -90,18 +102,28 @@ class _OpdIpdAppointmentsState extends State<OpdIpdAppointments> {
     final isMobile = screenWidth < 768;
     final isTablet = screenWidth >= 768 && screenWidth < 1024;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF7FAFC),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Main Content Area
-            Expanded(
-              child: _buildMainContent(isMobile, isTablet),
+    return Obx(
+      () => Visibility(
+        replacement: const Center(child: CircularProgressIndicator(color: AppColors.info,)),
+        visible: !assignedPatientsControllers.isLoading.value,
+        child: DefaultTabController(
+          length: 3,
+          animationDuration: const Duration(milliseconds: 800),
+          child: Scaffold(
+            backgroundColor: const Color(0xFFF7FAFC),
+            body: SafeArea(
+              child: Column(
+                children: [
+                  // Main Content Area
+                  Expanded(
+                    child: _buildMainContent(isMobile, isTablet),
+                  ),
+                ],
+              ),
             ),
-          ],
+          ),
         ),
-      ),
+      )
     );
   }
 
@@ -112,18 +134,15 @@ class _OpdIpdAppointmentsState extends State<OpdIpdAppointments> {
         children: [
           // Main Content
           Expanded(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Container(
-                padding: EdgeInsets.all(
-                  isMobile
-                      ? 16
-                      : isTablet
-                          ? 20
-                          : 24,
-                ),
-                child: _buildContent(isMobile, isTablet),
+            child: Container(
+              padding: EdgeInsets.all(
+                isMobile
+                    ? 16
+                    : isTablet
+                        ? 20
+                        : 24,
               ),
+              child: _buildContent(isMobile, isTablet),
             ),
           ),
         ],
@@ -137,18 +156,16 @@ class _OpdIpdAppointmentsState extends State<OpdIpdAppointments> {
       children: [
         // Header with breadcrumb
         if (!isMobile)
-          const Text(
-            'DOCTOR PANEL >> OPD/IPD Appointments',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF718096),
-            ),
+          const AppText(
+            'DOCTOR PANEL >> Assigned Patients',
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF718096),
           ),
 
         if (isMobile)
           const Text(
-            'OPD/IPD Appointments',
+            'Assigned Patients',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -159,542 +176,341 @@ class _OpdIpdAppointmentsState extends State<OpdIpdAppointments> {
         const SizedBox(height: 20),
 
         // STATS CARDS SECTION - Matching LabTestRequest size
-        _buildStatsCards(isMobile, isTablet),
+        statCard(),
 
         const SizedBox(height: 20),
 
         // Patients List Section
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(isMobile ? 16 : 20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Patients',
-                style: TextStyle(
-                  fontSize: isMobile ? 16 : 18,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF2D3748),
+        Expanded(
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(isMobile ? 16 : 20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withValues(alpha: 0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
                 ),
-              ),
-              const SizedBox(height: 16),
-
-              // Patients List/Table
-              if (isMobile)
-                _buildMobilePatientsList()
-              else
-                _buildDesktopPatientsTable(isTablet),
-            ],
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildTabs(),
+                const SizedBox(height: 10,),
+                Expanded(
+                  child: TabBarView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: [
+                      AppTable(
+                        columns: columns,
+                        rows: buildRows(PatientTabType.opd),
+                      ),
+                      AppTable(
+                        columns: columns,
+                        rows: buildRows(PatientTabType.ipd),
+                      ),
+                      AppTable(
+                        columns: columns,
+                        rows: buildRows(PatientTabType.teleconsultation),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildStatsCards(bool isMobile, bool isTablet) {
-    final statsData = [
-      {
-        'title': 'Today Appointments',
-        'value': '10',
-        'gradient': const LinearGradient(
+  Widget _buildTabs() {
+    return const TabBar(
+      isScrollable: true,
+      indicatorColor: Color(0xFF3182CE),
+      indicatorWeight: 3,
+      labelColor: Color(0xFF3182CE),
+      unselectedLabelColor: Color(0xFF4A5568),
+      labelStyle: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+      ),
+      tabs: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 30),
+          child: Tab(text: 'Total OPD patients'),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 30),
+          child: Tab(text: 'Active IPD patients'),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 30),
+          child: Tab(text: 'Teleconsultation'),
+        ),
+      ],
+    );
+  }
+
+
+  List<Widget> _cards() {
+    return [
+      StatCardWidget(
+        title: "Today's Appointments",
+        value: assignedPatientsControllers.todaysAppointments.value.toString(),
+        gradient: const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [Color(0xFF2C7EDB), Color(0xFFE1F0FF)],
         ),
-        'image': 'assets/images/box1.png',
-      },
-      {
-        'title': 'Total OPD patients',
-        'value': '24',
-        'gradient': const LinearGradient(
+        imagePath: 'assets/images/box1.png',
+      ),
+      StatCardWidget(
+        title: 'Total OPD Patients',
+        value: assignedPatientsControllers.totalOPDPatients.value.toString(),
+        gradient: const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [Color(0xFF00B894), Color(0xFFE3FCFA)],
         ),
-        'image': 'assets/images/box2.png',
-      },
-      {
-        'title': 'Active IPD patients',
-        'value': '8',
-        'gradient': const LinearGradient(
+        imagePath: 'assets/images/box2.png',
+      ),
+      StatCardWidget(
+        title: 'Active IPD patients',
+        value: assignedPatientsControllers.activeIPDPatients.value.toString(),
+        gradient: const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [Color(0xFF00C9C9), Color(0xFFDFFFFF)],
         ),
-        'image': 'assets/images/box3.png',
-      },
-      {
-        'title': 'Teleconsultation',
-        'value': '6',
-        'gradient': const LinearGradient(
+        imagePath: 'assets/images/box3.png',
+      ),
+      StatCardWidget(
+        title: 'Teleconsultation',
+        value: assignedPatientsControllers.teleconsultation.value.toString(),
+        gradient: const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [Color(0xFF00B83B), Color(0xFFECFEEE)],
         ),
-        'image': 'assets/images/box4.png',
-      },
+        imagePath: 'assets/images/box4.png',
+      ),
     ];
+  }
 
-    if (isMobile) {
-      return Column(
-        children: statsData.map((stat) {
-          return Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            child: _buildStatCard(
-              title: stat['title'] as String,
-              value: stat['value'] as String,
-              gradient: stat['gradient'] as Gradient,
-              imagePath: stat['image'] as String,
-              isMobile: true,
-            ),
-          );
-        }).toList(),
-      );
+  Widget statCard() {
+    return Row(
+      children: _cards().map(
+        (card) => Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: card,
+          ),
+        )
+      ).toList(),
+    );
+  }
+
+  final columns = [
+    AppTableColumn(title: 'Time', flex: 1.2),
+    AppTableColumn(title: 'Patient', flex: 3),
+    AppTableColumn(title: 'Details', flex: 2),
+    AppTableColumn(title: 'Action', flex: 3),
+  ];
+
+  List<TableRow> buildRows(PatientTabType tabType) {
+    final controller = assignedPatientsControllers;
+
+    switch (tabType) {
+      case PatientTabType.opd:
+        return _buildPatientRows(controller.opdPatients, tabType);
+
+      case PatientTabType.ipd:
+        return _buildPatientRows(controller.ipdPatients, tabType);
+
+      case PatientTabType.teleconsultation:
+        return _buildTeleRows(controller.telePatients);
+    }
+  }
+
+  List<TableRow> _buildPatientRows(
+    List<PatientModel> patients,
+    PatientTabType tabType,
+  ) {
+    if (patients.isEmpty) {
+      return [_emptyRow()];
     }
 
-    return Row(
-      children: statsData.map((stat) {
-        return Expanded(
-          child: Container(
-            margin: const EdgeInsets.only(right: 10),
-            child: _buildStatCard(
-              title: stat['title'] as String,
-              value: stat['value'] as String,
-              gradient: stat['gradient'] as Gradient,
-              imagePath: stat['image'] as String,
-              isMobile: false,
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildStatCard({
-    required String title,
-    required String value,
-    required Gradient gradient,
-    required String imagePath,
-    required bool isMobile,
-  }) {
-    return Container(
-      height: 140, // Same height as LabTestRequest
-      padding: const EdgeInsets.all(0),
-      decoration: BoxDecoration(
-        gradient: gradient,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Stack(
+    return patients.map((patient) {
+      return TableRow(
+        decoration: const BoxDecoration(
+          border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
+        ),
         children: [
-          // Background Image - Adjusted size and position
-          Positioned(
-            right: 0,
-            bottom: 0,
-            child: _buildBackgroundImage(imagePath),
-          ),
+          /// Time
+          _cell(Text(timeFromDateTime(patient.registeredAt))),
 
-          // Content - Moved to bottom with left margin
-          Positioned(
-            left: 20, // Same left margin
-            bottom: 20, // Same bottom position
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                // Value - Same font size and color
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF000000),
-                  ),
-                ),
-                const SizedBox(height: 50),
-                // Title text - Same font size and color
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF757575),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          /// Patient
+          _cell(Row(
+            children: [
+              CircleAvatar(
+                backgroundColor: Colors.blue.withValues(alpha: 0.2),
+                child: Text(patient.initials),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AppText(patient.name, fontWeight: FontWeight.w600),
+                  AppText('ID: ${patient.patientId}', color: Colors.grey),
+                ],
+              ),
+            ],
+          )),
+
+          /// Details
+          _cell(Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('${patient.age} years'),
+              Text(patient.gender, style: const TextStyle(color: Colors.grey)),
+            ],
+          )),
+
+          /// Actions
+          _cell(_buildActions(patient, tabType)),
         ],
-      ),
-    );
+      );
+    }).toList();
   }
 
-  Widget _buildBackgroundImage(String imagePath) {
-    return SizedBox(
-      width: 120,
-      height: 90,
-      child: Image.asset(
-        imagePath,
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            width: 120,
-            height: 90,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Center(
-              child: Text(
-                _getImageLabel(imagePath),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
+  List<TableRow> _buildTeleRows(List<TeleconsultationQueueModel> patients) {
+    if (patients.isEmpty) {
+      return [_emptyRow()];
+    }
 
-  String _getImageLabel(String imagePath) {
-    if (imagePath.contains('box1')) return 'Appointments';
-    if (imagePath.contains('box2')) return 'Lab Reports';
-    if (imagePath.contains('box3')) return 'IPD Patients';
-    if (imagePath.contains('box4')) return 'Teleconsultation';
-    return 'Image';
-  }
+    return patients.map((tele) {
+      return TableRow(
+        decoration: const BoxDecoration(
+          border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
+        ),
+        children: [
+          _cell(Text(timeFromDateTime(tele.createdAt))),
 
-  Widget _buildDesktopPatientsTable(bool isTablet) {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Container(
-        width: double.infinity,
-        child: DataTable(
-          columnSpacing: isTablet ? 30.0 : 40.0, // Increased spacing
-          headingRowHeight: 60, // Increased heading row height
-          headingRowColor: MaterialStateProperty.all(const Color(0xFFF7FAFC)),
-          headingTextStyle: TextStyle(
-            fontSize: isTablet ? 13 : 14, // Increased font size
+          _cell(AppText(
+            tele.patientName,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFF4A5568),
-          ),
-          dataRowHeight: 70, // Increased data row height
-          columns: [
-            DataColumn(
-              label: SizedBox(
-                width: isTablet ? 140 : 160, // Increased width
-                child: Padding(
-                  padding: EdgeInsets.only(
-                      left: isTablet ? 20 : 25), // Increased left padding
-                  child: const Text(
-                    'Time',
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-            ),
-            DataColumn(
-              label: SizedBox(
-                width: isTablet ? 220 : 260, // Increased width
-                child: Padding(
-                  padding: EdgeInsets.only(
-                      left: isTablet ? 20 : 25), // Increased left padding
-                  child: const Text(
-                    'Patient',
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-            ),
-            DataColumn(
-              label: SizedBox(
-                width: isTablet ? 140 : 160, // Increased width
-                child: Padding(
-                  padding: EdgeInsets.only(
-                      left: isTablet ? 20 : 25), // Increased left padding
-                  child: const Text(
-                    'Details',
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-            ),
-            DataColumn(
-              label: SizedBox(
-                width: isTablet ? 260 : 300, // Increased width
-                child: Padding(
-                  padding: EdgeInsets.only(
-                      left: isTablet ? 20 : 25), // Increased left padding
-                  child: const Text(
-                    'Action',
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-            ),
-          ],
-          rows: _patients.map((patient) {
-            return DataRow(
-              cells: [
-                DataCell(
-                  Container(
-                    width: isTablet ? 140 : 160, // Increased width
-                    height: 70, // Fixed height
-                    padding: EdgeInsets.only(
-                      left: isTablet ? 20 : 25, // Increased left padding
-                    ),
-                    alignment: Alignment.centerLeft,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        patient['time'],
-                        style: TextStyle(
-                          fontSize: isTablet ? 13 : 14, // Increased font size
-                          color: const Color(0xFF2D3748),
-                          fontWeight: FontWeight.w500,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
-                ),
-                DataCell(
-                  Container(
-                    width: isTablet ? 220 : 260, // Increased width
-                    height: 70, // Fixed height
-                    padding: EdgeInsets.only(
-                      left: isTablet ? 20 : 25, // Increased left padding
-                    ),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 42, // Increased size
-                            height: 42, // Increased size
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF2383E2),
-                              borderRadius:
-                                  BorderRadius.circular(10), // Increased radius
-                            ),
-                            child: Center(
-                              child: Text(
-                                patient['name'][0],
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18, // Increased font
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 16), // Increased spacing
-                          Expanded(
-                            child: SizedBox(
-                              height: 70, // Fixed height
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    patient['name'],
-                                    style: TextStyle(
-                                      fontSize:
-                                          isTablet ? 13 : 14, // Increased font
-                                      fontWeight: FontWeight.w600,
-                                      color: const Color(0xFF2D3748),
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
-                                  const SizedBox(height: 4), // Reduced spacing
-                                  Text(
-                                    'ID: ${patient['id']}',
-                                    style: TextStyle(
-                                      fontSize:
-                                          isTablet ? 12 : 13, // Increased font
-                                      color: const Color(0xFF718096),
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                DataCell(
-                  Container(
-                    width: isTablet ? 140 : 160, // Increased width
-                    height: 70, // Fixed height
-                    padding: EdgeInsets.only(
-                      left: isTablet ? 20 : 25, // Increased left padding
-                    ),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: SizedBox(
-                        height: 70, // Fixed height
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              patient['age'],
-                              style: TextStyle(
-                                fontSize: isTablet ? 13 : 14, // Increased font
-                                color: const Color(0xFF2D3748),
-                                fontWeight: FontWeight.w500,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
-                            const SizedBox(height: 8), // Increased spacing
-                            Text(
-                              patient['gender'],
-                              style: TextStyle(
-                                fontSize: isTablet ? 13 : 14, // Increased font
-                                color: const Color(0xFF2D3748),
-                                fontWeight: FontWeight.w500,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                DataCell(
-                  Container(
-                    width: isTablet ? 260 : 300, // Increased width
-                    height: 70, // Fixed height
-                    padding: EdgeInsets.only(
-                      left: isTablet ? 20 : 25, // Increased left padding
-                    ),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          // Admit Button
-                          SizedBox(
-                            width: isTablet ? 100 : 110, // Increased width
-                            height: 32, // Increased height
-                            child: ElevatedButton(
-                              onPressed: () => _admitPatient(patient),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF73F181),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 14, // Increased padding
-                                  vertical: 8, // Increased padding
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      8), // Increased radius
-                                ),
-                                elevation: 0,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.add,
-                                    size: isTablet ? 14 : 16, // Increased size
-                                    color: Colors.white,
-                                  ),
-                                  const SizedBox(width: 8), // Increased spacing
-                                  Text(
-                                    'Admit',
-                                    style: TextStyle(
-                                      fontSize:
-                                          isTablet ? 13 : 14, // Increased font
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                              width: isTablet ? 16 : 20), // Increased spacing
+          )),
 
-                          // Discharge Button
-                          SizedBox(
-                            width: isTablet ? 120 : 130, // Increased width
-                            height: 32, // Increased height
-                            child: ElevatedButton(
-                              onPressed: () => _dischargePatient(patient),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF5EBFFF),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 14, // Increased padding
-                                  vertical: 8, // Increased padding
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      8), // Increased radius
-                                ),
-                                elevation: 0,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.exit_to_app,
-                                    size: isTablet ? 14 : 16, // Increased size
-                                    color: Colors.white,
-                                  ),
-                                  const SizedBox(width: 8), // Increased spacing
-                                  Text(
-                                    'Discharge',
-                                    style: TextStyle(
-                                      fontSize:
-                                          isTablet ? 13 : 14, // Increased font
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          }).toList(),
+          _cell(AppText(tele.reason)),
+
+          _cell(Row(
+            children: [
+              AppButton(
+                text: 'Accept',
+                icon: Icons.check,
+                backgroundColor: AppColors.info,
+                onPressed: () {},
+              ),
+              const SizedBox(width: 10),
+              AppButton(
+                text: 'Reject',
+                icon: Icons.cancel_outlined,
+                backgroundColor: AppColors.error,
+                onPressed: () {},
+              ),
+            ],
+          )),
+        ],
+      );
+    }).toList();
+  }
+
+  TableRow _emptyRow() {
+    return TableRow(
+      children: List.generate(
+        columns.length,
+        (_) => const Padding(
+          padding: EdgeInsets.all(20),
+          child: Center(child: Text('No patients found')),
         ),
       ),
     );
+  }
+
+  Widget _cell(Widget child) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: child,
+    );
+  }
+
+  Widget _buildActions(PatientModel patient, PatientTabType tabType) {
+    switch (tabType) {
+      case PatientTabType.opd:
+        return Row(
+          children: [
+            AppButton(
+              onPressed: () {
+                assignedPatientsControllers.makeAdmitRequest(patientMongoId: patient.id);
+              },
+              text: 'Admit',
+              icon: Icons.arrow_forward,
+              backgroundColor: Colors.greenAccent,
+            ),
+            const SizedBox(width: 10),
+            AppButton(
+              onPressed: () {
+                assignedPatientsControllers.makeDischargeRequest(patientMongoId: patient.id);
+              },
+              text: 'Discharge',
+              icon: Icons.arrow_back,
+              backgroundColor: AppColors.info,
+            ),
+          ],
+        );
+
+      case PatientTabType.ipd:
+        return Row(
+          children: [
+            AppButton(
+              onPressed: () {
+                assignedPatientsControllers.makeDischargeRequest(patientMongoId: patient.id);
+              },
+              text: 'Discharge',
+              icon: Icons.arrow_back,
+              backgroundColor: AppColors.info,
+            ),
+          ],
+        );
+
+      case PatientTabType.teleconsultation:
+        return Row(
+          children: [
+            AppButton(
+              onPressed: () {
+
+              },
+              text: 'Accept',
+              icon: Icons.check,
+              backgroundColor: AppColors.info,
+            ),
+            const SizedBox(width: 10),
+            AppButton(
+              onPressed: () {
+                
+              },
+              text: 'Reject',
+              icon: Icons.cancel_outlined,
+              backgroundColor: AppColors.error,
+            ),
+          ],
+        );
+    }
   }
 
   Widget _buildMobilePatientsList() {
@@ -917,7 +733,7 @@ class _OpdIpdAppointmentsState extends State<OpdIpdAppointments> {
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF73F181).withOpacity(0.1),
+                    color: const Color(0xFF73F181).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -1036,7 +852,7 @@ class _OpdIpdAppointmentsState extends State<OpdIpdAppointments> {
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF5EBFFF).withOpacity(0.1),
+                    color: const Color(0xFF5EBFFF).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(

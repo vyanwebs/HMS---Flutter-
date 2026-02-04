@@ -167,7 +167,7 @@ class LaboratoryDashboard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: AppColors.laboratory.withOpacity(0.1),
+          backgroundColor: AppColors.laboratory.withValues(alpha: 0.1),
           child: Icon(Icons.science, color: AppColors.laboratory),
         ),
         title: Text(testName),
@@ -190,7 +190,7 @@ class LaboratoryDashboard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: resultColor.withOpacity(0.1),
+          backgroundColor: resultColor.withValues(alpha: 0.1),
           child: Icon(
             result == 'Normal' ? Icons.check_circle : Icons.warning,
             color: resultColor,
@@ -201,9 +201,9 @@ class LaboratoryDashboard extends StatelessWidget {
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: resultColor.withOpacity(0.1),
+            color: resultColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: resultColor.withOpacity(0.3)),
+            border: Border.all(color: resultColor.withValues(alpha: 0.3)),
           ),
           child: Text(
             result,

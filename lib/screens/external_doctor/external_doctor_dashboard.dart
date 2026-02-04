@@ -35,7 +35,7 @@ class ExternalDoctorDashboard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AppColors.externalDoctor.withOpacity(0.1),
+                color: AppColors.externalDoctor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -194,7 +194,7 @@ class ExternalDoctorDashboard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: AppColors.externalDoctor.withOpacity(0.1),
+          backgroundColor: AppColors.externalDoctor.withValues(alpha: 0.1),
           child: Icon(Icons.notifications, color: AppColors.externalDoctor),
         ),
         title: Text(title),

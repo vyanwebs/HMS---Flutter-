@@ -78,6 +78,7 @@ class _AppButtonState extends State<AppButton> {
                 )
               : Row(
                   mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     if (widget.icon != null && !widget.iconIsLast) ...[
                       Icon(widget.icon, size: widget.iconSize, color: widget.textColor),
@@ -85,6 +86,7 @@ class _AppButtonState extends State<AppButton> {
                     ],
                     Text(
                       widget.text,
+                      overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.poppins(
                         fontSize: widget.fontSize,
                         fontWeight: FontWeight.w600,

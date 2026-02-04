@@ -770,7 +770,7 @@ class _NewAppointmentScreenState extends State<NewAppointmentScreen> {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: _selectedPatientType == type
-              ? color.withOpacity(0.1)
+              ? color.withValues(alpha: 0.1)
               : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
@@ -870,7 +870,7 @@ class _NewAppointmentScreenState extends State<NewAppointmentScreen> {
           color: isSelected ? const Color(0xFF4299E1) : const Color(0xFFE2E8F0),
         ),
         backgroundColor: isSelected
-            ? const Color(0xFF4299E1).withOpacity(0.1)
+            ? const Color(0xFF4299E1).withValues(alpha: 0.1)
             : Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 12),
       ),

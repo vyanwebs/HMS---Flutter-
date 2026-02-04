@@ -1,13 +1,9 @@
-import 'package:device_preview/device_preview.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hms/screens/splash_screen.dart';
-import 'package:hms/screens/main_dashboard.dart';
-import 'package:hms/screens/module_login_screen.dart';
-import 'package:hms/screens/doctor/doctor_dashboard.dart';
-import 'package:hms/screens/reception/reception_dashboard.dart';
-import 'package:hms/utils/constants.dart';
+
+import 'controllers/panel_navigation_controller.dart';
+import 'screens/splash_screen.dart';
+import 'utils/constants.dart';
 
 // void main() => runApp(
 //   DevicePreview(
@@ -17,6 +13,7 @@ import 'package:hms/utils/constants.dart';
 // );
 
 void main() {
+  Get.put(PanelNavigationController(), permanent: true);
   runApp(const MyApp());
 }
 
@@ -32,6 +29,7 @@ class MyApp extends StatelessWidget {
       // locale: DevicePreview.locale(context),
       // builder: DevicePreview.appBuilder,
       theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.info),
         primaryColor: AppColors.primary,
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: AppColors.background,
@@ -81,14 +79,7 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const SplashScreen(),
-        '/mainDashboard': (context) => const MainDashboard(),
-        '/moduleLogin': (context) => const ModuleLoginScreen(module: 'Doctor'),
-        '/doctorDashboard': (context) => const DoctorDashboard(),
-        '/receptionDashboard': (context) => const ReceptionDashboard(),
-      },
+      home: const SplashScreen(),
     );
   }
 }
