@@ -15,9 +15,16 @@ import '../../utils/enums.dart';
 import '../../utils/images.dart';
 import '../../utils/keyboard_intents.dart';
 import '../../utils/text.dart';
+import '../../utils/validators.dart';
 import '../main_dashboard.dart';
+import 'monitoring/patient_details_Symptoms.dart';
+import 'monitoring/patient_details_consultation.dart';
+import 'monitoring/patient_details_diagnosis.dart';
+import 'monitoring/patient_details_followup.dart';
+import 'monitoring/patient_details_prescription.dart';
+import 'patient_certificate_screen.dart';
 import 'patient_details_investigation.dart';
-import 'patient_details_monitoring.dart';
+import 'monitoring/patient_details_vitals_monitoring.dart';
 import 'patient_details_surgical_notes.dart';
 import 'patient_details_treatment.dart';
 
@@ -54,15 +61,25 @@ class PatientDetails extends StatelessWidget {
           ),
         ],
       ),
-      floatingActionButton: Container(
-        margin: const EdgeInsets.only(top: 100),
-        child: FloatingActionButton(
-          onPressed: () {},
-          backgroundColor: AppColors.info,
-          child: const Icon(Icons.note_alt_outlined, color: Colors.white,),
-          
-        ),
-      ),
+      floatingActionButton: Obx(() {
+        final show = patientDetailsController.selectedMenu.value == PatientDetailsMenu.overview;
+
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          child: show
+            ? Container(
+                key: const ValueKey("overviewFab"),
+                margin: const EdgeInsets.only(top: 100),
+                child: FloatingActionButton(
+                  onPressed: () {},
+                  backgroundColor: AppColors.info,
+                  child: const Icon(Icons.note_alt_outlined,
+                      color: Colors.white),
+                ),
+              )
+            : const SizedBox.shrink(),
+        );
+      }),
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
     );
   }
@@ -102,6 +119,7 @@ class PatientDetails extends StatelessWidget {
             ),
           ],
         ),
+        const SizedBox(height: 10),
       ],
     );
   }
@@ -139,13 +157,11 @@ class PatientDetails extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              const AppText(
                 'Docnex',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2D3748),
-                ),
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2D3748),
               ),
             ],
           ),
@@ -173,11 +189,87 @@ class PatientDetails extends StatelessWidget {
           menu: PatientDetailsMenu.overview,
           icon: Icons.description_outlined,
         ),
-        _sideItem(
-          title: 'Monitoring',
-          menu: PatientDetailsMenu.monitoring,
-          icon: Icons.monitor_heart_outlined,
-        ),
+        /// MONITORING (Expandable)
+        Obx(() {
+          final isExpanded = patientDetailsController.isMonitoringExpanded.value;
+          final isAnyMonitoringSelected = patientDetailsController.selectedMenu.value.toString().contains('monitoring');
+
+          return Column(
+            children: [
+              InkWell(
+                onTap: () => patientDetailsController.toggleMonitoring(),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: isAnyMonitoringSelected
+                        ? AppColors.info.withValues(alpha: 0.15)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.monitor_heart_outlined,
+                        color: isAnyMonitoringSelected
+                            ? AppColors.info
+                            : Colors.grey,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: AppText(
+                          "Monitoring",
+                          color: isAnyMonitoringSelected
+                            ? AppColors.info
+                            : Colors.black87,
+                        ),
+                      ),
+                      Icon(
+                        isExpanded
+                          ? Icons.keyboard_arrow_up
+                          : Icons.keyboard_arrow_down,
+                        size: 20,
+                        color: Colors.grey,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              /// SUB MENU
+              if (isExpanded)
+                _monitoringSubItem(
+                  title: "Vitals",
+                  menu: PatientDetailsMenu.monitoringVitals,
+                ),
+              if (isExpanded)
+                _monitoringSubItem(
+                  title: "Symptoms",
+                  menu: PatientDetailsMenu.monitoringSymptoms,
+                ),
+              if (isExpanded)
+                _monitoringSubItem(
+                  title: "Follow ups",
+                  menu: PatientDetailsMenu.monitoringFollowUps,
+                ),
+              if (isExpanded)
+                _monitoringSubItem(
+                  title: "Prescription",
+                  menu: PatientDetailsMenu.monitoringPrescription,
+                ),
+              if (isExpanded)
+                _monitoringSubItem(
+                  title: "Consultation",
+                  menu: PatientDetailsMenu.monitoringConsultation,
+                ),
+              if (isExpanded)
+                _monitoringSubItem(
+                  title: "Diagnosis",
+                  menu: PatientDetailsMenu.monitoringDiagnosis,
+                ),
+            ],
+          );
+        }),
         _sideItem(
           title: 'Treatment',
           menu: PatientDetailsMenu.treatment,
@@ -206,7 +298,6 @@ class PatientDetails extends StatelessWidget {
           ),
           child: Column(
             children: [
-              // Simple logout button
               InkWell(
                 onTap: () => Get.back(),
                 child: const Padding(
@@ -231,6 +322,45 @@ class PatientDetails extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Widget _monitoringSubItem({
+    required String title,
+    required PatientDetailsMenu menu,
+  }) {
+    return Obx(() {
+      final isSelected = patientDetailsController.selectedMenu.value == menu;
+
+      return InkWell(
+        onTap: () => patientDetailsController.select(menu),
+        child: Container(
+          margin: const EdgeInsets.only(left: 28, right: 8, top: 2, bottom: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: isSelected
+              ? AppColors.info.withValues(alpha: 0.2)
+              : Colors.transparent,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.circle,
+                size: 6,
+                color: isSelected ? AppColors.info : Colors.grey,
+              ),
+              const SizedBox(width: 10),
+              AppText(
+                title,
+                fontSize: 13,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                color: isSelected ? AppColors.info : Colors.black87,
+              ),
+            ],
+          ),
+        ),
+      );
+    });
   }
 
   Widget _sideItem({
@@ -280,11 +410,26 @@ class PatientDetails extends StatelessWidget {
         case PatientDetailsMenu.overview:
           return _overviewContent(context);
 
-        case PatientDetailsMenu.monitoring:
-          return const PatientDetailsMonitoring();
+        case PatientDetailsMenu.monitoringVitals:
+          return PatientDetailsVitalsMonitoring(patient: patient);
+
+        case PatientDetailsMenu.monitoringSymptoms:
+          return const PatientDetailsSymptoms();
+
+        case PatientDetailsMenu.monitoringFollowUps:
+          return const PatientDetailsFollowUps();
+
+        case PatientDetailsMenu.monitoringPrescription:
+          return PatientDetailsPrescription(patient: patient);
+
+        case PatientDetailsMenu.monitoringConsultation:
+          return const PatientDetailsConsultation();
+
+        case PatientDetailsMenu.monitoringDiagnosis:
+          return PatientDetailsDiagnosis(patient: patient);
 
         case PatientDetailsMenu.treatment:
-          return const PatientDetailsTreatment();
+          return PatientDetailsTreatment(patient: patient,);
 
         case PatientDetailsMenu.investigation:
           return const PatientDetailsInvestigation();
@@ -332,7 +477,7 @@ class PatientDetails extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
                 AppText(
-                  "ID: ${patient.id} : Age-${patient.age} : ${patient.gender}",
+                  "ID: ${patient.patientId} : Age-${patient.age} : ${patient.gender}",
                   fontSize: 12,
                   color: AppColors.greyText,
                 )
@@ -574,9 +719,7 @@ class PatientDetails extends StatelessWidget {
           ),
           label: "Certificate",
           color: Colors.green,
-          onTap: () {
-            debugPrint("Certificates clicked");
-          },
+          onTap: () => Get.to(() => CertificateScreen(patient: patient)),
         ),
 
         actionItem(
@@ -744,7 +887,7 @@ class PatientDetails extends StatelessWidget {
                 }
                 return null;
               },
-              onFieldSubmitted: (_) => submit(), // ✅ ENTER KEY
+              onFieldSubmitted: (_) => submit(),
               decoration: InputDecoration(
                 hintText: hintText,
                 hintStyle: TextStyle(color: Colors.grey.shade400),
@@ -787,7 +930,7 @@ class PatientDetails extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(6),
         onTap: () {
-          controller.text = label;          // ✅ set text
+          controller.text = label;
           controller.selection = TextSelection.fromPosition(
             TextPosition(offset: controller.text.length),
           ); // cursor at end
@@ -816,9 +959,9 @@ class PatientDetails extends StatelessWidget {
       chips: [
         "Fever",
         "Chills / Rigors",
-        "Fever",
-        "Chills / Rigors",
         "Fatigue",
+        "Headache",
+        "Body pain",
       ],
       onButtonTap: () {
 
@@ -913,199 +1056,317 @@ class PatientDetails extends StatelessWidget {
     );
   } 
 
+  final FocusNode medicineFocus = FocusNode();
+  final FocusNode durationFocus = FocusNode();
+  final FocusNode commentFocus = FocusNode();
+
   Widget prescriptionCard() {
-    final morningCtrl = TextEditingController(text: "0");
-    final afternoonCtrl = TextEditingController(text: "0");
-    final nightCtrl = TextEditingController(text: "0");
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(12),
+    final formKey = GlobalKey<FormState>();
+    final controller = patientDetailsController;
+
+    return FocusTraversalGroup(
+      policy: OrderedTraversalPolicy(),
+      child: Shortcuts(
+        shortcuts: {
+          LogicalKeySet(LogicalKeyboardKey.enter): const ActivateIntent(),
+        },
+        child: Actions(
+          actions: {
+            ActivateIntent: CallbackAction<ActivateIntent>(
+              onInvoke: (_) {
+                _submitPrescription(
+                  formKey: formKey,
+                  controller: controller,
+                );
+                return null;
+              },
+            ),
+          },
+          child: Form(
+            key: formKey,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ---------------- Frequently used medicines ----------------
+                  const AppText(
+                    "Frequently used medicines",
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  const SizedBox(height: 10),
+          
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: controller.frequentlyUsedMedicines.map((e) => lightChip(e)).toList(),
+                  ),
+          
+                  const SizedBox(height: 20),
+          
+                  // ---------------- Prescription details ----------------
+                  const AppText(
+                    "Prescription details",
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+          
+                  const SizedBox(height: 14),
+          
+                  // ---------------- Medicine search ----------------
+                  const AppText(
+                    "Selected medicine",
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  const SizedBox(height: 8),
+          
+                  TextFormField(
+                    controller: controller.medicineCtrl,
+                    textInputAction: TextInputAction.next,
+                    onChanged: (v) {
+                      controller.medicineError.value = null;
+                      controller.searchMedicine(v);
+                    },
+                    validator: (_) => null,
+                    decoration: InputDecoration(
+                      hintText: "Search medicine (min 3 characters)",
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.grey.shade300),
+                      ),
+                    ),
+                  ),
+          
+                  Obx(() {
+                    final error = controller.medicineError.value;
+                    if (error == null) return const SizedBox();
+                    return AppText(error, fontSize: 12, color: Colors.red);
+                  }),
+          
+                  // ---------------- Medicine dropdown ----------------
+                  Obx(() {
+                    if (controller.isMedicineLoading.value) {
+                      return const Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      );
+                    }
+          
+                    if (controller.medicines.isEmpty) return const SizedBox();
+          
+                    return Column(
+                      children: [
+                        const SizedBox(height: 6),
+                        Container(
+                          constraints: const BoxConstraints(maxHeight: 200),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey.shade300),
+                          ),
+                          child: ListView.separated(
+                            itemCount: controller.medicines.length,
+                            separatorBuilder: (_, __) => const Divider(height: 1),
+                            itemBuilder: (_, index) {
+                              final med = controller.medicines[index];
+                              return ListTile(
+                                dense: true,
+                                title: Text(med.name),
+                                onTap: () {
+                                  controller.medicineCtrl.text = med.name;
+                                  controller.selectMedicine(med);
+                                  FocusScope.of(Get.context!).unfocus();
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+          
+                  const SizedBox(height: 14),
+          
+                  // ---------------- Dosage ----------------
+                  const AppText(
+                    "Dosage information",
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  const SizedBox(height: 12),
+          
+                  Row(
+                    children: [
+                      Expanded(
+                        child: dosageBox(
+                          title: "Morning",
+                          controller: controller.morningCtrl,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: dosageBox(
+                          title: "Afternoon",
+                          controller: controller.afternoonCtrl,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: dosageBox(
+                          title: "Night",
+                          controller: controller.nightCtrl,
+                        ),
+                      ),
+                    ],
+                  ),
+          
+                  Obx(() {
+                    final error = controller.dosageError.value;
+                    if (error == null) return const SizedBox();
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: AppText(error, fontSize: 12, color: Colors.red),
+                    );
+                  }),
+          
+                  const SizedBox(height: 14),
+          
+                  // ---------------- Meal timing ----------------
+                  Obx(() => Row(
+                    children: [
+                      mealButton(
+                        text: "Before meal",
+                        selected: controller.isBeforeMeal.value,
+                        onTap: controller.selectBeforeMeal,
+                      ),
+                      const SizedBox(width: 10),
+                      mealButton(
+                        text: "After meal",
+                        selected: !controller.isBeforeMeal.value,
+                        onTap: controller.selectAfterMeal,
+                      ),
+                    ],
+                  )),
+          
+                  const SizedBox(height: 20),
+          
+                  // ---------------- Duration ----------------
+                  const AppText("Duration", fontSize: 13, fontWeight: FontWeight.w500),
+                  const SizedBox(height: 8),
+          
+                  TextFormField(
+                    controller: controller.durationCtrl,
+                    textInputAction: TextInputAction.done,
+                    validator: (v) {
+                      if (v == null || v.isEmpty) {
+                        return "Duration is required";
+                      }
+                      final days = int.tryParse(v);
+                      if (days == null) {
+                        return "Enter valid days";
+                      }
+                      if (days <= 0) {
+                        return "Duration must be at least 1 day";
+                      }
+                      if (days > 365) {
+                        return "Duration cannot exceed 365 days";
+                      }
+                      return null;
+                    },
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                    onFieldSubmitted: (_) {
+                      _submitPrescription(
+                        formKey: formKey,
+                        controller: controller,
+                      );
+                    },
+                    decoration: InputDecoration(
+                      hintText: "Enter duration",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+          
+                  const SizedBox(height: 16),
+          
+                  // ---------------- Comment ----------------
+                  const AppText("Add comment", fontSize: 13),
+                  const SizedBox(height: 8),
+          
+                  TextFormField(
+                    controller: controller.commentCtrl,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      hintText: "Enter Comments",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+          
+                  const SizedBox(height: 20),
+          
+                  // ---------------- Submit ----------------
+                  Center(
+                    child: SizedBox(
+                      width: 200,
+                      child: AppButton(
+                        text: "Add prescription",
+                        onPressed: () {
+                          _submitPrescription(
+                            formKey: formKey,
+                            controller: controller,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// Frequently used medicines
-          const AppText(
-            "Frequently used medicines",
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
-          const SizedBox(height: 10),
+    );
+  }
 
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: patientDetailsController.frequentlyUsedMedicines.map((e) => lightChip(e)).toList(),
-          ),
+  void _submitPrescription({
+    required GlobalKey<FormState> formKey,
+    required PatientDetailsControllers controller,
+  }) {
+    if (controller.selectedMedicine.value == null) {
+      controller.medicineError.value = "Please select a medicine from the list";
+      return;
+    }
 
-          const SizedBox(height: 20),
+    final m = int.tryParse(controller.morningCtrl.text) ?? 0;
+    final a = int.tryParse(controller.afternoonCtrl.text) ?? 0;
+    final n = int.tryParse(controller.nightCtrl.text) ?? 0;
 
-          /// Prescription details
-          const AppText(
-            "Prescription details",
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-          ),
+    final formValid = formKey.currentState!.validate();
+    final dosageValid = controller.validateDosage(m, a, n);
 
-          const SizedBox(height: 14),
+    if (!formValid || !dosageValid) return;
 
-          /// Selected medicine
-          const AppText(
-            "Selected medicine",
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-          ),
-          const SizedBox(height: 8),
-
-          TextFormField(
-            textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-              hintText: "Enter Medicine name",
-              hintStyle: TextStyle(color: Colors.grey.shade400),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.grey.shade300),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 18),
-
-          /// Dosage information
-          const AppText(
-            "Dosage information",
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-          ),
-
-          const SizedBox(height: 12),
-
-          Row(
-            children: [
-              Expanded(child: dosageBox(title: "Morning", controller: morningCtrl)),
-              const SizedBox(width: 10),
-              Expanded(child: dosageBox(title: "Afternoon", controller: afternoonCtrl)),
-              const SizedBox(width: 10),
-              Expanded(child: dosageBox(title: "Night", controller: nightCtrl)),
-            ],
-          ),
-
-          const SizedBox(height: 14),
-
-          /// Meal timing
-          Obx(
-            () => Row(
-              children: [
-                mealButton(
-                  text: "Before meal",
-                  selected: patientDetailsController.isBeforeMeal.value,
-                  onTap: patientDetailsController.selectBeforeMeal,
-                ),
-                const SizedBox(width: 10),
-                mealButton(
-                  text: "After meal",
-                  selected: !patientDetailsController.isBeforeMeal.value,
-                  onTap: patientDetailsController.selectAfterMeal,
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          /// Duration
-          const AppText(
-            "Duration",
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-          ),
-          const SizedBox(height: 8),
-
-          TextFormField(
-            textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-              hintText: "Enter duration",
-              hintStyle: TextStyle(color: Colors.grey.shade400),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.grey.shade300),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          /// Add comment
-          const AppText(
-            "Add comment",
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-          ),
-          const SizedBox(height: 8),
-
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: Colors.grey.shade300,
-                style: BorderStyle.solid,
-              ),
-            ),
-            child: TextFormField(
-              maxLines: 3,
-              decoration: InputDecoration(
-                hintText: "Enter specific prescription comment",
-                hintStyle: TextStyle(color: Colors.grey.shade400),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.all(12),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          /// Add prescription button
-          Center(
-            child: SizedBox(
-              width: 200,
-              child: AppButton(
-                text: "Add prescription",
-                onPressed: () {
-                  // TODO: controller.addPrescription()
-                },
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                borderRadius: 8,
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          /// Current prescription
-          const AppText(
-            "Current prescription",
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
-
-          const SizedBox(height: 12),
-
-          currentPrescriptionItem(),
-
-        ],
-      ),
+    controller.createPrescription(
+      patientMongoId: patient.id,
+      morningQty: m,
+      afternoonQty: a,
+      nightQty: n,
     );
   }
 
@@ -1420,9 +1681,11 @@ class AddVitalDialog extends StatelessWidget {
               ),
               const SizedBox(height: 6),
 
-              _input(
+              _bpInput(
                 label: 'BP',
                 controller: patientDetailsController.bpCtrl,
+                inputFormatters: [BPInputFormatter()],
+                validator: bpValidator,
               ),
 
               const SizedBox(height: 16),
@@ -1433,13 +1696,19 @@ class AddVitalDialog extends StatelessWidget {
                     child: _input(
                       label: 'Pulse',
                       controller: patientDetailsController.pulseCtrl,
+                      isNumeric: true,
+                      min: 20,
+                      max: 250,
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: _input(
-                      label: 'Temperature',
+                      label: 'Temperature (°F)',
                       controller: patientDetailsController.tempCtrl,
+                      isNumeric: true,
+                      min: 80,
+                      max: 115,
                     ),
                   ),
                 ],
@@ -1450,6 +1719,9 @@ class AddVitalDialog extends StatelessWidget {
               _input(
                 label: 'SpO₂',
                 controller: patientDetailsController.spo2Ctrl,
+                isNumeric: true,
+                min: 50,
+                max: 100,
                 isLast: true,
                 onSubmit: _submitForm,
               ),
@@ -1481,14 +1753,15 @@ class AddVitalDialog extends StatelessWidget {
     );
   }
 
-  Widget _input(
-    {
-      required String label,
-      required TextEditingController controller,
-      bool isLast = false,
-      VoidCallback? onSubmit,
-    }
-  ) {
+  Widget _input({
+    required String label,
+    required TextEditingController controller,
+    bool isLast = false,
+    VoidCallback? onSubmit,
+    bool isNumeric = false,
+    double? min,
+    double? max,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1500,12 +1773,29 @@ class AddVitalDialog extends StatelessWidget {
         const SizedBox(height: 6),
         TextFormField(
           controller: controller,
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return '$label is required';
-            }
-            return null;
-          },
+          keyboardType: isNumeric
+              ? const TextInputType.numberWithOptions(decimal: true)
+              : TextInputType.text,
+          inputFormatters: isNumeric
+              ? [
+                  FilteringTextInputFormatter.allow(
+                    RegExp(r'^\d*\.?\d*$'),
+                  ),
+                ]
+              : [],
+          validator: isNumeric
+              ? (value) => doubleValidator(
+                    value,
+                    label: label,
+                    min: min,
+                    max: max,
+                  )
+              : (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return '$label is required';
+                  }
+                  return null;
+                },
           onFieldSubmitted: (_) {
             if (isLast) {
               onSubmit?.call();
@@ -1515,7 +1805,8 @@ class AddVitalDialog extends StatelessWidget {
           },
           decoration: InputDecoration(
             hintText: label,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -1527,6 +1818,70 @@ class AddVitalDialog extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Widget _bpInput({
+    required String label,
+    required TextEditingController controller,
+    List<TextInputFormatter>? inputFormatters,
+    String? Function(String?)? validator,
+    bool isLast = false,
+    VoidCallback? onSubmit,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppText(label, fontSize: 12, fontWeight: FontWeight.w500),
+        const SizedBox(height: 6),
+        TextFormField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          inputFormatters: inputFormatters,
+          validator: validator ??
+              (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return '$label is required';
+                }
+                return null;
+              },
+          onFieldSubmitted: (_) {
+            if (isLast) {
+              onSubmit?.call();
+            } else {
+              FocusScope.of(Get.context!).nextFocus();
+            }
+          },
+          decoration: InputDecoration(
+            hintText: 'e.g. 120/80',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class BPInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final text = newValue.text;
+
+    // Allow only digits and /
+    if (!RegExp(r'^[0-9/]*$').hasMatch(text)) {
+      return oldValue;
+    }
+
+    // Allow only one /
+    if ('/'.allMatches(text).length > 1) {
+      return oldValue;
+    }
+
+    return newValue;
   }
 }
 

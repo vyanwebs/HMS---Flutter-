@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../../controllers/teleconsultation_controllers.dart';
+import '../../models/teleconsultation_model.dart';
+import '../../utils/buttons.dart';
+import '../../utils/text.dart';
+import '../../widgets/doctor_panel/stat_card_widget.dart';
 
 class Telecommunication extends StatelessWidget {
-  const Telecommunication({super.key});
+  Telecommunication({super.key});
+
+  final teleController = Get.put(TeleconsultationControllers());
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +24,6 @@ class Telecommunication extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Main Content Area
             Expanded(
               child: _buildMainContent(isMobile, isTablet),
             ),
@@ -58,55 +67,70 @@ class Telecommunication extends StatelessWidget {
       children: [
         // Header with breadcrumb
         if (!isMobile)
-          const Text(
+          const AppText(
             'DOCTOR PANEL >> Teleconsultation',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF718096),
-            ),
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF718096),
           ),
 
         if (isMobile)
-          const Text(
+          const AppText(
             'Teleconsultation',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF718096),
-            ),
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF718096),
           ),
 
+        const SizedBox(height: 20),
+        // Stats Cards
+        Obx(() => teleconsultationStatCard(isMobile: isMobile)),
         const SizedBox(height: 20),
 
         // Title Section
-        const Text(
-          'Teleconsultation',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF2D3748),
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AppText(
+                  'Teleconsultation',
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF2D3748),
+                ),
+                SizedBox(height: 4),
+                AppText(
+                  'Video and audio consultations with patients',
+                  fontSize: 14,
+                  color: Color(0xFF718096),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                outlinedButton(
+                  text: "Add consult",
+                  icon: Icons.add,
+                  onPressed: () {},
+                ),
+                const SizedBox(width: 12),
+                AppButton(
+                  text: "Schedule new",
+                  backgroundColor: const Color(0xFF2383E2),
+                  onPressed: () {},
+                ),
+              ],
+            ),
+          ],
         ),
-        const SizedBox(height: 4),
-        const Text(
-          'Video and audio consultations with patients',
-          style: TextStyle(
-            fontSize: 14,
-            color: Color(0xFF718096),
-          ),
-        ),
-        const SizedBox(height: 20),
-
-        // Stats Cards
-        _buildStatsCards(isMobile, isTablet),
         const SizedBox(height: 20),
 
         // Main Content
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Left Column - Today's Consultations
             Expanded(
               flex: isMobile ? 1 : 4,
               child: Container(
@@ -125,18 +149,37 @@ class Telecommunication extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    const AppText(
                       "Today's Consultation",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF2D3748),
-                      ),
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2D3748),
                     ),
                     const SizedBox(height: 16),
-                    _consultTile(ongoing: true),
-                    _consultTile(),
-                    _consultTile(),
+                    Obx(() {
+                      if (teleController.isLoading.value) {
+                        return const Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
+
+                      if (teleController.todaysTeleconsultations.isEmpty) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 20),
+                          child: AppText(
+                            'No consultations today',
+                            color: Color(0xFF718096),
+                          ),
+                        );
+                      }
+
+                      return Column(
+                        children: teleController.todaysTeleconsultations.map(
+                          (consultation) =>_consultTile(model: consultation)
+                        ).toList(),
+                      );
+                    }),
                   ],
                 ),
               ),
@@ -165,30 +208,26 @@ class Telecommunication extends StatelessWidget {
                         ],
                       ),
                       alignment: Alignment.center,
-                      child: Column(
+                      child: const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
                           Icon(
                             Icons.videocam_off,
                             size: 60,
                             color: Color(0xFFCBD5E0),
                           ),
                           SizedBox(height: 12),
-                          Text(
+                          AppText(
                             'No active consultation',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: Color(0xFF2D3748),
-                            ),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Color(0xFF2D3748),
                           ),
                           SizedBox(height: 8),
-                          Text(
+                          AppText(
                             'Select a patient to start consultation',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Color(0xFF718096),
-                            ),
+                            fontSize: 14,
+                            color: Color(0xFF718096),
                           ),
                         ],
                       ),
@@ -219,13 +258,11 @@ class Telecommunication extends StatelessWidget {
                               color: const Color(0xFF2383E2),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: const Text(
+                            child: const AppText(
                               'Chat & Notes',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -246,16 +283,13 @@ class Telecommunication extends StatelessWidget {
                                     hintText: 'Type a message',
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
-                                      borderSide: const BorderSide(
-                                          color: Color(0xFFE2E8F0)),
+                                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
-                                      borderSide: const BorderSide(
-                                          color: Color(0xFF2383E2)),
+                                      borderSide: const BorderSide(color: Color(0xFF2383E2)),
                                     ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 12),
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                                   ),
                                 ),
                               ),
@@ -263,17 +297,16 @@ class Telecommunication extends StatelessWidget {
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF2383E2),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 12),
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
                                 onPressed: () {},
                                 icon: const Icon(Icons.send, size: 16),
-                                label: const Text(
+                                label: const AppText(
                                   'Send',
-                                  style: TextStyle(fontSize: 14),
+                                  fontSize: 14,
                                 ),
                               )
                             ],
@@ -313,13 +346,11 @@ class Telecommunication extends StatelessWidget {
                     color: const Color(0xFF2383E2),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Text(
+                  child: const AppText(
                     'Chat & Notes',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                    ),
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -340,16 +371,13 @@ class Telecommunication extends StatelessWidget {
                           hintText: 'Type a message',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
-                            borderSide:
-                                const BorderSide(color: Color(0xFFE2E8F0)),
+                            borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
-                            borderSide:
-                                const BorderSide(color: Color(0xFF2383E2)),
+                            borderSide: const BorderSide(color: Color(0xFF2383E2)),
                           ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 12),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         ),
                       ),
                     ),
@@ -357,17 +385,16 @@ class Telecommunication extends StatelessWidget {
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2383E2),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
                       onPressed: () {},
                       icon: const Icon(Icons.send, size: 16),
-                      label: const Text(
+                      label: const AppText(
                         'Send',
-                        style: TextStyle(fontSize: 14),
+                        fontSize: 14,
                       ),
                     )
                   ],
@@ -380,198 +407,39 @@ class Telecommunication extends StatelessWidget {
     );
   }
 
-  // ===================== STATS CARDS =====================
+  String _formatTime(DateTime dateTime) {
+    final hour = dateTime.hour;
+    final minute = dateTime.minute.toString().padLeft(2, '0');
 
-  Widget _buildStatsCards(bool isMobile, bool isTablet) {
-    final statsData = [
-      {
-        'title': 'Total Schedule',
-        'value': '12',
-        'gradient': const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF2C7EDB), Color(0xFFE1F0FF)],
-        ),
-        'image': 'assets/images/box1.png',
-      },
-      {
-        'title': 'Today Schedule',
-        'value': '8',
-        'gradient': const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF00B894), Color(0xFFE3FCFA)],
-        ),
-        'image': 'assets/images/box2.png',
-      },
-      {
-        'title': 'Completed',
-        'value': '4',
-        'gradient': const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF00C9C9), Color(0xFFDFFFFF)],
-        ),
-        'image': 'assets/images/box3.png',
-      },
-      {
-        'title': 'Cancelled',
-        'value': '0',
-        'gradient': const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF00B83B), Color(0xFFECFEEE)],
-        ),
-        'image': 'assets/images/box4.png',
-      },
-    ];
+    final isAM = hour < 12;
+    final formattedHour = hour == 0
+        ? 12
+        : hour > 12
+            ? hour - 12
+            : hour;
 
-    if (isMobile) {
-      return Column(
-        children: statsData.map((stat) {
-          return Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            child: _buildStatCard(
-              title: stat['title'] as String,
-              value: stat['value'] as String,
-              gradient: stat['gradient'] as Gradient,
-              imagePath: stat['image'] as String,
-              isMobile: true,
-            ),
-          );
-        }).toList(),
-      );
-    }
-
-    return Row(
-      children: statsData.map((stat) {
-        return Expanded(
-          child: Container(
-            margin: const EdgeInsets.only(right: 10),
-            child: _buildStatCard(
-              title: stat['title'] as String,
-              value: stat['value'] as String,
-              gradient: stat['gradient'] as Gradient,
-              imagePath: stat['image'] as String,
-              isMobile: false,
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildStatCard({
-    required String title,
-    required String value,
-    required Gradient gradient,
-    required String imagePath,
-    required bool isMobile,
-  }) {
-    return Container(
-      height: 140,
-      padding: const EdgeInsets.all(0),
-      decoration: BoxDecoration(
-        gradient: gradient,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Stack(
-        children: [
-          // Background Image - Adjusted size and position
-          Positioned(
-            right: 0,
-            bottom: 0,
-            child: _buildBackgroundImage(imagePath),
-          ),
-
-          // Content - Moved to bottom with left margin
-          Positioned(
-            left: 20, // Added left margin
-            bottom: 20, // Position at bottom
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                // Value at the top
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF000000),
-                  ),
-                ),
-                const SizedBox(height: 50),
-                // Title text at the bottom
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF757575),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBackgroundImage(String imagePath) {
-    return SizedBox(
-      width: 120,
-      height: 90,
-      child: Image.asset(
-        imagePath,
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            width: 120,
-            height: 90,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Center(
-              child: Text(
-                _getImageLabel(imagePath),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  String _getImageLabel(String imagePath) {
-    if (imagePath.contains('box1')) return 'Total';
-    if (imagePath.contains('box2')) return 'Today';
-    if (imagePath.contains('box3')) return 'Completed';
-    if (imagePath.contains('box4')) return 'Cancelled';
-    return 'Image';
+    return '$formattedHour:$minute ${isAM ? 'AM' : 'PM'}';
   }
 
   // ===================== TODAY CONSULTATIONS =====================
 
-  Widget _consultTile({bool ongoing = false}) {
+  Widget _consultTile({
+    required TeleconsultationModel model,
+  }) {
+    final bool ongoing = model.status == 'ONGOING';
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: ongoing ? const Color(0xFFF0F7FF) : const Color(0xFFF7FAFC),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ================= HEADER =================
           Row(
             children: [
               Container(
@@ -581,106 +449,86 @@ class Telecommunication extends StatelessWidget {
                   color: const Color(0xFF2383E2),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Center(
-                  child: Icon(
-                    Icons.person,
-                    color: Colors.white,
-                    size: 22,
-                  ),
+                child: const Icon(
+                  Icons.person,
+                  color: Colors.white,
+                  size: 22,
                 ),
               ),
               const SizedBox(width: 12),
-              const Expanded(
-                child: Text(
-                  'John Smith',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF2D3748),
-                  ),
+              Expanded(
+                child: AppText(
+                  model.patientName,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF2D3748),
                 ),
               ),
-              if (ongoing)
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFDCFCE7),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Text(
-                    'Ongoing',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF16A34A),
-                    ),
-                  ),
+
+              // STATUS
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: ongoing
+                      ? const Color(0xFFDCFCE7)
+                      : const Color(0xFFEFF6FF),
+                  borderRadius: BorderRadius.circular(16),
                 ),
+                child: AppText(
+                  ongoing ? 'Ongoing' : 'Scheduled',
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: ongoing
+                      ? const Color(0xFF16A34A)
+                      : const Color(0xFF2563EB),
+                ),
+              ),
             ],
           ),
+
           const SizedBox(height: 8),
-          Text(
-            'Age : 45',
-            style: TextStyle(
-              fontSize: 14,
-              color: const Color(0xFF718096),
-            ),
+
+          // ================= META =================
+          AppText(
+            'Age : ${model.patientAge}',
+            fontSize: 14,
+            color: const Color(0xFF718096),
           ),
-          Text(
-            'Time : 10:00 A.M.',
-            style: TextStyle(
-              fontSize: 14,
-              color: const Color(0xFF718096),
-            ),
+          AppText(
+            'Time : ${_formatTime(model.startTime)}',
+            fontSize: 14,
+            color: const Color(0xFF718096),
           ),
+
           const SizedBox(height: 12),
+
+          // ================= ACTIONS =================
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               if (!ongoing)
-                SizedBox(
-                  width: 120,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2383E2),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      minimumSize: const Size(0, 36),
-                    ),
-                    onPressed: () {},
-                    child: const Text(
-                      'Reschedule',
-                      style:
-                          TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ),
-              if (!ongoing) const SizedBox(width: 10),
-              SizedBox(
-                width: 100,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFF56565),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    minimumSize: const Size(0, 36),
-                  ),
+                outlinedButton(
+                  text: "Reschedule",
+                  icon: Icons.schedule,
+                  fontSize: 11,
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   onPressed: () {},
-                  child: const Text(
-                    'Cancel',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                  ),
                 ),
-              ),
+
+              // ❌ CANCEL REMOVED FOR ONGOING
+              if (!ongoing) const SizedBox(width: 10),
+              if (!ongoing)
+                AppButton(
+                  text: "Cancel",
+                  icon: Icons.close,
+                  fontSize: 11,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 8),
+                  backgroundColor: const Color(0xFFEF4444),
+                  onPressed: () {},
+                ),
             ],
-          )
+          ),
         ],
       ),
     );
@@ -701,14 +549,129 @@ class Telecommunication extends StatelessWidget {
             color: isDoctor ? Colors.transparent : const Color(0xFFE2E8F0),
           ),
         ),
-        child: Text(
+        child: AppText(
           text,
-          style: TextStyle(
-            color: isDoctor ? Colors.white : const Color(0xFF2D3748),
-            fontSize: 14,
+          color: isDoctor ? Colors.white : const Color(0xFF2D3748),
+          fontSize: 14,
+        ),
+      ),
+    );
+  }
+
+  Widget outlinedButton({
+    required String text,
+    IconData? icon,
+    required VoidCallback onPressed,
+    Color color = const Color(0xFF2383E2),
+    double fontSize = 12,
+    EdgeInsets padding =
+        const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+    double borderRadius = 12,
+  }) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(borderRadius),
+        onTap: onPressed,
+        child: Container(
+          padding: padding,
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(borderRadius),
+            border: Border.all(color: color, width: 1.4),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (icon != null) ...[
+                Icon(icon, size: 16, color: color),
+                const SizedBox(width: 8),
+              ],
+              Text(
+                text,
+                style: GoogleFonts.poppins(
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                ),
+              ),
+            ],
           ),
         ),
       ),
+    );
+  }
+
+  List<Widget> _teleconsultationCards() {
+    return [
+      StatCardWidget(
+        title: 'Total Schedule',
+        value: teleController.totalSchedule.value.toString(),
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF2C7EDB), Color(0xFFE1F0FF)],
+        ),
+        imagePath: 'assets/images/box1.png',
+      ),
+      StatCardWidget(
+        title: 'Today Schedule',
+        value: teleController.todaySchedule.value.toString(),
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF00B894), Color(0xFFE3FCFA)],
+        ),
+        imagePath: 'assets/images/box2.png',
+      ),
+      StatCardWidget(
+        title: 'Completed',
+        value: teleController.completed.value.toString(),
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF00C9C9), Color(0xFFDFFFFF)],
+        ),
+        imagePath: 'assets/images/box3.png',
+      ),
+      StatCardWidget(
+        title: 'Cancelled',
+        value: teleController.cancelled.value.toString(),
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF00B83B), Color(0xFFECFEEE)],
+        ),
+        imagePath: 'assets/images/box4.png',
+      ),
+    ];
+  }
+
+  Widget teleconsultationStatCard({required bool isMobile}) {
+    if (isMobile) {
+      return Column(
+        children: _teleconsultationCards()
+            .map(
+              (card) => Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: card,
+              ),
+            )
+            .toList(),
+      );
+    }
+
+    return Row(
+      children: _teleconsultationCards()
+          .map(
+            (card) => Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: card,
+              ),
+            ),
+          )
+          .toList(),
     );
   }
 }

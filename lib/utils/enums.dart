@@ -31,22 +31,48 @@ enum DoctorPanelMenu implements PanelMenu {
   const DoctorPanelMenu(this.label);
 }
 
-enum PatientDetailsMenu implements PanelMenu {
-  overview('Overview'),
-  monitoring('Monitoring'),
-  treatment('Treatment'),
-  investigation('Investigation'),
-  surgicalNotes('Surgical notes');
-
-  @override
-  final String label;
-  const PatientDetailsMenu(this.label);
-}
-
 enum PatientTabType {
   opd,
   ipd,
   teleconsultation,
+}
+
+enum PatientDetailsMenu {
+  overview,
+
+  // Monitoring group
+  monitoringVitals,
+  monitoringSymptoms,
+  monitoringFollowUps,
+  monitoringPrescription,
+  monitoringConsultation,
+  monitoringDiagnosis,
+
+  treatment,
+  investigation,
+  surgicalNotes,
+}
+
+enum VitalsViewMode {
+  table,
+  analysis,
+}
+
+enum VitalType {
+  temperature,
+  pulse,
+  bp,
+  spo2,
+  respiration,
+  sugar,
+  weight,
+}
+
+enum TimeRange {
+  days7,
+  days14,
+  days30,
+  all,
 }
 
 enum TeleconsultationStatus {

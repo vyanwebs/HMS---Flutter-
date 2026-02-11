@@ -352,7 +352,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
           return const OpdIpdAppointments();
 
         case DoctorPanelMenu.telecommunication:
-          return const Telecommunication();
+          return Telecommunication();
 
         case DoctorPanelMenu.labResults:
           return const LabTestRequest();

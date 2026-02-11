@@ -14,7 +14,6 @@ class BroadcastView extends StatelessWidget {
   final doctorDashboardControllers = Get.find<DoctorDashboardControllers>();
   final navController = Get.find<PanelNavigationController>();
 
-
   @override
   Widget build(BuildContext context) {
     return ResponsiveLayout(

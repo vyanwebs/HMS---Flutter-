@@ -98,7 +98,7 @@ class PatientStatisticsChart extends StatelessWidget {
     );
   }
 
-  LineChartBarData _line(List<double> values, Color color) {
+  LineChartBarData _line(List<int> values, Color color) {
     return LineChartBarData(
       isCurved: true,
       color: color,
@@ -110,7 +110,7 @@ class PatientStatisticsChart extends StatelessWidget {
       ),
       spots: List.generate(
         values.length,
-        (index) => FlSpot(index.toDouble(), values[index]),
+        (index) => FlSpot(index.toDouble(), values[index].toDouble()),
       ),
     );
   }

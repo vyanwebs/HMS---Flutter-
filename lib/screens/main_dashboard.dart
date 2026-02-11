@@ -9,6 +9,7 @@ import '../utils/constants.dart';
 import '../utils/enums.dart';
 import '../utils/images.dart';
 import '../utils/text.dart';
+import '../utils/url_launchers.dart';
 import '../widgets/arrow_step_card.dart';
 import '../widgets/helper_widgets.dart';
 import '../widgets/info_card.dart';
@@ -575,7 +576,7 @@ class _MainDashboardState extends State<MainDashboard> {
 
                         // BUTTON
                         AppButton(
-                          onPressed: () {},
+                          onPressed: () => openWebsite("https://docnex.care/"),
                           text: 'Discover',
                           fontSize: 12,
                           icon: Icons.arrow_forward_ios_rounded,

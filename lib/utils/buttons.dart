@@ -68,14 +68,16 @@ class _AppButtonState extends State<AppButton> {
             child: Padding(
               padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
               child: widget.isLoading
-              ? const SizedBox(
-                  height: 18,
-                  width: 18,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
+              ? const Center(
+                child: SizedBox(
+                    height: 18,
+                    width: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
                   ),
-                )
+              )
               : Row(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,

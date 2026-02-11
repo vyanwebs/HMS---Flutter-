@@ -1,7 +1,7 @@
 class PatientChartData {
-  final double ipd;
-  final double opd;
-  final double emergency;
+  final int ipd;
+  final int opd;
+  final int emergency;
 
   PatientChartData({
     required this.ipd,

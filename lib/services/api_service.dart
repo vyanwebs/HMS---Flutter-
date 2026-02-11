@@ -47,20 +47,27 @@ class NetworkHelper {
   
   Future<Map<String, dynamic>> postData({
     required Map<String, dynamic> body,
+    bool auth = false,
   }) async {
+    final headers = {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Accept": "application/json",
+    };
+
+    if (auth) {
+      final token = await StorageService.getToken();
+      if (token != null) {
+        headers["Authorization"] = "Bearer $token";
+      }
+    }
+
     final response = await http.post(
       Uri.parse(url),
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
+      headers: headers,
       body: body,
     );
 
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception(response.body);
-    }
+    return _processResponse(response);
   }
 
   /// GET
@@ -123,6 +130,35 @@ class NetworkHelper {
         headers: headers,
         body: isFormData ? body : jsonEncode(body),
       );
+
+      return _processResponse(response);
+    } catch (e) {
+      _logError(e);
+      return {"success": false, "message": "Network error"};
+    }
+  }
+
+  /// DELETE
+  Future<Map<String, dynamic>> delete({
+    bool auth = false,
+    Map<String, dynamic>? body,
+  }) async {
+    try {
+      final headers = await _headers(auth: auth);
+
+      final request = http.Request(
+        "DELETE",
+        Uri.parse(url),
+      );
+
+      request.headers.addAll(headers);
+
+      if (body != null) {
+        request.body = jsonEncode(body);
+      }
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
 
       return _processResponse(response);
     } catch (e) {

@@ -1,5 +1,9 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mdi_icons/flutter_mdi_icons.dart';
+import 'package:get/get.dart';
 
+import '../../controllers/patient_history_controllers.dart';
 import '../../utils/text.dart';
 
 class PatientHistory extends StatefulWidget {
@@ -10,18 +14,10 @@ class PatientHistory extends StatefulWidget {
 }
 
 class _PatientHistoryState extends State<PatientHistory> {
-  // State variables
-  String _selectedPatient = 'Sahah Johnson - UH20242001';
+
+  final controller = Get.put(PatientHistoryControllers());
+
   final TextEditingController _searchController = TextEditingController();
-  final List<String> _patients = [
-    'Sahah Johnson - UH20242001',
-    'John Smith - UH20242002',
-    'Emily Davis - UH20242003',
-    'Michael Brown - UH20242004',
-    'Robert Wilson - UH20242005',
-    'Lisa Anderson - UH20242006',
-    'David Miller - UH20242007',
-  ];
 
   // Sample timeline data
   final List<Map<String, dynamic>> _timelineData = [
@@ -164,48 +160,44 @@ class _PatientHistoryState extends State<PatientHistory> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header with breadcrumb
-        if (isMobile) ...[
-          const Text(
-            'CLINICAL RECORDS >> Patient History',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF718096),
-            ),
-          ),
-          const SizedBox(height: 20),
-        ],
-
-        // Desktop header
-        if (!isMobile)
-          const AppText(
-            'CLINICAL RECORDS >> Patient History',
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF718096),
-          ),
-
-        if (!isMobile) const SizedBox(height: 20),
-
-        const Text(
-          'Patient history timeline',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+        // Breadcrumb
+        const AppText(
+          'DOCTOR PANEL >> Patient History',
+          fontSize: 14,
+          color: Color(0xFF94A3B8),
         ),
+
+        const SizedBox(height: 12),
+
+        // Page Title
+        const AppText(
+          'Patient history timeline',
+          fontSize: 22,
+          fontWeight: FontWeight.w700,
+          color: Color(0xFF0F172A),
+        ),
+
         const SizedBox(height: 4),
-        const Text(
+
+        const AppText(
           'Chronological view of patient medical records',
-          style: TextStyle(color: Colors.black54),
+          fontSize: 14,
+          color: Color(0xFF64748B),
         ),
         const SizedBox(height: 16),
 
         _patientInfoCard(isMobile, isTablet),
         const SizedBox(height: 24),
 
-        Text(
-          'Medical history - ${_selectedPatient.split(' - ')[0]}',
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        ),
+        Obx(() {
+          final patient = controller.selectedPatient.value;
+          return AppText(
+            'Medical history - ${patient?.name ?? ''}',
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF0F172A),
+          );
+        }),
         const SizedBox(height: 16),
 
         // Show message if no results found
@@ -222,14 +214,15 @@ class _PatientHistoryState extends State<PatientHistory> {
                 children: [
                   Icon(Icons.search_off, size: 48, color: Colors.grey),
                   SizedBox(height: 16),
-                  Text(
+                  AppText(
                     'No records found',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500
                   ),
                   SizedBox(height: 8),
-                  Text(
+                  AppText(
                     'Try searching with different keywords',
-                    style: TextStyle(color: Colors.grey),
+                    color: Colors.grey
                   ),
                 ],
               ),
@@ -249,7 +242,7 @@ class _PatientHistoryState extends State<PatientHistory> {
               time: item['time'] as String,
               downloadUrl: item['downloadUrl'] as String,
             );
-          }).toList(),
+          }),
 
         // Add some bottom padding for better scrolling
         const SizedBox(height: 40),
@@ -262,15 +255,15 @@ class _PatientHistoryState extends State<PatientHistory> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          const AppText(
             'Patient information',
-            style: TextStyle(fontWeight: FontWeight.w600),
+            fontWeight: FontWeight.w600,
           ),
           const SizedBox(height: 16),
           Row(
@@ -293,35 +286,81 @@ class _PatientHistoryState extends State<PatientHistory> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Select patient', style: TextStyle(fontSize: 12)),
+        const AppText(
+          'Select patient',
+          fontSize: 12,
+        ),
         const SizedBox(height: 6),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
-          ),
-          child: DropdownButton<String>(
-            value: _selectedPatient,
-            icon: const Icon(Icons.keyboard_arrow_down, size: 18, color: Colors.black45),
-            iconSize: 16,
-            elevation: 16,
-            style: const TextStyle(color: Colors.black54),
-            underline: const SizedBox(),
-            isExpanded: true,
-            onChanged: (String? newValue) {
-              setState(() {
-                _selectedPatient = newValue!;
-              });
-            },
-            items: _patients.map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
-          ),
+
+        DropdownButtonHideUnderline(
+          child: Obx(() {
+            // Filter patients based on search text
+            final filteredPatients = controller.searchText.value.isEmpty
+                ? controller.patients
+                : controller.patients
+                    .where((patient) => patient.name
+                        .toLowerCase()
+                        .contains(controller.searchText.value.toLowerCase()))
+                    .toList();
+
+            return DropdownButton2<PatientModel>(
+              isExpanded: true,
+              value: controller.patients.contains(controller.selectedPatient.value)
+                  ? controller.selectedPatient.value
+                  : null,
+              hint: const AppText("Search patient"),
+              
+              items: filteredPatients
+                  .map((patient) => DropdownMenuItem<PatientModel>(
+                        value: patient,
+                        child: AppText(patient.displayName), // Show patient ID too
+                      ))
+                  .toList(),
+
+              onChanged: (value) {
+                controller.selectedPatient.value = value;
+              },
+
+              dropdownSearchData: DropdownSearchData(
+                searchController: controller.searchController,
+                searchInnerWidgetHeight: 60,
+                searchInnerWidget: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: TextField(
+                    controller: controller.searchController,
+                    decoration: InputDecoration(
+                      isDense: true,
+                      hintText: 'Search patient...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+                searchMatchFn: (item, searchValue) {
+                  // Return true for all items since we're handling filtering above
+                  return true;
+                },
+              ),
+
+              buttonStyleData: ButtonStyleData(
+                height: 44,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+              ),
+
+              dropdownStyleData: DropdownStyleData(
+                maxHeight: 300,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            );
+          }),
         ),
       ],
     );
@@ -331,28 +370,20 @@ class _PatientHistoryState extends State<PatientHistory> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Search history', style: TextStyle(fontSize: 12)),
+        const AppText('Search history', fontSize: 12),
         const SizedBox(height: 6),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
+        TextField(
+          controller: _searchController,
+          decoration: const InputDecoration(
+            hintText: 'Search by diagnosis, medication',
+            border: InputBorder.none,
+            hintStyle: TextStyle(color: Colors.black54),
+            suffixIcon: Icon(Icons.search, size: 18, color: Colors.black45),
           ),
-          child: TextField(
-            controller: _searchController,
-            decoration: const InputDecoration(
-              hintText: 'Search by diagnosis, medication',
-              border: InputBorder.none,
-              hintStyle: TextStyle(color: Colors.black54),
-              suffixIcon: Icon(Icons.search, size: 18, color: Colors.black45),
-            ),
-            style: const TextStyle(color: Colors.black54),
-            onChanged: (value) {
-              setState(() {});
-            },
-          ),
+          style: const TextStyle(color: Colors.black54),
+          onChanged: (value) {
+            setState(() {});
+          },
         ),
       ],
     );
@@ -372,16 +403,15 @@ class _PatientHistoryState extends State<PatientHistory> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            height: 44,
-            width: 44,
+            height: 90,
+            width: 90,
             decoration: BoxDecoration(
               color: color,
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.medical_services, color: iconColor, size: 22),
+            child: Icon(Mdi.stethoscope, color: iconColor, size: 22),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -395,24 +425,25 @@ class _PatientHistoryState extends State<PatientHistory> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
-                      style: const TextStyle(fontWeight: FontWeight.w600)),
+                  AppText(title, fontWeight: FontWeight.w600),
                   const SizedBox(height: 4),
-                  Text(subtitle, style: const TextStyle(color: Colors.black54)),
+                  AppText(subtitle, color: Colors.black54),
                   const SizedBox(height: 8),
                   Row(
                     children: [
                       const Icon(Icons.person_outline,
                           size: 14, color: Colors.black45),
                       const SizedBox(width: 4),
-                      Text(
+                      AppText(
                         doctor,
-                        style: const TextStyle(fontSize: 12, color: Colors.black54),
+                        fontSize: 12,
+                        color: Colors.black54
                       ),
                       const Spacer(),
-                      Text(
+                      AppText(
                         '$date • $time',
-                        style: const TextStyle(fontSize: 12, color: Colors.black45),
+                        fontSize: 12,
+                        color: Colors.black45
                       ),
                     ],
                   ),
@@ -423,11 +454,10 @@ class _PatientHistoryState extends State<PatientHistory> {
                         onPressed: () {
                           _showDetailsDialog(title, details, doctor, date, time);
                         },
-                        child: const Text(
+                        child: const AppText(
                           'View Details',
-                          style: TextStyle(
-                              color: Color(0xFF2563EB),
-                              fontWeight: FontWeight.w500),
+                          color: Color(0xFF2563EB),
+                          fontWeight: FontWeight.w500
                         ),
                       ),
                       const SizedBox(width: 24),
@@ -435,11 +465,10 @@ class _PatientHistoryState extends State<PatientHistory> {
                         onPressed: () {
                           _downloadReport(title, downloadUrl);
                         },
-                        child: const Text(
+                        child: const AppText(
                           'Download',
-                          style: TextStyle(
-                              color: Color(0xFF16A34A),
-                              fontWeight: FontWeight.w500),
+                          color: Color(0xFF16A34A),
+                          fontWeight: FontWeight.w500
                         ),
                       ),
                     ],
@@ -470,13 +499,11 @@ class _PatientHistoryState extends State<PatientHistory> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    AppText(
                       title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF2D3748),
-                      ),
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF2D3748),
                     ),
                     IconButton(
                       icon: const Icon(Icons.close, size: 20),
@@ -498,9 +525,9 @@ class _PatientHistoryState extends State<PatientHistory> {
                         children: [
                           const Icon(Icons.person_outline, size: 16, color: Colors.black45),
                           const SizedBox(width: 8),
-                          Text(
+                          AppText(
                             'Doctor: $doctor',
-                            style: const TextStyle(color: Colors.black87),
+                            color: Colors.black87
                           ),
                         ],
                       ),
@@ -509,9 +536,9 @@ class _PatientHistoryState extends State<PatientHistory> {
                         children: [
                           const Icon(Icons.calendar_today, size: 16, color: Colors.black45),
                           const SizedBox(width: 8),
-                          Text(
+                          AppText(
                             'Date: $date',
-                            style: const TextStyle(color: Colors.black87),
+                            color: Colors.black87
                           ),
                         ],
                       ),
@@ -520,9 +547,9 @@ class _PatientHistoryState extends State<PatientHistory> {
                         children: [
                           const Icon(Icons.access_time, size: 16, color: Colors.black45),
                           const SizedBox(width: 8),
-                          Text(
+                          AppText(
                             'Time: $time',
-                            style: const TextStyle(color: Colors.black87),
+                            color: Colors.black87
                           ),
                         ],
                       ),
@@ -530,22 +557,17 @@ class _PatientHistoryState extends State<PatientHistory> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
+                const AppText(
                   'Details',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF2D3748),
-                  ),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF2D3748),
                 ),
                 const SizedBox(height: 8),
-                Text(
+                AppText(
                   details,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black87,
-                    height: 1.5,
-                  ),
+                  fontSize: 14,
+                  color: Colors.black87,
                 ),
                 const SizedBox(height: 20),
                 SizedBox(
@@ -559,9 +581,9 @@ class _PatientHistoryState extends State<PatientHistory> {
                         borderRadius: BorderRadius.circular(6),
                       ),
                     ),
-                    child: const Text(
+                    child: const AppText(
                       'Close',
-                      style: TextStyle(color: Colors.white),
+                      color: Colors.white
                     ),
                   ),
                 ),
@@ -603,21 +625,17 @@ class _PatientHistoryState extends State<PatientHistory> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
+                const AppText(
                   'Downloading Report',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2D3748),
-                  ),
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF2D3748),
                 ),
                 const SizedBox(height: 8),
-                Text(
+                AppText(
                   title,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF4A5568),
-                  ),
+                  fontSize: 14,
+                  color: const Color(0xFF4A5568),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
@@ -625,12 +643,10 @@ class _PatientHistoryState extends State<PatientHistory> {
                   valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF16A34A)),
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                const AppText(
                   'Preparing file for download...',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
+                  fontSize: 12,
+                  color: Colors.grey,
                 ),
                 const SizedBox(height: 20),
                 SizedBox(
@@ -648,9 +664,9 @@ class _PatientHistoryState extends State<PatientHistory> {
                         borderRadius: BorderRadius.circular(6),
                       ),
                     ),
-                    child: const Text(
+                    child: const AppText(
                       'Complete Download',
-                      style: TextStyle(color: Colors.white),
+                      color: Colors.white
                     ),
                   ),
                 ),
@@ -673,7 +689,7 @@ class _PatientHistoryState extends State<PatientHistory> {
   void _showDownloadSuccess(String title) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Successfully downloaded: $title'),
+        content: AppText('Successfully downloaded: $title'),
         backgroundColor: const Color(0xFF16A34A),
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,

@@ -22,79 +22,6 @@ class OpdIpdAppointments extends StatefulWidget {
 class _OpdIpdAppointmentsState extends State<OpdIpdAppointments> {
 
   final assignedPatientsControllers = Get.put(AssignedPatientsControllers());
-  // Sample patient data
-  final List<Map<String, dynamic>> _patients = [
-    {
-      'time': '9.00 a.m.',
-      'name': 'John Smith',
-      'id': 'PAT123',
-      'age': '21 years',
-      'gender': 'Male',
-    },
-    {
-      'time': '10.00 a.m.',
-      'name': 'Sarah Johnson',
-      'id': 'PAT124',
-      'age': '35 years',
-      'gender': 'Female',
-    },
-    {
-      'time': '11.00 a.m.',
-      'name': 'Michael Brown',
-      'id': 'PAT125',
-      'age': '28 years',
-      'gender': 'Male',
-    },
-    {
-      'time': '12.00 p.m.',
-      'name': 'Emily Davis',
-      'id': 'PAT126',
-      'age': '45 years',
-      'gender': 'Female',
-    },
-    {
-      'time': '2.00 p.m.',
-      'name': 'Robert Wilson',
-      'id': 'PAT127',
-      'age': '32 years',
-      'gender': 'Male',
-    },
-    {
-      'time': '3.00 p.m.',
-      'name': 'Lisa Anderson',
-      'id': 'PAT128',
-      'age': '29 years',
-      'gender': 'Female',
-    },
-    {
-      'time': '4.00 p.m.',
-      'name': 'David Miller',
-      'id': 'PAT129',
-      'age': '38 years',
-      'gender': 'Male',
-    },
-    {
-      'time': '5.00 p.m.',
-      'name': 'Jennifer Walker',
-      'id': 'PAT130',
-      'age': '42 years',
-      'gender': 'Female',
-    },
-    {
-      'time': '6.00 p.m.',
-      'name': 'William Lee',
-      'id': 'PAT131',
-      'age': '51 years',
-      'gender': 'Male',
-    },
-    {
-      'time': '7.00 p.m.',
-      'name': 'Maria Garcia',
-      'id': 'PAT132',
-      'age': '33 years',
-      'gender': 'Female',
-    },
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -497,443 +424,443 @@ class _OpdIpdAppointmentsState extends State<OpdIpdAppointments> {
     }
   }
 
-  Widget _buildMobilePatientsList() {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Column(
-        children: _patients.map((patient) {
-          return Container(
-            margin: const EdgeInsets.only(bottom: 16), // Increased margin
-            padding: const EdgeInsets.all(16), // Increased padding
-            decoration: BoxDecoration(
-              color: const Color(0xFFF7FAFC),
-              borderRadius: BorderRadius.circular(10), // Increased radius
-              border: Border.all(color: const Color(0xFFE2E8F0)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        patient['name'],
-                        style: const TextStyle(
-                          fontSize: 16, // Increased font
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF2D3748),
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Text(
-                      patient['time'],
-                      style: const TextStyle(
-                        fontSize: 14, // Increased font
-                        color: Color(0xFF718096),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16), // Increased spacing
-                Row(
-                  children: [
-                    Container(
-                      width: 42, // Increased size
-                      height: 42, // Increased size
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF2383E2),
-                        borderRadius:
-                            BorderRadius.circular(10), // Increased radius
-                      ),
-                      child: Center(
-                        child: Text(
-                          patient['name'][0],
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18, // Increased font
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16), // Increased spacing
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'ID: ${patient['id']}',
-                            style: const TextStyle(
-                              fontSize: 14, // Increased font
-                              color: Color(0xFF718096),
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 6), // Increased spacing
-                          Text(
-                            'Age: ${patient['age']}',
-                            style: const TextStyle(
-                              fontSize: 14, // Increased font
-                              color: const Color(0xFF718096),
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 6), // Increased spacing
-                          Text(
-                            'Gender: ${patient['gender']}',
-                            style: const TextStyle(
-                              fontSize: 14, // Increased font
-                              color: const Color(0xFF718096),
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16), // Increased spacing
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Admit Button
-                      Expanded(
-                        child: Container(
-                          height: 32, // Increased height
-                          margin: const EdgeInsets.only(
-                              right: 8), // Increased margin
-                          child: ElevatedButton(
-                            onPressed: () => _admitPatient(patient),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF73F181),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12, // Increased padding
-                                vertical: 8, // Increased padding
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                    8), // Increased radius
-                              ),
-                              elevation: 0,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.add,
-                                  size: 16, // Increased size
-                                  color: Colors.white,
-                                ),
-                                const SizedBox(width: 6), // Increased spacing
-                                const Text(
-                                  'Admit',
-                                  style: TextStyle(
-                                    fontSize: 14, // Increased font
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+  // Widget _buildMobilePatientsList() {
+  //   return SingleChildScrollView(
+  //     physics: const BouncingScrollPhysics(),
+  //     child: Column(
+  //       children: _patients.map((patient) {
+  //         return Container(
+  //           margin: const EdgeInsets.only(bottom: 16), // Increased margin
+  //           padding: const EdgeInsets.all(16), // Increased padding
+  //           decoration: BoxDecoration(
+  //             color: const Color(0xFFF7FAFC),
+  //             borderRadius: BorderRadius.circular(10), // Increased radius
+  //             border: Border.all(color: const Color(0xFFE2E8F0)),
+  //           ),
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Row(
+  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                 children: [
+  //                   Expanded(
+  //                     child: Text(
+  //                       patient['name'],
+  //                       style: const TextStyle(
+  //                         fontSize: 16, // Increased font
+  //                         fontWeight: FontWeight.bold,
+  //                         color: Color(0xFF2D3748),
+  //                       ),
+  //                       overflow: TextOverflow.ellipsis,
+  //                     ),
+  //                   ),
+  //                   Text(
+  //                     patient['time'],
+  //                     style: const TextStyle(
+  //                       fontSize: 14, // Increased font
+  //                       color: Color(0xFF718096),
+  //                       fontWeight: FontWeight.w500,
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //               const SizedBox(height: 16), // Increased spacing
+  //               Row(
+  //                 children: [
+  //                   Container(
+  //                     width: 42, // Increased size
+  //                     height: 42, // Increased size
+  //                     decoration: BoxDecoration(
+  //                       color: const Color(0xFF2383E2),
+  //                       borderRadius:
+  //                           BorderRadius.circular(10), // Increased radius
+  //                     ),
+  //                     child: Center(
+  //                       child: Text(
+  //                         patient['name'][0],
+  //                         style: const TextStyle(
+  //                           color: Colors.white,
+  //                           fontSize: 18, // Increased font
+  //                           fontWeight: FontWeight.bold,
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ),
+  //                   const SizedBox(width: 16), // Increased spacing
+  //                   Expanded(
+  //                     child: Column(
+  //                       crossAxisAlignment: CrossAxisAlignment.start,
+  //                       mainAxisSize: MainAxisSize.min,
+  //                       children: [
+  //                         Text(
+  //                           'ID: ${patient['id']}',
+  //                           style: const TextStyle(
+  //                             fontSize: 14, // Increased font
+  //                             color: Color(0xFF718096),
+  //                           ),
+  //                           overflow: TextOverflow.ellipsis,
+  //                         ),
+  //                         const SizedBox(height: 6), // Increased spacing
+  //                         Text(
+  //                           'Age: ${patient['age']}',
+  //                           style: const TextStyle(
+  //                             fontSize: 14, // Increased font
+  //                             color: const Color(0xFF718096),
+  //                           ),
+  //                           overflow: TextOverflow.ellipsis,
+  //                         ),
+  //                         const SizedBox(height: 6), // Increased spacing
+  //                         Text(
+  //                           'Gender: ${patient['gender']}',
+  //                           style: const TextStyle(
+  //                             fontSize: 14, // Increased font
+  //                             color: const Color(0xFF718096),
+  //                           ),
+  //                           overflow: TextOverflow.ellipsis,
+  //                         ),
+  //                       ],
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //               const SizedBox(height: 16), // Increased spacing
+  //               Container(
+  //                 padding: const EdgeInsets.symmetric(vertical: 4),
+  //                 child: Row(
+  //                   mainAxisAlignment: MainAxisAlignment.center,
+  //                   crossAxisAlignment: CrossAxisAlignment.center,
+  //                   children: [
+  //                     // Admit Button
+  //                     Expanded(
+  //                       child: Container(
+  //                         height: 32, // Increased height
+  //                         margin: const EdgeInsets.only(
+  //                             right: 8), // Increased margin
+  //                         child: ElevatedButton(
+  //                           onPressed: () => _admitPatient(patient),
+  //                           style: ElevatedButton.styleFrom(
+  //                             backgroundColor: const Color(0xFF73F181),
+  //                             padding: const EdgeInsets.symmetric(
+  //                               horizontal: 12, // Increased padding
+  //                               vertical: 8, // Increased padding
+  //                             ),
+  //                             shape: RoundedRectangleBorder(
+  //                               borderRadius: BorderRadius.circular(
+  //                                   8), // Increased radius
+  //                             ),
+  //                             elevation: 0,
+  //                           ),
+  //                           child: Row(
+  //                             mainAxisAlignment: MainAxisAlignment.center,
+  //                             children: [
+  //                               const Icon(
+  //                                 Icons.add,
+  //                                 size: 16, // Increased size
+  //                                 color: Colors.white,
+  //                               ),
+  //                               const SizedBox(width: 6), // Increased spacing
+  //                               const Text(
+  //                                 'Admit',
+  //                                 style: TextStyle(
+  //                                   fontSize: 14, // Increased font
+  //                                   fontWeight: FontWeight.w600,
+  //                                   color: Colors.white,
+  //                                 ),
+  //                                 overflow: TextOverflow.ellipsis,
+  //                               ),
+  //                             ],
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ),
 
-                      // Discharge Button
-                      Expanded(
-                        child: Container(
-                          height: 32, // Increased height
-                          child: ElevatedButton(
-                            onPressed: () => _dischargePatient(patient),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF5EBFFF),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12, // Increased padding
-                                vertical: 8, // Increased padding
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                    8), // Increased radius
-                              ),
-                              elevation: 0,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.exit_to_app,
-                                  size: 16, // Increased size
-                                  color: Colors.white,
-                                ),
-                                const SizedBox(width: 6), // Increased spacing
-                                const Text(
-                                  'Discharge',
-                                  style: TextStyle(
-                                    fontSize: 14, // Increased font
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
+  //                     // Discharge Button
+  //                     Expanded(
+  //                       child: Container(
+  //                         height: 32, // Increased height
+  //                         child: ElevatedButton(
+  //                           onPressed: () => _dischargePatient(patient),
+  //                           style: ElevatedButton.styleFrom(
+  //                             backgroundColor: const Color(0xFF5EBFFF),
+  //                             padding: const EdgeInsets.symmetric(
+  //                               horizontal: 12, // Increased padding
+  //                               vertical: 8, // Increased padding
+  //                             ),
+  //                             shape: RoundedRectangleBorder(
+  //                               borderRadius: BorderRadius.circular(
+  //                                   8), // Increased radius
+  //                             ),
+  //                             elevation: 0,
+  //                           ),
+  //                           child: Row(
+  //                             mainAxisAlignment: MainAxisAlignment.center,
+  //                             children: [
+  //                               const Icon(
+  //                                 Icons.exit_to_app,
+  //                                 size: 16, // Increased size
+  //                                 color: Colors.white,
+  //                               ),
+  //                               const SizedBox(width: 6), // Increased spacing
+  //                               const Text(
+  //                                 'Discharge',
+  //                                 style: TextStyle(
+  //                                   fontSize: 14, // Increased font
+  //                                   fontWeight: FontWeight.w600,
+  //                                   color: Colors.white,
+  //                                 ),
+  //                                 overflow: TextOverflow.ellipsis,
+  //                               ),
+  //                             ],
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         );
+  //       }).toList(),
+  //     ),
+  //   );
+  // }
 
-  void _admitPatient(Map<String, dynamic> patient) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 350),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF73F181).withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.add,
-                    color: Color(0xFF73F181),
-                    size: 28,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Admit Patient',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2D3748),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  patient['name'],
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF4A5568),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'ID: ${patient['id']}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF718096),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          side: const BorderSide(color: Color(0xFFE2E8F0)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                        child: const Text(
-                          'Cancel',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF718096),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content:
-                                  Text('Patient ${patient['name']} admitted'),
-                              backgroundColor: const Color(0xFF73F181),
-                              duration: const Duration(seconds: 2),
-                              behavior: SnackBarBehavior.floating,
-                              margin: const EdgeInsets.all(16),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF73F181),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                        child: const Text(
-                          'Admit',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  // void _admitPatient(Map<String, dynamic> patient) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => Dialog(
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(12),
+  //       ),
+  //       child: ConstrainedBox(
+  //         constraints: const BoxConstraints(maxWidth: 350),
+  //         child: Padding(
+  //           padding: const EdgeInsets.all(20),
+  //           child: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: [
+  //               Container(
+  //                 width: 60,
+  //                 height: 60,
+  //                 decoration: BoxDecoration(
+  //                   color: const Color(0xFF73F181).withValues(alpha: 0.1),
+  //                   shape: BoxShape.circle,
+  //                 ),
+  //                 child: const Icon(
+  //                   Icons.add,
+  //                   color: Color(0xFF73F181),
+  //                   size: 28,
+  //                 ),
+  //               ),
+  //               const SizedBox(height: 16),
+  //               const Text(
+  //                 'Admit Patient',
+  //                 style: TextStyle(
+  //                   fontSize: 18,
+  //                   fontWeight: FontWeight.bold,
+  //                   color: Color(0xFF2D3748),
+  //                 ),
+  //               ),
+  //               const SizedBox(height: 10),
+  //               Text(
+  //                 patient['name'],
+  //                 style: const TextStyle(
+  //                   fontSize: 16,
+  //                   color: Color(0xFF4A5568),
+  //                   fontWeight: FontWeight.w500,
+  //                 ),
+  //               ),
+  //               const SizedBox(height: 6),
+  //               Text(
+  //                 'ID: ${patient['id']}',
+  //                 style: const TextStyle(
+  //                   fontSize: 14,
+  //                   color: Color(0xFF718096),
+  //                 ),
+  //               ),
+  //               const SizedBox(height: 20),
+  //               Row(
+  //                 children: [
+  //                   Expanded(
+  //                     child: OutlinedButton(
+  //                       onPressed: () => Navigator.pop(context),
+  //                       style: OutlinedButton.styleFrom(
+  //                         padding: const EdgeInsets.symmetric(vertical: 12),
+  //                         side: const BorderSide(color: Color(0xFFE2E8F0)),
+  //                         shape: RoundedRectangleBorder(
+  //                           borderRadius: BorderRadius.circular(6),
+  //                         ),
+  //                       ),
+  //                       child: const Text(
+  //                         'Cancel',
+  //                         style: TextStyle(
+  //                           fontSize: 14,
+  //                           fontWeight: FontWeight.w500,
+  //                           color: Color(0xFF718096),
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ),
+  //                   const SizedBox(width: 12),
+  //                   Expanded(
+  //                     child: ElevatedButton(
+  //                       onPressed: () {
+  //                         Navigator.pop(context);
+  //                         ScaffoldMessenger.of(context).showSnackBar(
+  //                           SnackBar(
+  //                             content:
+  //                                 Text('Patient ${patient['name']} admitted'),
+  //                             backgroundColor: const Color(0xFF73F181),
+  //                             duration: const Duration(seconds: 2),
+  //                             behavior: SnackBarBehavior.floating,
+  //                             margin: const EdgeInsets.all(16),
+  //                           ),
+  //                         );
+  //                       },
+  //                       style: ElevatedButton.styleFrom(
+  //                         backgroundColor: const Color(0xFF73F181),
+  //                         padding: const EdgeInsets.symmetric(vertical: 12),
+  //                         shape: RoundedRectangleBorder(
+  //                           borderRadius: BorderRadius.circular(6),
+  //                         ),
+  //                       ),
+  //                       child: const Text(
+  //                         'Admit',
+  //                         style: TextStyle(
+  //                           fontSize: 14,
+  //                           fontWeight: FontWeight.w600,
+  //                           color: Colors.white,
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  void _dischargePatient(Map<String, dynamic> patient) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 350),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF5EBFFF).withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.exit_to_app,
-                    color: Color(0xFF5EBFFF),
-                    size: 28,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Discharge Patient',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2D3748),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  patient['name'],
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF4A5568),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'ID: ${patient['id']}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF718096),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          side: const BorderSide(color: Color(0xFFE2E8F0)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                        child: const Text(
-                          'Cancel',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF718096),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content:
-                                  Text('Patient ${patient['name']} discharged'),
-                              backgroundColor: const Color(0xFF5EBFFF),
-                              duration: const Duration(seconds: 2),
-                              behavior: SnackBarBehavior.floating,
-                              margin: const EdgeInsets.all(16),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF5EBFFF),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                        child: const Text(
-                          'Discharge',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  // void _dischargePatient(Map<String, dynamic> patient) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => Dialog(
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(12),
+  //       ),
+  //       child: ConstrainedBox(
+  //         constraints: const BoxConstraints(maxWidth: 350),
+  //         child: Padding(
+  //           padding: const EdgeInsets.all(20),
+  //           child: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: [
+  //               Container(
+  //                 width: 60,
+  //                 height: 60,
+  //                 decoration: BoxDecoration(
+  //                   color: const Color(0xFF5EBFFF).withValues(alpha: 0.1),
+  //                   shape: BoxShape.circle,
+  //                 ),
+  //                 child: const Icon(
+  //                   Icons.exit_to_app,
+  //                   color: Color(0xFF5EBFFF),
+  //                   size: 28,
+  //                 ),
+  //               ),
+  //               const SizedBox(height: 16),
+  //               const Text(
+  //                 'Discharge Patient',
+  //                 style: TextStyle(
+  //                   fontSize: 18,
+  //                   fontWeight: FontWeight.bold,
+  //                   color: Color(0xFF2D3748),
+  //                 ),
+  //               ),
+  //               const SizedBox(height: 10),
+  //               Text(
+  //                 patient['name'],
+  //                 style: const TextStyle(
+  //                   fontSize: 16,
+  //                   color: Color(0xFF4A5568),
+  //                   fontWeight: FontWeight.w500,
+  //                 ),
+  //               ),
+  //               const SizedBox(height: 6),
+  //               Text(
+  //                 'ID: ${patient['id']}',
+  //                 style: const TextStyle(
+  //                   fontSize: 14,
+  //                   color: Color(0xFF718096),
+  //                 ),
+  //               ),
+  //               const SizedBox(height: 20),
+  //               Row(
+  //                 children: [
+  //                   Expanded(
+  //                     child: OutlinedButton(
+  //                       onPressed: () => Navigator.pop(context),
+  //                       style: OutlinedButton.styleFrom(
+  //                         padding: const EdgeInsets.symmetric(vertical: 12),
+  //                         side: const BorderSide(color: Color(0xFFE2E8F0)),
+  //                         shape: RoundedRectangleBorder(
+  //                           borderRadius: BorderRadius.circular(6),
+  //                         ),
+  //                       ),
+  //                       child: const Text(
+  //                         'Cancel',
+  //                         style: TextStyle(
+  //                           fontSize: 14,
+  //                           fontWeight: FontWeight.w500,
+  //                           color: Color(0xFF718096),
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ),
+  //                   const SizedBox(width: 12),
+  //                   Expanded(
+  //                     child: ElevatedButton(
+  //                       onPressed: () {
+  //                         Navigator.pop(context);
+  //                         ScaffoldMessenger.of(context).showSnackBar(
+  //                           SnackBar(
+  //                             content:
+  //                                 Text('Patient ${patient['name']} discharged'),
+  //                             backgroundColor: const Color(0xFF5EBFFF),
+  //                             duration: const Duration(seconds: 2),
+  //                             behavior: SnackBarBehavior.floating,
+  //                             margin: const EdgeInsets.all(16),
+  //                           ),
+  //                         );
+  //                       },
+  //                       style: ElevatedButton.styleFrom(
+  //                         backgroundColor: const Color(0xFF5EBFFF),
+  //                         padding: const EdgeInsets.symmetric(vertical: 12),
+  //                         shape: RoundedRectangleBorder(
+  //                           borderRadius: BorderRadius.circular(6),
+  //                         ),
+  //                       ),
+  //                       child: const Text(
+  //                         'Discharge',
+  //                         style: TextStyle(
+  //                           fontSize: 14,
+  //                           fontWeight: FontWeight.w600,
+  //                           color: Colors.white,
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 }

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hms/screens/module_login_screen.dart';
 
 import '../models/hospital_panel_model.dart';
+import '../screens/module_login_screen.dart';
 import '../utils/constants.dart';
+import '../utils/text.dart';
 
 class HospitalPanelCard extends StatelessWidget {
   final HospitalPanel panel;
@@ -33,7 +34,7 @@ class HospitalPanelCard extends StatelessWidget {
             borderRadius: const BorderRadius.all(Radius.circular(6)),
             child: AspectRatio(
               aspectRatio: 1.4,
-              child: Image.network(
+              child: Image.asset(
                 panel.image,
                 fit: BoxFit.cover,
               ),
@@ -45,12 +46,10 @@ class HospitalPanelCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                AppText(
                   panel.title,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
                 ),
 
                 const SizedBox(height: 6),
@@ -59,12 +58,10 @@ class HospitalPanelCard extends StatelessWidget {
                   children: [
                     Icon(Icons.person, size: 16, color: Colors.grey.shade600),
                     const SizedBox(width: 6),
-                    Text(
+                    AppText(
                       "Total Registration : ${panel.totalRegistrations}",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade600,
-                      ),
+                      fontSize: 12,
+                      color: Colors.grey.shade600,
                     ),
                   ],
                 ),
@@ -92,9 +89,10 @@ class HospitalPanelCard extends StatelessWidget {
                       ),
                       child: const Row(
                         children: [
-                          Text(
+                          AppText(
                             "Start Registration  ",
-                            style: TextStyle(fontSize: 12),
+                            fontSize: 12,
+                            color: Colors.white,
                           ),
                           Icon(Icons.chevron_right_rounded)
                         ],
