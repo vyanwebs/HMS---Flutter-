@@ -45,7 +45,7 @@ class PatientModel {
   final String registeredByStaffId;
   final List<String> admissionIds;
 
-  final String currentAdmissionCode;
+  final int currentAdmissionCode;
   final String currentAdmissionId;
 
   final String currentBedAssign;
@@ -59,6 +59,12 @@ class PatientModel {
   final String initialVitalStatus;
   final Map<String, dynamic>? currentNurseAssign;
 
+  final String patientType;
+  final int ipdDepositAmount;
+  final int currentIPDCode;
+  final DateTime? createdAt;
+  final String admissionInstructions;
+  final String currentBill;
 
   PatientModel({
     required this.id,
@@ -103,7 +109,15 @@ class PatientModel {
 
     required this.currentWardType,
     required this.initialVitalStatus,
-    this.currentNurseAssign
+    this.currentNurseAssign,
+
+    required this.patientType,
+    required this.ipdDepositAmount,
+    required this.currentIPDCode,
+    this.createdAt,
+    required this.admissionInstructions,
+    required this.currentBill,
+
   });
 
   // ================= FROM JSON =================
@@ -146,7 +160,7 @@ class PatientModel {
       registeredBy: json['registeredBy'] ?? '',
       registeredByStaffId: json['registeredByStaffId'] ?? '',
       admissionIds: List<String>.from(json['admissionIds'] ?? []),
-      currentAdmissionCode: json['currentAdmissionCode'] ?? '',
+      currentAdmissionCode: json['currentAdmissionCode'] ?? 0,
       currentAdmissionId: json['currentAdmissionId'] ?? '',
       currentBedAssign: json['currentBedAssign'] ?? '',
       roomNumber: json['roomNumber'] ?? '',
@@ -171,6 +185,12 @@ class PatientModel {
       currentNurseAssign: json['currentNurseAssign'] is Map<String, dynamic>
         ? json['currentNurseAssign']
         : null,
+
+      patientType: json['patientType'] ?? '',
+      ipdDepositAmount: int.tryParse(json['ipdDepositAmount']?.toString() ?? '') ?? 0,
+      currentIPDCode: int.tryParse(json['currentIPDCode']?.toString() ?? '') ?? 0,
+      admissionInstructions: json['admissionInstructions'] ?? '',
+      currentBill: json['currentBill']?.toString() ?? '',
 
     );
   }
@@ -214,6 +234,14 @@ class PatientModel {
       'bedNumber': bedNumber,
       'avatar': avatar?.toJson(),
       'currentVitalsReport': currentVitalsReport?.toJson(),
+
+      'patientType': patientType,
+      'ipdDepositAmount': ipdDepositAmount,
+      'currentIPDCode': currentIPDCode,
+      'createdAt': createdAt?.toIso8601String(),
+      'admissionInstructions': admissionInstructions,
+      'currentBill': currentBill,
+
     };
   }
 
@@ -250,7 +278,7 @@ class PatientModel {
     String? registeredBy,
     String? registeredByStaffId,
     List<String>? admissionIds,
-    String? currentAdmissionCode,
+    int? currentAdmissionCode,
     String? currentAdmissionId,
     String? currentBedAssign,
     String? roomNumber,
@@ -300,6 +328,11 @@ class PatientModel {
       currentVitalsReport: currentVitalsReport ?? this.currentVitalsReport,
       currentWardType: '',
       initialVitalStatus: '',
+      admissionInstructions: '',
+      patientType: '',
+      ipdDepositAmount: ipdDepositAmount,
+      currentIPDCode: currentIPDCode,
+      currentBill: ''
     );
   }
 

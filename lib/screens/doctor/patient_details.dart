@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_mdi_icons/flutter_mdi_icons.dart';
 import 'package:get/get.dart';
 import 'package:hugeicons/hugeicons.dart';
 
@@ -17,6 +18,8 @@ import '../../utils/keyboard_intents.dart';
 import '../../utils/text.dart';
 import '../../utils/validators.dart';
 import '../main_dashboard.dart';
+import 'discharge_summary.dart';
+import 'e_prescriptions.dart';
 import 'monitoring/patient_details_Symptoms.dart';
 import 'monitoring/patient_details_consultation.dart';
 import 'monitoring/patient_details_diagnosis.dart';
@@ -285,6 +288,16 @@ class PatientDetails extends StatelessWidget {
           menu: PatientDetailsMenu.surgicalNotes,
           imagePath: surgicalNotes,
         ),
+        _sideItem(
+          title: 'E-Prescriptions',
+          menu: PatientDetailsMenu.ePrescription,
+          icon: Icons.list_alt,
+        ),
+        _sideItem(
+          title: 'Discharge Summary',
+          menu: PatientDetailsMenu.dischargeSummary,
+          icon: Mdi.weight,
+        ),
 
         const Spacer(),
 
@@ -436,6 +449,12 @@ class PatientDetails extends StatelessWidget {
 
         case PatientDetailsMenu.surgicalNotes:
           return const PatientDetailsSurgicalNotes();
+
+        case PatientDetailsMenu.ePrescription:
+          return const EPrescriptions();
+
+        case PatientDetailsMenu.dischargeSummary:
+          return DischargeSummary(patient: patient);
       }
     });
   }

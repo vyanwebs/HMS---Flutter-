@@ -3,14 +3,13 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  cloud_firestore
   file_saver
-  firebase_core
-  flutter_webrtc
   permission_handler_windows
   printing
+  speech_to_text_windows
   syncfusion_pdfviewer_windows
   url_launcher_windows
+  webview_windows
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

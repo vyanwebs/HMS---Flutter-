@@ -70,6 +70,19 @@ class NetworkHelper {
     return _processResponse(response);
   }
 
+  Future<http.Response> postRaw({
+    required Map<String, dynamic> body,
+    bool auth = false,
+  }) async {
+    final response = await http.post(
+      Uri.parse(url),
+      headers: await _headers(auth: auth),
+      body: jsonEncode(body),
+    );
+
+    return response;
+  }
+
   /// GET
   Future<Map<String, dynamic>> get({bool auth = false}) async {
     try {

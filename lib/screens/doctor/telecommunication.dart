@@ -564,8 +564,7 @@ class Telecommunication extends StatelessWidget {
     required VoidCallback onPressed,
     Color color = const Color(0xFF2383E2),
     double fontSize = 12,
-    EdgeInsets padding =
-        const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+    EdgeInsets padding = const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
     double borderRadius = 12,
   }) {
     return MouseRegion(

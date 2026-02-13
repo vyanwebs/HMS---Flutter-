@@ -1,5 +1,3 @@
-import '../utils/images.dart';
-
 class PatientAvatarModel {
   final String id;
   final String url;
@@ -30,8 +28,8 @@ class PatientAvatarModel {
   factory PatientAvatarModel.empty() {
     return PatientAvatarModel(
       id: '',
-      url: userImage,
-      googleDriveLink: userImage,
+      url: "",
+      googleDriveLink: "",
     );
   }
 }

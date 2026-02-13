@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -7,101 +6,68 @@ import '../services/api_service.dart';
 import '../services/apis.dart';
 
 class PatientHistoryControllers extends GetxController {
-  final patients = <PatientModel>[].obs;
-  final selectedPatient = Rxn<PatientModel>();
 
-  final searchText = ''.obs;
-  final searchController = TextEditingController();
+  final historyList = <PatientHistoryModel>[].obs;
+  final isHistoryLoading = false.obs;
 
-  final isLoading = false.obs;
-
-  Timer? _debounce;
-
-  @override
-  void onInit() {
-    super.onInit();
-
-    // Listen to search controller directly
-    searchController.addListener(() {
-      _onSearchChanged(searchController.text);
-    });
-  }
-
-  void _onSearchChanged(String value) {
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-
-    // Update search text for filtering
-    searchText.value = value;
-
-    // Only clear selection if search is modified
-    if (selectedPatient.value != null && 
-        !selectedPatient.value!.name.toLowerCase().contains(value.toLowerCase())) {
-      selectedPatient.value = null;
-    }
-
-    _debounce = Timer(const Duration(milliseconds: 500), () {
-      if (value.trim().length >= 2) {
-        fetchPatients(value.trim());
-      } else {
-        patients.clear();
-      }
-    });
-  }
-
-  Future<void> fetchPatients(String name) async {
+  Future<void> fetchPatientHistory(String uhid) async {
     try {
-      isLoading(true);
+      isHistoryLoading.value = true;
 
-      final encodedName = Uri.encodeQueryComponent(name);
+      final url = "$getPatientHistoryByUHIDApi/$uhid";
 
-      final helper = NetworkHelper(
-        url: "$getPatientByNameApi?name=$encodedName",
-      );
-
+      final helper = NetworkHelper(url: url);
       final response = await helper.get(auth: true);
 
       if (response['success'] == true) {
-        final List data = response['data'];
-        final parsed = data.map((e) => PatientModel.fromJson(e)).toList();
+        final List data = response['data'] ?? [];
 
-        patients.assignAll(parsed);
+        final parsed =
+            data.map((e) => PatientHistoryModel.fromJson(e)).toList();
+
+        parsed.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+        historyList.assignAll(parsed);
       } else {
-        patients.clear();
+        historyList.clear();
       }
     } catch (e) {
-      print("Patient search error: $e");
-      patients.clear();
+      historyList.clear();
+      debugPrint("History fetch error: $e");
     } finally {
-      isLoading(false);
+      isHistoryLoading.value = false;
     }
-  }
-
-  @override
-  void onClose() {
-    searchController.dispose();
-    _debounce?.cancel();
-    super.onClose();
   }
 }
 
-class PatientModel {
+class PatientHistoryModel {
   final String id;
-  final String name;
-  final String patientId;
+  final String eventType;
+  final String title;
+  final String note;
+  final DateTime createdAt;
+  final String? admissionCode;
+  final String? admissionType;
 
-  PatientModel({
+  PatientHistoryModel({
     required this.id,
-    required this.name,
-    required this.patientId,
+    required this.eventType,
+    required this.title,
+    required this.note,
+    required this.createdAt,
+    this.admissionCode,
+    this.admissionType,
   });
 
-  factory PatientModel.fromJson(Map<String, dynamic> json) {
-    return PatientModel(
-      id: json['_id'],
-      name: json['name'],
-      patientId: json['patientId'],
+  factory PatientHistoryModel.fromJson(Map<String, dynamic> json) {
+    return PatientHistoryModel(
+      id: json['_id'] ?? '',
+      eventType: json['eventType'] ?? '',
+      title: json['title'] ?? '',
+      note: json['note'] ?? '',
+      createdAt: DateTime.parse(json['createdAt']),
+      admissionCode: json['admissionCode'],
+      admissionType: json['admissionType'],
     );
   }
-
-  String get displayName => '$name - $patientId';
 }
