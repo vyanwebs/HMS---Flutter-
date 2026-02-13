@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mdi_icons/flutter_mdi_icons.dart';
 import 'package:get/get.dart';
 import 'package:hms/screens/main_dashboard.dart';
 import 'package:hms/screens/doctor/opd_ipd_appointments.dart';
 import 'package:hms/screens/doctor/patient_history.dart';
 import 'package:hms/screens/doctor/lab_test_request.dart';
 import 'package:hms/screens/doctor/telecommunication.dart';
-import 'package:hms/screens/doctor/ipd_management.dart';
-import 'package:hms/screens/doctor/discharge_summary.dart';
 import 'package:hms/screens/doctor/doctor_settings.dart';
 import 'package:hms/screens/doctor/doctor_profile.dart';
 import 'package:hms/screens/doctor/doctor_inbox.dart';
@@ -25,6 +24,9 @@ import '../../widgets/doctor_panel/scheduled_patients_widget.dart';
 import '../../widgets/doctor_panel/stat_card_widget.dart';
 import '../../widgets/doctor_panel/teleconsultation_widget.dart';
 import '../../widgets/doctor_panel/weekly_patients_chart_widget.dart';
+import '../reception/analysis_screen.dart';
+import 'broadcast_screen.dart';
+import 'ipd_management.dart';
 
 class DoctorDashboard extends StatefulWidget {
   const DoctorDashboard({super.key});
@@ -248,6 +250,11 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                   imagePath: analysisIcon
                 ),
                 _buildSidebarItem(
+                  title: 'Ipd Management',
+                  menu: DoctorPanelMenu.ipdManagement,
+                  icon: Mdi.pill
+                ),
+                _buildSidebarItem(
                   title: 'Profile',
                   menu: DoctorPanelMenu.profile,
                   icon: Icons.person_outlined
@@ -355,16 +362,19 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
           return Telecommunication();
 
         case DoctorPanelMenu.labResults:
-          return const LabTestRequest();
+          return LabTestRequest();
 
         case DoctorPanelMenu.patientDatabase:
           return const PatientHistory();
 
         case DoctorPanelMenu.broadcasting:
-          return const IpdManagement();
+          return const BroadcastScreen();
+
+        case DoctorPanelMenu.ipdManagement:
+          return IpdManagement();
 
         case DoctorPanelMenu.analysis:
-          return const DischargeSummary();
+          return const AnalysisScreen();
 
         case DoctorPanelMenu.profile:
           return const DoctorProfile();

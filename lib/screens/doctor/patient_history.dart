@@ -1,9 +1,9 @@
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mdi_icons/flutter_mdi_icons.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/patient_history_controllers.dart';
+import '../../controllers/patient_search_controllers.dart';
 import '../../utils/text.dart';
 
 class PatientHistory extends StatefulWidget {
@@ -15,90 +15,10 @@ class PatientHistory extends StatefulWidget {
 
 class _PatientHistoryState extends State<PatientHistory> {
 
-  final controller = Get.put(PatientHistoryControllers());
+  final searchController = Get.put(PatientSearchController());
+  final historyController = Get.put(PatientHistoryControllers());
 
   final TextEditingController _searchController = TextEditingController();
-
-  // Sample timeline data
-  final List<Map<String, dynamic>> _timelineData = [
-    {
-      'color': Color(0xFFE8F1FF),
-      'iconColor': Color(0xFF3B82F6),
-      'title': 'OPD Consultation',
-      'subtitle': 'Chest pain evaluation , ECG performed',
-      'doctor': 'Dr. Sarah Williams',
-      'date': '15 Jan 2025',
-      'time': '10:30 AM',
-      'details': 'Patient presented with chest pain lasting 30 minutes. ECG showed ST elevation in inferior leads. Blood pressure: 140/90 mmHg, Heart rate: 92 bpm.',
-      'downloadUrl': 'https://hospital.com/reports/consultation_001.pdf',
-    },
-    {
-      'color': Color(0xFFF1EDFF),
-      'iconColor': Color(0xFF8B5CF6),
-      'title': 'Laboratory Tests',
-      'subtitle': 'Complete Blood Count, Lipid Profile, Troponin I',
-      'doctor': 'Dr. Sarah Williams',
-      'date': '15 Jan 2025',
-      'time': '11:45 AM',
-      'details': 'Blood tests ordered. Results: Troponin I - 2.5 ng/mL (elevated), Cholesterol - 240 mg/dL, HDL - 38 mg/dL, LDL - 180 mg/dL.',
-      'downloadUrl': 'https://hospital.com/reports/lab_results_001.pdf',
-    },
-    {
-      'color': Color(0xFFFFF1E8),
-      'iconColor': Color(0xFFF97316),
-      'title': 'OPD Consultation',
-      'subtitle': 'Chest pain evaluation , ECG performed',
-      'doctor': 'Dr. Sarah Williams',
-      'date': '22 Jan 2025',
-      'time': '02:15 PM',
-      'details': 'Follow-up consultation. Patient reports improvement in chest pain. ECG shows resolution of ST elevation. Blood pressure: 130/85 mmHg.',
-      'downloadUrl': 'https://hospital.com/reports/consultation_002.pdf',
-    },
-    {
-      'color': Color(0xFFEAF7EF),
-      'iconColor': Color(0xFF22C55E),
-      'title': 'Diagnosis',
-      'subtitle': 'Acute Myocardial Infarction - Inferior Wall',
-      'doctor': 'Dr. Sarah Williams',
-      'date': '15 Jan 2025',
-      'time': '12:30 PM',
-      'details': 'Final diagnosis: Acute Inferior Wall Myocardial Infarction. Based on ECG changes and elevated cardiac enzymes. Recommended for cardiac monitoring.',
-      'downloadUrl': 'https://hospital.com/reports/diagnosis_001.pdf',
-    },
-    {
-      'color': Color(0xFFFCEBFF),
-      'iconColor': Color(0xFFD946EF),
-      'title': 'Prescription',
-      'subtitle': 'Aspirin 75mg, Atorvastatin 40mg, Clopidogrel 75mg',
-      'doctor': 'Dr. Sarah Williams',
-      'date': '15 Jan 2025',
-      'time': '01:00 PM',
-      'details': 'Prescribed medications: Aspirin 75mg daily, Atorvastatin 40mg at bedtime, Clopidogrel 75mg daily. Follow-up in 1 week.',
-      'downloadUrl': 'https://hospital.com/reports/prescription_001.pdf',
-    },
-    {
-      'color': Color(0xFFFFF7DB),
-      'iconColor': Color(0xFFEAB308),
-      'title': 'Follow-up Visit',
-      'subtitle': 'Blood pressure monitoring, medication review',
-      'doctor': 'Dr. Sarah Williams',
-      'date': '29 Jan 2025',
-      'time': '09:45 AM',
-      'details': 'Follow-up visit. Patient reports no chest pain. Blood pressure controlled at 125/80 mmHg. Medication compliance good.',
-      'downloadUrl': 'https://hospital.com/reports/followup_001.pdf',
-    },
-    {
-      'color': Color(0xFFE8F1FF),
-      'iconColor': Color(0xFF3B82F6),
-      'title': 'Annual Health Checkup',
-      'subtitle': 'Complete metabolic panel, HbA1c, Lipid profile',
-      'doctor': 'Dr. Sarah Williams',
-      'date': '05 Feb 2025',
-      'time': '11:00 AM',
-      'details': 'Annual comprehensive health checkup. All parameters within normal range. HbA1c: 5.8%, Lipid profile improved.',
-      'downloadUrl': 'https://hospital.com/reports/annual_checkup_001.pdf',
-    },
-  ];
 
   @override
   void dispose() {
@@ -148,14 +68,6 @@ class _PatientHistoryState extends State<PatientHistory> {
   }
 
   Widget _buildContent(bool isMobile, bool isTablet) {
-    // Filter timeline data based on search
-    final filteredTimeline = _timelineData.where((item) {
-      final searchText = _searchController.text.toLowerCase();
-      if (searchText.isEmpty) return true;
-      return item['title'].toLowerCase().contains(searchText) ||
-          item['subtitle'].toLowerCase().contains(searchText) ||
-          item['details'].toLowerCase().contains(searchText);
-    }).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -190,7 +102,7 @@ class _PatientHistoryState extends State<PatientHistory> {
         const SizedBox(height: 24),
 
         Obx(() {
-          final patient = controller.selectedPatient.value;
+          final patient = searchController.selectedPatient.value;
           return AppText(
             'Medical history - ${patient?.name ?? ''}',
             fontSize: 18,
@@ -200,54 +112,85 @@ class _PatientHistoryState extends State<PatientHistory> {
         }),
         const SizedBox(height: 16),
 
-        // Show message if no results found
-        if (filteredTimeline.isEmpty)
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
-            ),
-            child: const Center(
-              child: Column(
-                children: [
-                  Icon(Icons.search_off, size: 48, color: Colors.grey),
-                  SizedBox(height: 16),
-                  AppText(
-                    'No records found',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500
-                  ),
-                  SizedBox(height: 8),
-                  AppText(
-                    'Try searching with different keywords',
-                    color: Colors.grey
-                  ),
-                ],
-              ),
-            ),
-          )
-        else
-          // Timeline items
-          ...filteredTimeline.map((item) {
-            return _timelineItem(
-              color: item['color'] as Color,
-              iconColor: item['iconColor'] as Color,
-              title: item['title'] as String,
-              subtitle: item['subtitle'] as String,
-              doctor: item['doctor'] as String,
-              details: item['details'] as String,
-              date: item['date'] as String,
-              time: item['time'] as String,
-              downloadUrl: item['downloadUrl'] as String,
+        Obx(() {
+          if (searchController.selectedPatient.value == null) {
+            return const Center(
+              child: AppText("Please select a patient"),
             );
-          }),
+          }
+
+          if (historyController.isHistoryLoading.value) {
+            return const Padding(
+              padding: EdgeInsets.all(40),
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          if (historyController.historyList.isEmpty) {
+            return const Padding(
+              padding: EdgeInsets.all(40),
+              child: Center(child: AppText("No history found")),
+            );
+          }
+
+          return Column(
+            children: historyController.historyList.map((item) {
+              final style = _getEventStyle(item.eventType);
+
+              return _timelineItem(
+                color: style['color'],
+                iconColor: style['iconColor'],
+                title: item.title,
+                subtitle: item.eventType.replaceAll('_', ' '),
+                doctor: item.admissionType ?? '',
+                details: item.note,
+                date: formatDate(item.createdAt),
+                time: formatTime(item.createdAt),
+              );
+            }).toList(),
+          );
+        }),
 
         // Add some bottom padding for better scrolling
         const SizedBox(height: 40),
       ],
     );
+  }
+
+  Map<String, dynamic> _getEventStyle(String type) {
+    switch (type) {
+      case "OPD_VISIT":
+        return {
+          "color": const Color(0xFFE8F1FF),
+          "iconColor": const Color(0xFF3B82F6),
+        };
+
+      case "ADMISSION_WARD_ASSIGNMENT":
+        return {
+          "color": const Color(0xFFEAF7EF),
+          "iconColor": const Color(0xFF22C55E),
+        };
+
+      case "IPD_BILL":
+        return {
+          "color": const Color(0xFFFFF1E8),
+          "iconColor": const Color(0xFFF97316),
+        };
+
+      default:
+        return {
+          "color": const Color(0xFFF1EDFF),
+          "iconColor": const Color(0xFF8B5CF6),
+        };
+    }
+  }
+
+  String formatDate(DateTime date) {
+    return "${date.day}-${date.month}-${date.year}";
+  }
+
+  String formatTime(DateTime date) {
+    return "${date.hour}:${date.minute.toString().padLeft(2, '0')}";
   }
 
   Widget _patientInfoCard(bool isMobile, bool isTablet) {
@@ -269,7 +212,37 @@ class _PatientHistoryState extends State<PatientHistory> {
           Row(
             children: [
               Expanded(
-                child: _patientDropdown(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const AppText('Select patient', fontSize: 12),
+                    const SizedBox(height: 6),
+                    GestureDetector(
+                      onTap: _openPatientSearchSheet,
+                      child: Container(
+                        height: 44,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                        ),
+                        alignment: Alignment.centerLeft,
+                        child: Obx(() {
+                          final patient = searchController.selectedPatient.value;
+                          return AppText(
+                            patient != null
+                              ? patient.displayName
+                              : "Search patient",
+                            color: patient != null
+                              ? Colors.black
+                              : Colors.black45,
+                          );
+                        }),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               SizedBox(width: isMobile ? 8 : 16),
               Expanded(
@@ -282,87 +255,82 @@ class _PatientHistoryState extends State<PatientHistory> {
     );
   }
 
-  Widget _patientDropdown() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const AppText(
-          'Select patient',
-          fontSize: 12,
+  void _openPatientSearchSheet() {
+    Get.bottomSheet(
+      Container(
+        height: MediaQuery.of(context).size.height * 0.8,
+        padding: const EdgeInsets.all(16),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),
-        const SizedBox(height: 6),
+        child: Column(
+          children: [
+            const SizedBox(height: 8),
 
-        DropdownButtonHideUnderline(
-          child: Obx(() {
-            // Filter patients based on search text
-            final filteredPatients = controller.searchText.value.isEmpty
-                ? controller.patients
-                : controller.patients
-                    .where((patient) => patient.name
-                        .toLowerCase()
-                        .contains(controller.searchText.value.toLowerCase()))
-                    .toList();
-
-            return DropdownButton2<PatientModel>(
-              isExpanded: true,
-              value: controller.patients.contains(controller.selectedPatient.value)
-                  ? controller.selectedPatient.value
-                  : null,
-              hint: const AppText("Search patient"),
-              
-              items: filteredPatients
-                  .map((patient) => DropdownMenuItem<PatientModel>(
-                        value: patient,
-                        child: AppText(patient.displayName), // Show patient ID too
-                      ))
-                  .toList(),
-
-              onChanged: (value) {
-                controller.selectedPatient.value = value;
-              },
-
-              dropdownSearchData: DropdownSearchData(
-                searchController: controller.searchController,
-                searchInnerWidgetHeight: 60,
-                searchInnerWidget: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: TextField(
-                    controller: controller.searchController,
-                    decoration: InputDecoration(
-                      isDense: true,
-                      hintText: 'Search patient...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                ),
-                searchMatchFn: (item, searchValue) {
-                  // Return true for all items since we're handling filtering above
-                  return true;
-                },
-              ),
-
-              buttonStyleData: ButtonStyleData(
-                height: 44,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
+            /// Search Field
+            TextField(
+              controller: searchController.searchController,
+              autofocus: true,
+              decoration: InputDecoration(
+                hintText: "Search patient...",
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: Obx(() => searchController.isLoading.value
+                    ? const Padding(
+                        padding: EdgeInsets.all(12),
+                        child: SizedBox(
+                          height: 16,
+                          width: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      )
+                    : const SizedBox()),
+                border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 12),
               ),
+            ),
 
-              dropdownStyleData: DropdownStyleData(
-                maxHeight: 300,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            );
-          }),
+            const SizedBox(height: 16),
+
+            /// Patient List
+            Expanded(
+              child: Obx(() {
+                final patients = searchController.patients;
+
+                if (searchController.isLoading.value && patients.isEmpty) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                if (patients.isEmpty) {
+                  return const Center(
+                    child: AppText("Start typing to search"),
+                  );
+                }
+
+                return ListView.builder(
+                  itemCount: patients.length,
+                  itemBuilder: (context, index) {
+                    final patient = patients[index];
+
+                    return ListTile(
+                      title: AppText(patient.displayName),
+                      onTap: () {
+                        searchController.selectPatient(patient);
+                        searchController.clearSearch();
+                        Get.back();
+                      },
+                    );
+                  },
+                );
+              }),
+            ),
+          ],
         ),
-      ],
+      ),
+      isScrollControlled: true,
     );
   }
 
@@ -398,7 +366,6 @@ class _PatientHistoryState extends State<PatientHistory> {
     required String details,
     required String date,
     required String time,
-    required String downloadUrl,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -463,7 +430,7 @@ class _PatientHistoryState extends State<PatientHistory> {
                       const SizedBox(width: 24),
                       TextButton(
                         onPressed: () {
-                          _downloadReport(title, downloadUrl);
+                          _downloadReport(title, "");
                         },
                         child: const AppText(
                           'Download',

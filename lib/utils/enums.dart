@@ -22,6 +22,7 @@ enum DoctorPanelMenu implements PanelMenu {
   labResults('Laboratory results'),
   patientDatabase('Patients Database'),
   broadcasting('Broadcasting'),
+  ipdManagement('Ipd Management'),
   analysis('Analysis'),
   profile('Profile'),
   settings('Settings');
@@ -51,6 +52,8 @@ enum PatientDetailsMenu {
   treatment,
   investigation,
   surgicalNotes,
+  ePrescription,
+  dischargeSummary
 }
 
 enum VitalsViewMode {

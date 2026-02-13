@@ -43,6 +43,10 @@
 	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>We need speech recognition to allow you to dictate discharge summaries.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need microphone access to record your voice for discharge summaries.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 </dict>
