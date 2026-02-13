@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:get/get.dart';
 
 import '../services/api_service.dart';
@@ -57,6 +59,7 @@ class ModuleLoginControllers extends GetxController {
         );
       }
     } catch (e) {
+      log('Login error: $e');
       AppSnackbar.show(
         title: 'Network Error',
         message: e.toString(),
