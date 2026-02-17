@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mdi_icons/flutter_mdi_icons.dart';
 import 'package:get/get.dart';
+import 'package:hms/utils/snackbar.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 import '../../controllers/patient_details_controllers.dart';
@@ -25,9 +26,9 @@ import 'monitoring/patient_details_consultation.dart';
 import 'monitoring/patient_details_diagnosis.dart';
 import 'monitoring/patient_details_followup.dart';
 import 'monitoring/patient_details_prescription.dart';
+import 'monitoring/patient_details_vitals_monitoring.dart';
 import 'patient_certificate_screen.dart';
 import 'patient_details_investigation.dart';
-import 'monitoring/patient_details_vitals_monitoring.dart';
 import 'patient_details_surgical_notes.dart';
 import 'patient_details_treatment.dart';
 
@@ -46,6 +47,14 @@ class PatientDetails extends StatelessWidget {
       desktop: desktopView(context),
     );
   }
+
+  void _showInvestigationDialog() {
+  showDialog(
+    context: Get.context!,
+    barrierDismissible: false,
+    builder: (_) => InvestigationRequestDialog(patient: patient),
+  );
+}
 
   Widget desktopView(BuildContext context) {
     return Scaffold(
@@ -445,7 +454,10 @@ class PatientDetails extends StatelessWidget {
           return PatientDetailsTreatment(patient: patient,);
 
         case PatientDetailsMenu.investigation:
-          return const PatientDetailsInvestigation();
+          return  PatientDetailsInvestigationPage(patient: patient,
+          onNewInvestigation: _showInvestigationDialog,
+          );
+
 
         case PatientDetailsMenu.surgicalNotes:
           return const PatientDetailsSurgicalNotes();
@@ -2103,6 +2115,8 @@ class _InvestigationRequestDialogState extends State<InvestigationRequestDialog>
   final scheduleCtrl = TextEditingController();
   final reasonCtrl = TextEditingController();
   final historyCtrl = TextEditingController();
+  final tagsCtrl = TextEditingController();
+  final investigationDetailsCtrl = TextEditingController();
 
   @override
   void dispose() {
@@ -2266,6 +2280,11 @@ class _InvestigationRequestDialogState extends State<InvestigationRequestDialog>
             fontSize: 12,
             color: AppColors.greyText,
           ),
+          AppText(
+            "Adm Id : ${widget.patient.currentAdmissionCode}",
+            fontSize: 12,
+            color: AppColors.greyText,
+          ),
           const SizedBox(height: 12),
           AppText("Gender : ${widget.patient.gender}", fontSize: 12),
           AppText("Age : ${widget.patient.age} years", fontSize: 12),
@@ -2275,9 +2294,11 @@ class _InvestigationRequestDialogState extends State<InvestigationRequestDialog>
   }
 
   // ================= RIGHT FORM =================
-  Widget _form() {
-    return Form(
-      key: _formKey,
+Widget _form() {
+  return Form(
+    key: _formKey,
+    child: SingleChildScrollView(
+      padding: const EdgeInsets.all(16), // optional
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -2333,6 +2354,7 @@ class _InvestigationRequestDialogState extends State<InvestigationRequestDialog>
 
               const SizedBox(height: 16),
 
+              /// Schedule
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -2345,12 +2367,14 @@ class _InvestigationRequestDialogState extends State<InvestigationRequestDialog>
                   TextFormField(
                     controller: scheduleCtrl,
                     readOnly: true,
-                    validator: (v) => v == null || v.isEmpty ? "Schedule date and time is required" : null,
+                    validator: (v) =>
+                        v == null || v.isEmpty ? "Schedule date and time is required" : null,
                     onTap: _pickDateTime,
                     decoration: InputDecoration(
                       hintText: "Select date & time",
                       suffixIcon: const Icon(Icons.calendar_today_outlined),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -2375,8 +2399,24 @@ class _InvestigationRequestDialogState extends State<InvestigationRequestDialog>
                 hint: "Enter clinical history",
                 maxLines: 3,
               ),
+
+              _input(
+                label: "Investigation Details",
+                controller: investigationDetailsCtrl,
+                hint: "Enter investigation details",
+                maxLines: 2,
+              ),
+
+              _input(
+                label: "Tags (comma separated)",
+                controller: tagsCtrl,
+                hint: "eg Cancer, Blood, Infection",
+                maxLines: 2,
+              ),
             ],
           ),
+
+          const SizedBox(height: 24),
 
           /// ACTIONS
           Row(
@@ -2396,22 +2436,39 @@ class _InvestigationRequestDialogState extends State<InvestigationRequestDialog>
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   // ================= SUBMIT =================
-  void _submit() {
-    if (!_formKey.currentState!.validate()) return;
+void _submit() async {
+  if (!_formKey.currentState!.validate()) return;
 
-    controller.createInvestigation(
-      patientId: widget.patient.id,
-      investigationType: investigationCtrl.text,
-      priority: priorityCtrl.text,
-      scheduledDateTime: toIsoWithoutMilliseconds(selectedDateTime!),
-      reasonForInvestigation: reasonCtrl.text,
-      clinicalHistory: historyCtrl.text,
+  if (selectedDateTime == null) {
+    AppSnackbar.show(
+      title: "Error",
+      message: "Please select schedule date & time",
+      type: AppSnackType.error,
     );
+    return;
   }
+
+  final success = await controller.createInvestigation(
+    patientMongoId: widget.patient.id,               // ✅ MongoDB ID
+    patientId: widget.patient.patientId,             // ✅ Normal patient ID (optional, kept for signature)
+    investigationType: investigationCtrl.text,
+    priority: priorityCtrl.text,
+    scheduledDateTime: selectedDateTime!.toIso8601String(),
+    reasonForInvestigation: reasonCtrl.text,
+    clinicalHistory: historyCtrl.text,
+    investigationDetails: investigationDetailsCtrl.text, // 👈 was missing
+    patient: widget.patient,                          // ✅ if needed by controller
+  );
+
+  if (success && mounted) {
+    Get.back();
+  }
+}
 
   // ================= INPUT HELPERS =================
   Widget _input({

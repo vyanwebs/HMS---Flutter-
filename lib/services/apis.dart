@@ -61,3 +61,7 @@ String deleteMultiLabTestRequestApi = "$baseUrl/api/lab-test-request/delete-mult
 String getIpdPatientsApi = "$baseUrl/api/doctor/ipd-patients";
 String createDischargeSummaryApi = "$baseUrl/api/discharge-summary/create";
 String viewDischargeSummaryApi = "$baseUrl/api/discharge-summary/view";
+String CreateinvestigationApi = "$baseUrl/api/investigation/create";
+String UpdateinvetationApi = "$baseUrl/api/investigation/update-by-id/";
+String invetationbyidApi = "$baseUrl/api/investigation/get-by-patient-mongo-id";
+ 
