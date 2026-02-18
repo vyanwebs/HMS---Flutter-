@@ -66,6 +66,7 @@ String getIpdManagementDetailsApi = "$baseUrl/api/doctor/ipd-management-details"
 String createSymptomsApi = "$baseUrl/api/symptoms/create-symptoms";
 String getMedicinelistApi = "$baseUrl/api/medicine/table?limit=50";
 String createconsultationApi = "$baseUrl/api/consultation-form/create";
+String updateinvestigationApi = "$baseUrl/api/investigation/update-by-id";
 String fetchAllSymptomsApi = "$baseUrl/api/symptoms/fetch-all-symptoms";
 String deleteSymptomsApi = "$baseUrl/api/symptoms";
 String filterSymptomsApi = "$baseUrl/api/symptoms/name";
