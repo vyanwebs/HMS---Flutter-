@@ -114,8 +114,7 @@ class PatientModel {
   String get displayName => '$name - $patientId';
 
   @override
-  bool operator ==(Object other) =>
-      other is PatientModel && other.id == id;
+  bool operator ==(Object other) => other is PatientModel && other.id == id;
 
   @override
   int get hashCode => id.hashCode;

@@ -1,14 +1,18 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../controllers/Doctor/patient_search_controllers.dart';
 import '../../controllers/Reception/opd_registration_controller.dart';
 import '../../utils/buttons.dart';
 import '../../utils/text.dart';
+import '../../widgets/patient_selector_widget.dart';
 
 class OPDScreen extends StatelessWidget {
   OPDScreen({super.key});
 
   final controller = Get.find<OPDRegistrationController>();
+  final searchController = Get.find<PatientSearchController>();
 
   @override
   Widget build(BuildContext context) {
@@ -422,105 +426,6 @@ class OPDScreen extends StatelessWidget {
 
   Widget _finalReviewStep() {
     return Container();
-  // Column(
-  //   crossAxisAlignment: CrossAxisAlignment.start,
-  //   children: [
-
-  //     const AppText(
-  //       "Final Review",
-  //       fontSize: 18,
-  //       fontWeight: FontWeight.w600,
-  //     ),
-
-  //     const SizedBox(height: 25),
-
-  //     Container(
-  //       padding: const EdgeInsets.all(20),
-  //       decoration: BoxDecoration(
-  //         color: const Color(0xFFF7F9FC),
-  //         borderRadius: BorderRadius.circular(12),
-  //         border: Border.all(color: Colors.grey.shade300),
-  //       ),
-  //       child: Column(
-  //         crossAxisAlignment: CrossAxisAlignment.start,
-  //         children: [
-
-  //           const AppText(
-  //             "Patient Information",
-  //             fontWeight: FontWeight.w600,
-  //           ),
-  //           const SizedBox(height: 15),
-
-  //           AppText("Name: ${controller.patientName.value}"),
-  //           AppText("Gender: ${controller.gender.value}"),
-  //           AppText("Age: ${controller.age.value}"),
-  //           AppText("Phone: ${controller.phone.value}"),
-
-  //           const SizedBox(height: 20),
-
-  //           const AppText(
-  //             "Assigned Doctor",
-  //             fontWeight: FontWeight.w600,
-  //           ),
-  //           const SizedBox(height: 10),
-
-  //           AppText(controller.selectedDoctor.value),
-
-  //         ],
-  //       ),
-  //     ),
-
-  //     const SizedBox(height: 30),
-
-  //     Row(
-  //       mainAxisAlignment: MainAxisAlignment.end,
-  //       children: [
-  //         TextButton(
-  //           onPressed: () {
-  //             controller.opdStep.value = 2;
-  //           },
-  //           child: const Text("Back"),
-  //         ),
-  //         const SizedBox(width: 15),
-  //         ElevatedButton(
-  //           style: ElevatedButton.styleFrom(
-  //             backgroundColor: Colors.green,
-  //           ),
-  //           onPressed: () {
-  //             // 🔥 Final API call
-              
-  //           },
-  //           child: const Text("Confirm & Register"),
-  //         ),
-  //       ],
-  //     )
-  //   ],
-  // );
-  }
-
-  Widget _opdStepItem(int number, String title, int currentStep) {
-    final active = number == currentStep;
-
-    return Column(
-      children: [
-        CircleAvatar(
-          radius: 18,
-          backgroundColor:
-              active ? const Color(0xFF2383E2) : Colors.grey.shade300,
-          child: Text(
-            "$number",
-            style: TextStyle(
-              color: active ? Colors.white : Colors.black,
-            ),
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          title,
-          style: const TextStyle(fontSize: 13),
-        ),
-      ],
-    );
   }
 
   Widget _sectionHeader(String title) {
@@ -870,9 +775,22 @@ class OPDScreen extends StatelessWidget {
         const SizedBox(height: 12),
         Row(
           children: [
-            Expanded(child: _textField("Search patient")),
+            Expanded(
+              child: CustomPatientSearchField(
+                label: "",
+                onChanged: (patient) {
+                  if (kDebugMode) {
+                    print(patient?.displayName);
+                  }
+                },
+              ),
+            ),
             const SizedBox(width: 20),
-            Expanded(child: _textField("Patient id result")),
+            Expanded(
+              child: _textField(
+                "Patient id result"
+              )
+            ),
           ],
         )
       ],
