@@ -121,14 +121,14 @@ class InvestigationController extends GetxController {
       
       final String url = "$baseUrl/api/investigation/create";
       print("📤 POST Request URL: $url");
-
+      print ("scheduledDateAndTime -${scheduledDateAndTime}");
       // Validate required fields
       if (patientMongoId.isEmpty) throw Exception("patientMongoId is required");
       if (patientId.isEmpty) throw Exception("patientId is required");
       if (doctorMongoId.isEmpty) throw Exception("doctorMongoId is required");
       if (investigationType.isEmpty) throw Exception("investigationType is required");
-      if (scheduledDateAndTime.isEmpty) throw Exception("scheduledDateAndTime is required");
-
+      if (scheduledDateAndTime.toString().isEmpty) throw Exception("scheduledDateAndTime is required");
+ 
       // Prepare the request body
       final Map<String, dynamic> body = {
         "patientMongoId": patientMongoId,
@@ -136,7 +136,7 @@ class InvestigationController extends GetxController {
         "doctorMongoId": doctorMongoId,
         "investigationType": investigationType,
         "priority": priority,
-        "scheduledDateAndTime": scheduledDateAndTime, // Should be local ISO string (with offset)
+        "scheduledDateAndTime": scheduledDateAndTime.toString(), // Should be local ISO string (with offset)
         "reasonForInvestigation": reasonForInvestigation,
         "clinicalHistory": clinicalHistory,
         "investigationDetails": investigationDetails,
@@ -146,8 +146,10 @@ class InvestigationController extends GetxController {
         "insuranceCovered": insuranceCovered,
       };
 
+
       // Print the request body for debugging
       print("📤 Request Body: ${_maskSensitiveData(body)}");
+
 
       final helper = NetworkHelper(url: url);
       final response = await helper.post(body: body, auth: true);
@@ -203,23 +205,23 @@ class InvestigationController extends GetxController {
   }
 
   /// NEW: Create Investigation using InvestigationModel (preferred)
-  Future<bool> createInvestigationFromModel(InvestigationModel investigation) async {
-    return createInvestigation(
-      patientMongoId: investigation.patientMongoId ?? '',
-      patientId: investigation.patientId ?? '',
-      doctorMongoId: investigation.doctorMongoId ?? '',
-      investigationType: investigation.investigationType,
-      priority: investigation.priority,
-      scheduledDateAndTime: investigation.scheduledDateAndTime.toIso8601String(), // local ISO
-      reasonForInvestigation: investigation.reasonForInvestigation,
-      clinicalHistory: investigation.clinicalHistory,
-      investigationDetails: investigation.investigationDetails,
-      tags: investigation.tags,
-      insuranceStatus: investigation.insuranceStatus,
-      paymentStatus: investigation.paymentStatus,
-      insuranceCovered: investigation.insuranceCovered,
-    );
-  }
+  // Future<bool> createInvestigationFromModel(InvestigationModel investigation) async {
+  //   return createInvestigation(
+  //     patientMongoId: investigation.patientMongoId ?? '',
+  //     patientId: investigation.patientId ?? '',
+  //     doctorMongoId: investigation.doctorMongoId ?? '',
+  //     investigationType: investigation.investigationType,
+  //     priority: investigation.priority,
+  //     scheduledDateAndTime: investigation.scheduledDateAndTime.toIso8601String(), // local ISO
+  //     reasonForInvestigation: investigation.reasonForInvestigation,
+  //     clinicalHistory: investigation.clinicalHistory,
+  //     investigationDetails: investigation.investigationDetails,
+  //     tags: investigation.tags,
+  //     insuranceStatus: investigation.insuranceStatus,
+  //     paymentStatus: investigation.paymentStatus,
+  //     insuranceCovered: investigation.insuranceCovered,
+  //   );
+  // }
 
   /// Update Investigation
   Future<bool> updateInvestigation({

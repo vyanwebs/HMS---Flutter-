@@ -28,9 +28,9 @@ import 'monitoring/patient_details_consultation.dart';
 import 'monitoring/patient_details_diagnosis.dart';
 import 'monitoring/patient_details_followup.dart';
 import 'monitoring/patient_details_prescription.dart';
+import 'monitoring/patient_details_vitals_monitoring.dart';
 import 'patient_certificate_screen.dart';
 import 'patient_details_investigation.dart';
-import 'monitoring/patient_details_vitals_monitoring.dart';
 import 'patient_details_surgical_notes.dart';
 import 'patient_details_treatment.dart';
 
@@ -65,6 +65,14 @@ class _PatientDetailsState extends State<PatientDetails> {
       desktop: desktopView(context),
     );
   }
+
+  void _showInvestigationDialog() {
+  showDialog(
+    context: Get.context!,
+    barrierDismissible: false,
+    builder: (_) => InvestigationRequestDialog(patient: widget.patient),
+  );
+}
 
   Widget desktopView(BuildContext context) {
     return Scaffold(

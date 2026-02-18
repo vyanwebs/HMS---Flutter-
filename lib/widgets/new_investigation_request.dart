@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import '../controllers/Doctor/investigation_controller.dart';
 import '../../models/patient_model.dart';
 import '../../utils/buttons.dart';
 import '../../utils/constants.dart';
 import '../../utils/snackbar.dart';
 import '../../utils/text.dart';
+import '../controllers/Doctor/investigation_controller.dart';
 
 class InvestigationRequestDialog extends StatefulWidget {
   final PatientModel patient;
@@ -125,54 +125,70 @@ class _InvestigationRequestDialogState extends State<InvestigationRequestDialog>
     return "697c929c30e0981185ef355e";
   }
 
+  String formatDateWithOffset(DateTime dateTime) {
+    final local = dateTime.toLocal();
+    final offset = local.timeZoneOffset;
 
-void _submit() async {
-  if (!_formKey.currentState!.validate()) return;
+    final sign = offset.isNegative ? '-' : '+';
+    final hours = offset.inHours.abs().toString().padLeft(2, '0');
+    final minutes = (offset.inMinutes.abs() % 60).toString().padLeft(2, '0');
 
-  if (selectedDateTime == null) {
-    AppSnackbar.show(
-      title: "Error",
-      message: "Please select schedule date & time",
-      type: AppSnackType.error,
+    return '${local.year.toString().padLeft(4, '0')}-'
+        '${local.month.toString().padLeft(2, '0')}-'
+        '${local.day.toString().padLeft(2, '0')}T'
+        '${local.hour.toString().padLeft(2, '0')}:'
+        '${local.minute.toString().padLeft(2, '0')}:00'
+        '$sign$hours:$minutes';
+  }
+
+
+  void _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    if (selectedDateTime == null) {
+      AppSnackbar.show(
+        title: "Error",
+        message: "Please select schedule date & time",
+        type: AppSnackType.error,
+      );
+      return;
+    }
+
+    final doctorMongoId = _getDoctorMongoId();
+    if (doctorMongoId.isEmpty) {
+      AppSnackbar.show(
+        title: "Error",
+        message: "Doctor ID is missing",
+        type: AppSnackType.error,
+      );
+      return;
+    }
+
+    final String formattedDate = formatDateWithOffset(selectedDateTime!);
+
+    print("🔵 Original selected DateTime: $selectedDateTime");
+    print("🔵 Formatted date being sent: $formattedDate");
+
+    final success = await investigationController.createInvestigation(
+      patientMongoId: widget.patient.id,
+      patientId: widget.patient.patientId,
+      doctorMongoId: doctorMongoId,
+      investigationType: _investigationType,
+      priority: _priority,
+      scheduledDateAndTime: formattedDate,
+      reasonForInvestigation: reasonCtrl.text,
+      clinicalHistory: historyCtrl.text,
+      investigationDetails: investigationDetailsCtrl.text,
+      tags: tagsCtrl.text,
+      insuranceStatus: _insuranceStatus,
+      paymentStatus: _paymentStatus,
+      insuranceCovered: insuranceCovered,
     );
-    return;
+
+    if (success && mounted) {
+      Get.back();
+    }
   }
-
-  final doctorMongoId = _getDoctorMongoId();
-  if (doctorMongoId.isEmpty) {
-    AppSnackbar.show(
-      title: "Error",
-      message: "Doctor ID is missing",
-      type: AppSnackType.error,
-    );
-    return;
-  }
-
-  // ✅ Format with offset using intl
-// ✅ Better: Produces "2026-02-26T11:48:00.000Z" (Server loves this)
-final String formattedDate = selectedDateTime!.toUtc().toIso8601String();  print("🔵 Original selected DateTime: ${selectedDateTime!}");
-  print("🔵 Formatted date being sent: $formattedDate");
-
-  final success = await investigationController.createInvestigation(
-    patientMongoId: widget.patient.id,
-    patientId: widget.patient.patientId,
-    doctorMongoId: doctorMongoId,
-    investigationType: _investigationType,
-    priority: _priority,
-    scheduledDateAndTime: formattedDate,
-    reasonForInvestigation: reasonCtrl.text,
-    clinicalHistory: historyCtrl.text,
-    investigationDetails: investigationDetailsCtrl.text,
-    tags: tagsCtrl.text,
-    insuranceStatus: _insuranceStatus,
-    paymentStatus: _paymentStatus,
-    insuranceCovered: insuranceCovered,
-  );
-
-  if (success && mounted) {
-    Get.back();
-  }
-}
 
 
   @override
