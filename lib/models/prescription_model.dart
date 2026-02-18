@@ -53,16 +53,19 @@ class PrescriptionModel {
 class MedicineModel {
   final String id;
   final String name;
+  final String? category;
 
   MedicineModel({
     required this.id,
     required this.name,
+    this.category,
   });
 
   factory MedicineModel.fromJson(Map<String, dynamic> json) {
     return MedicineModel(
       id: json['_id'],
       name: json['name'],
+      category: json['category'] ?? json['medicineCategory'] ?? json['drugCategory'] ?? null,
     );
   }
 }

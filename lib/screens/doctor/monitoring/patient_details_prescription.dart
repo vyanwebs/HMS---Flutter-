@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mdi_icons/flutter_mdi_icons.dart';
 import 'package:get/get.dart';
 
-import '../../../controllers/patient_details_prescription_controllers.dart';
+import '../../../controllers/Doctor/patient_details_prescription_controllers.dart';
 import '../../../models/patient_model.dart';
 import '../../../utils/buttons.dart';
 import '../../../utils/constants.dart';

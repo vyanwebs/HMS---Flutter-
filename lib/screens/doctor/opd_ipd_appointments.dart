@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/assigned_patients_controllers.dart';
+import '../../controllers/Doctor/assigned_patients_controllers.dart';
 import '../../models/patient_model.dart';
 import '../../models/teleconsultation_queue_model.dart';
 import '../../utils/buttons.dart';

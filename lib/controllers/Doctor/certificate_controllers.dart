@@ -5,12 +5,12 @@ import 'package:get/get.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
-import '../models/certificate_response_model.dart';
-import '../models/certificate_type_model.dart';
-import '../services/api_service.dart';
-import '../services/apis.dart';
-import '../utils/overlay.dart';
-import '../utils/snackbar.dart';
+import '../../models/certificate_response_model.dart';
+import '../../models/certificate_type_model.dart';
+import '../../services/api_service.dart';
+import '../../services/apis.dart';
+import '../../utils/overlay.dart';
+import '../../utils/snackbar.dart';
 
 class CertificateControllers extends GetxController {
 

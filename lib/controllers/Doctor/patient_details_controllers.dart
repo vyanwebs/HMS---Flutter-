@@ -4,14 +4,14 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../models/patient_model.dart';
-import '../models/prescription_model.dart';
-import '../screens/doctor/patient_details.dart';
-import '../services/api_service.dart';
-import '../services/apis.dart';
-import '../utils/enums.dart';
-import '../utils/overlay.dart';
-import '../utils/snackbar.dart';
+import '../../models/patient_model.dart';
+import '../../models/prescription_model.dart';
+import '../../screens/doctor/patient_details.dart';
+import '../../services/api_service.dart';
+import '../../services/apis.dart';
+import '../../utils/enums.dart';
+import '../../utils/overlay.dart';
+import '../../utils/snackbar.dart';
 
 class PatientDetailsControllers extends GetxController {
 
@@ -20,11 +20,6 @@ class PatientDetailsControllers extends GetxController {
   final isMonitoringExpanded = false.obs;
   
   RxBool isBeforeMeal = true.obs;
-
-  final bpCtrl = TextEditingController();
-  final pulseCtrl = TextEditingController();
-  final tempCtrl = TextEditingController();
-  final spo2Ctrl = TextEditingController();
 
   RxList frequentlyUsedMedicines = [
     "Viral Fever",
@@ -50,64 +45,6 @@ class PatientDetailsControllers extends GetxController {
     isMonitoringExpanded.toggle();
   }
 
-  /// ---------- CREATE VITAL ----------
-  Future<void> createVital({
-    required PatientModel patient,
-  }) async {
-    try {
-      LoadingOverlayService.show(message: "Adding vitals...");
-      log(patient.id);
-      final api = NetworkHelper(url: addVitalsApi);
-
-      final response = await api.post(
-        auth: true,
-        body: {
-          "patientMongoId": patient.id,
-          "bp": bpCtrl.text.trim(),
-          "pulse": int.tryParse(pulseCtrl.text),
-          "temperature": double.tryParse(tempCtrl.text),
-          "spo2": int.tryParse(spo2Ctrl.text),
-        },
-      );
-
-      LoadingOverlayService.hide();
-      Get.back();
-
-      if (response['success'] == true) {
-        AppSnackbar.show(
-          title: "Success",
-          message: "Vitals added successfully",
-          type: AppSnackType.success,
-        );
-
-        clearVitalForm();
-
-      } else {
-        AppSnackbar.show(
-          title: "Failed",
-          message: response['message'] ?? "Unable to add vitals",
-          type: AppSnackType.error,
-        );
-      }
-    } catch (e, s) {
-      LoadingOverlayService.hide();
-
-      log('❌ createVital failed', error: e, stackTrace: s);
-
-      AppSnackbar.show(
-        title: "Error",
-        message: "Something went wrong",
-        type: AppSnackType.error,
-      );
-    } 
-  }
-
-  void clearVitalForm() {
-    bpCtrl.clear();
-    pulseCtrl.clear();
-    tempCtrl.clear();
-    spo2Ctrl.clear();
-  }
 
   Future<void> makeAdmitRequest({
     required PatientModel patient,

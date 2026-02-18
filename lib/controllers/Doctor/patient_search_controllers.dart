@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../services/api_service.dart';
-import '../services/apis.dart';
+import '../../services/api_service.dart';
+import '../../services/apis.dart';
 
 class PatientSearchController extends GetxController {
 

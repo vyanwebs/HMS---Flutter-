@@ -3,14 +3,14 @@ import 'dart:developer';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
-import '../models/broadcast_model.dart';
-import '../models/pending_task_model.dart';
-import '../models/patient_model.dart';
-import '../models/teleconsultation_queue_model.dart';
-import '../models/weekly_patients_chart_model.dart';
-import '../services/api_service.dart';
-import '../services/apis.dart';
-import '../utils/images.dart';
+import '../../models/broadcast_model.dart';
+import '../../models/patient_model.dart';
+import '../../models/pending_task_model.dart';
+import '../../models/teleconsultation_queue_model.dart';
+import '../../models/weekly_patients_chart_model.dart';
+import '../../services/api_service.dart';
+import '../../services/apis.dart';
+import '../../utils/images.dart';
 
 class DoctorDashboardControllers extends GetxController {
 

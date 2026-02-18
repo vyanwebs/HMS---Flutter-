@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-import '../../controllers/lab_test_controllers.dart';
-import '../../controllers/patient_search_controllers.dart';
+import '../../controllers/Doctor/lab_test_controllers.dart';
+import '../../controllers/Doctor/patient_search_controllers.dart';
 import '../../models/lab_test_request_model.dart';
 import '../../utils/buttons.dart';
 import '../../utils/keyboard_intents.dart';

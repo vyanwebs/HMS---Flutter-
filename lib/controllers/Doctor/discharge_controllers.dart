@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
 
-import '../services/api_service.dart';
-import '../services/apis.dart';
-import '../utils/overlay.dart';
-import '../utils/snackbar.dart';
+import '../../services/api_service.dart';
+import '../../services/apis.dart';
+import '../../utils/overlay.dart';
+import '../../utils/snackbar.dart';
 
 class DischargeControllers extends GetxController {
 

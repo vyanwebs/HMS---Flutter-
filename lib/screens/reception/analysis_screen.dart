@@ -26,328 +26,330 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Analytics & Reports',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2D3748),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF7FAFC),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: _selectedPeriod,
-                    items: ['Today', 'This Week', 'This Month', 'This Year']
-                        .map((period) => DropdownMenuItem(
-                              value: period,
-                              child: Text(period),
-                            ))
-                        .toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedPeriod = value!;
-                      });
-                    },
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Analytics & Reports',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2D3748),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-
-          // Stats Overview
-          Row(
-            children: [
-              Expanded(
-                child: _buildAnalysisCard(
-                  'Total Revenue',
-                  '₹2,45,800',
-                  '+12.5%',
-                  Icons.trending_up,
-                  const Color(0xFF48BB78),
-                ),
-              ),
-              const SizedBox(width: 20),
-              Expanded(
-                child: _buildAnalysisCard(
-                  'Total Patients',
-                  '324',
-                  '+8.2%',
-                  Icons.people,
-                  const Color(0xFF4299E1),
-                ),
-              ),
-              const SizedBox(width: 20),
-              Expanded(
-                child: _buildAnalysisCard(
-                  'Avg. Stay Duration',
-                  '4.2 days',
-                  '-0.5%',
-                  Icons.timelapse,
-                  const Color(0xFFED8936),
-                ),
-              ),
-              const SizedBox(width: 20),
-              Expanded(
-                child: _buildAnalysisCard(
-                  'Bed Occupancy',
-                  '78%',
-                  '+5.3%',
-                  Icons.king_bed,
-                  const Color(0xFF9F7AEA),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 30),
-
-          // Charts Row
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Revenue Trend',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF2D3748),
-                      ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF7FAFC),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _selectedPeriod,
+                      items: ['Today', 'This Week', 'This Month', 'This Year']
+                          .map((period) => DropdownMenuItem(
+                                value: period,
+                                child: Text(period),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedPeriod = value!;
+                        });
+                      },
                     ),
-                    const SizedBox(height: 20),
-
-                    Container(
-                      padding: const EdgeInsets.all(25),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFE2E8F0)),
-                      ),
-                      child: Column(
-                        children: [
-                          // Revenue Chart
-                          SizedBox(
-                            height: 200,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                _buildRevenueBar(40000, 'Jan'),
-                                _buildRevenueBar(45000, 'Feb'),
-                                _buildRevenueBar(52000, 'Mar'),
-                                _buildRevenueBar(48000, 'Apr'),
-                                _buildRevenueBar(60000, 'May'),
-                                _buildRevenueBar(55000, 'Jun'),
-                                _buildRevenueBar(75000, 'Jul'),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          const Divider(height: 1),
-                          const SizedBox(height: 20),
-                          const Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Total Revenue: ₹3,75,000',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF2D3748),
-                                ),
-                              ),
-                              Text(
-                                'Growth: +25.3%',
-                                style: TextStyle(
-                                  color: Color(0xFF48BB78),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-
-              const SizedBox(width: 30),
-
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Patient Distribution',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF2D3748),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    Container(
-                      padding: const EdgeInsets.all(25),
-                      height: 300,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFE2E8F0)),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _buildDistributionItem('IPD Patients', 78,
-                              const Color(0xFF4299E1), '24%'),
-                          _buildDistributionItem('OPD Patients', 246,
-                              const Color(0xFF48BB78), '76%'),
-                          const SizedBox(height: 20),
-                          Container(
-                            height: 100,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFF4299E1),
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(8),
-                                        bottomLeft: Radius.circular(8),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 3,
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFF48BB78),
-                                      borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(8),
-                                        bottomRight: Radius.circular(8),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 30),
-
-          // Department Performance
-          const Text(
-            'Department Performance',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF2D3748),
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          Container(
-            padding: const EdgeInsets.all(25),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
-            ),
-            child: Column(
-              children: [
-                // Department Performance Bars
-                _buildPerformanceBar('Cardiology', 85, const Color(0xFF4299E1)),
-                const SizedBox(height: 15),
-                _buildPerformanceBar('Orthopedics', 72, const Color(0xFF48BB78)),
-                const SizedBox(height: 15),
-                _buildPerformanceBar('Neurology', 68, const Color(0xFF9F7AEA)),
-                const SizedBox(height: 15),
-                _buildPerformanceBar('Dermatology', 91, const Color(0xFFED8936)),
-                const SizedBox(height: 15),
-                _buildPerformanceBar('Pediatrics', 79, const Color(0xFFF56565)),
               ],
             ),
-          ),
-
-          const SizedBox(height: 30),
-
-          // Report Generation
-          const Text(
-            'Generate Reports',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF2D3748),
+            const SizedBox(height: 20),
+        
+            // Stats Overview
+            Row(
+              children: [
+                Expanded(
+                  child: _buildAnalysisCard(
+                    'Total Revenue',
+                    '₹2,45,800',
+                    '+12.5%',
+                    Icons.trending_up,
+                    const Color(0xFF48BB78),
+                  ),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: _buildAnalysisCard(
+                    'Total Patients',
+                    '324',
+                    '+8.2%',
+                    Icons.people,
+                    const Color(0xFF4299E1),
+                  ),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: _buildAnalysisCard(
+                    'Avg. Stay Duration',
+                    '4.2 days',
+                    '-0.5%',
+                    Icons.timelapse,
+                    const Color(0xFFED8936),
+                  ),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: _buildAnalysisCard(
+                    'Bed Occupancy',
+                    '78%',
+                    '+5.3%',
+                    Icons.king_bed,
+                    const Color(0xFF9F7AEA),
+                  ),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 20),
-
-          Row(
-            children: [
-              Expanded(
-                child: _buildReportCard(
-                  'Financial Report',
-                  Icons.pie_chart,
-                  'Revenue, Expenses, Profit',
-                  const Color(0xFF48BB78),
+        
+            const SizedBox(height: 30),
+        
+            // Charts Row
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Revenue Trend',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF2D3748),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+        
+                      Container(
+                        padding: const EdgeInsets.all(25),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                        ),
+                        child: Column(
+                          children: [
+                            // Revenue Chart
+                            SizedBox(
+                              height: 200,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  _buildRevenueBar(40000, 'Jan'),
+                                  _buildRevenueBar(45000, 'Feb'),
+                                  _buildRevenueBar(52000, 'Mar'),
+                                  _buildRevenueBar(48000, 'Apr'),
+                                  _buildRevenueBar(60000, 'May'),
+                                  _buildRevenueBar(55000, 'Jun'),
+                                  _buildRevenueBar(75000, 'Jul'),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            const Divider(height: 1),
+                            const SizedBox(height: 20),
+                            const Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Total Revenue: ₹3,75,000',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF2D3748),
+                                  ),
+                                ),
+                                Text(
+                                  'Growth: +25.3%',
+                                  style: TextStyle(
+                                    color: Color(0xFF48BB78),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 20),
-              Expanded(
-                child: _buildReportCard(
-                  'Patient Statistics',
-                  Icons.people,
-                  'Admissions, Discharges',
-                  const Color(0xFF4299E1),
+        
+                const SizedBox(width: 30),
+        
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Patient Distribution',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF2D3748),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+        
+                      Container(
+                        padding: const EdgeInsets.all(25),
+                        height: 300,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _buildDistributionItem('IPD Patients', 78,
+                                const Color(0xFF4299E1), '24%'),
+                            _buildDistributionItem('OPD Patients', 246,
+                                const Color(0xFF48BB78), '76%'),
+                            const SizedBox(height: 20),
+                            Container(
+                              height: 100,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFF4299E1),
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(8),
+                                          bottomLeft: Radius.circular(8),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 3,
+                                    child: Container(
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFF48BB78),
+                                        borderRadius: BorderRadius.only(
+                                          topRight: Radius.circular(8),
+                                          bottomRight: Radius.circular(8),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+              ],
+            ),
+        
+            const SizedBox(height: 30),
+        
+            // Department Performance
+            const Text(
+              'Department Performance',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2D3748),
               ),
-              const SizedBox(width: 20),
-              Expanded(
-                child: _buildReportCard(
-                  'Department Report',
-                  Icons.local_hospital,
-                  'Performance, Utilization',
-                  const Color(0xFFED8936),
+            ),
+            const SizedBox(height: 20),
+        
+            Container(
+              padding: const EdgeInsets.all(25),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+              ),
+              child: Column(
+                children: [
+                  // Department Performance Bars
+                  _buildPerformanceBar('Cardiology', 85, const Color(0xFF4299E1)),
+                  const SizedBox(height: 15),
+                  _buildPerformanceBar('Orthopedics', 72, const Color(0xFF48BB78)),
+                  const SizedBox(height: 15),
+                  _buildPerformanceBar('Neurology', 68, const Color(0xFF9F7AEA)),
+                  const SizedBox(height: 15),
+                  _buildPerformanceBar('Dermatology', 91, const Color(0xFFED8936)),
+                  const SizedBox(height: 15),
+                  _buildPerformanceBar('Pediatrics', 79, const Color(0xFFF56565)),
+                ],
+              ),
+            ),
+        
+            const SizedBox(height: 30),
+        
+            // Report Generation
+            const Text(
+              'Generate Reports',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2D3748),
+              ),
+            ),
+            const SizedBox(height: 20),
+        
+            Row(
+              children: [
+                Expanded(
+                  child: _buildReportCard(
+                    'Financial Report',
+                    Icons.pie_chart,
+                    'Revenue, Expenses, Profit',
+                    const Color(0xFF48BB78),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 20),
-              Expanded(
-                child: _buildReportCard(
-                  'Export Data',
-                  Icons.download,
-                  'Excel, PDF, CSV',
-                  const Color(0xFF9F7AEA),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: _buildReportCard(
+                    'Patient Statistics',
+                    Icons.people,
+                    'Admissions, Discharges',
+                    const Color(0xFF4299E1),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+                const SizedBox(width: 20),
+                Expanded(
+                  child: _buildReportCard(
+                    'Department Report',
+                    Icons.local_hospital,
+                    'Performance, Utilization',
+                    const Color(0xFFED8936),
+                  ),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: _buildReportCard(
+                    'Export Data',
+                    Icons.download,
+                    'Excel, PDF, CSV',
+                    const Color(0xFF9F7AEA),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

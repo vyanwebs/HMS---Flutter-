@@ -11,7 +11,7 @@ import 'package:hms/screens/doctor/doctor_profile.dart';
 import 'package:hms/screens/doctor/doctor_inbox.dart';
 import 'package:hms/utils/enums.dart';
 
-import '../../controllers/doctor_dashboard_controllers.dart';
+import '../../controllers/Doctor/doctor_dashboard_controllers.dart';
 import '../../controllers/panel_navigation_controller.dart';
 import '../../utils/constants.dart';
 import '../../utils/images.dart';
@@ -333,10 +333,12 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                 ? Icon(icon, color: isSelected ? Colors.white : const Color(0xFF718096))
                 : Image.asset(imagePath!, color: isSelected ? Colors.white : const Color(0xFF718096), scale: 20,),
               const SizedBox(width: 12),
-              Text(
-                title,
-                style: TextStyle(
+              Expanded(
+                child: AppText(
+                  title,
                   color: isSelected ? Colors.white : const Color(0xFF4A5568),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],

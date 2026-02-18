@@ -16,16 +16,18 @@ class ModuleLoginControllers extends GetxController {
   Future<void> login({
     required String email,
     required String password,
+    required String role,
   }) async {
     try {
       isLoading.value = true;
 
-      final api = NetworkHelper(url: doctorLoginApi);
+      final api = NetworkHelper(url: staffLoginApi);
 
       final response = await api.postData(
         body: {
           "email": email.trim(),
           "password": password.trim(),
+          "role": role.toLowerCase()
         },
       );
 
@@ -75,7 +77,7 @@ class ModuleLoginControllers extends GetxController {
     switch (role.toLowerCase()) {
       case 'doctor':
         return UserPanel.doctor;
-      case 'reception':
+      case 'receptionist':
         return UserPanel.reception;
       case 'nurse':
         return UserPanel.nurse;

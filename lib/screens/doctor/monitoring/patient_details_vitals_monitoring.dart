@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mdi_icons/flutter_mdi_icons.dart';
 import 'package:get/get.dart';
 
-import '../../../controllers/patient_details_vitals_monitoring_controllers.dart';
+import '../../../controllers/Doctor/vitals_controllers.dart';
 import '../../../models/patient_model.dart';
 import '../../../models/patient_vitals_model.dart';
 import '../../../utils/buttons.dart';
@@ -11,6 +11,7 @@ import '../../../utils/constants.dart';
 import '../../../utils/enums.dart';
 import '../../../utils/labels.dart';
 import '../../../utils/text.dart';
+import '../../../widgets/add_vitals_dialog.dart';
 import '../../../widgets/helper_widgets.dart';
 
 class PatientDetailsVitalsMonitoring extends StatefulWidget {
@@ -24,7 +25,7 @@ class PatientDetailsVitalsMonitoring extends StatefulWidget {
 
 class _PatientDetailsVitalsMonitoringState extends State<PatientDetailsVitalsMonitoring> {
 
-  final vitalsCtrl = Get.put(PatientDetailsVitalsMonitoringControllers());
+  final vitalsCtrl = Get.put(VitalsControllers());
 
   @override
   void initState() {
@@ -114,8 +115,8 @@ class _PatientDetailsVitalsMonitoringState extends State<PatientDetailsVitalsMon
         children: [
           AppText(
             hasSelection
-                ? "${vitalsCtrl.selectedVitalIds.length} selected"
-                : "Patient Vital",
+              ? "${vitalsCtrl.selectedVitalIds.length} selected"
+              : "Patient Vital",
             fontSize: 20,
             fontWeight: FontWeight.w600,
           ),
@@ -138,9 +139,15 @@ class _PatientDetailsVitalsMonitoringState extends State<PatientDetailsVitalsMon
                 ),
                 const SizedBox(width: 12),
                 AppButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (_) => AddVitalDialog(patient: widget.patient),
+                    );
+                  },
                   text: "Add",
                   icon: Icons.add,
-                  onPressed: () {},
                 ),
               ] else
                 AppButton(

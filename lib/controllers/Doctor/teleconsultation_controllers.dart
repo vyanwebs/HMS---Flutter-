@@ -1,9 +1,9 @@
 import 'dart:developer';
 
 import 'package:get/get.dart';
-import '../models/teleconsultation_model.dart';
-import '../services/api_service.dart';
-import '../services/apis.dart';
+import '../../models/teleconsultation_model.dart';
+import '../../services/api_service.dart';
+import '../../services/apis.dart';
 
 class TeleconsultationControllers extends GetxController {
   final isLoading = false.obs;

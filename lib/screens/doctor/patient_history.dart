@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mdi_icons/flutter_mdi_icons.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/patient_history_controllers.dart';
-import '../../controllers/patient_search_controllers.dart';
+import '../../controllers/Doctor/patient_history_controllers.dart';
+import '../../controllers/Doctor/patient_search_controllers.dart';
 import '../../utils/text.dart';
 
 class PatientHistory extends StatefulWidget {
@@ -15,7 +15,7 @@ class PatientHistory extends StatefulWidget {
 
 class _PatientHistoryState extends State<PatientHistory> {
 
-  final searchController = Get.put(PatientSearchController());
+  final searchController = Get.find<PatientSearchController>();
   final historyController = Get.put(PatientHistoryControllers());
 
   final TextEditingController _searchController = TextEditingController();

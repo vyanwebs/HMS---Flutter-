@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/certificate_controllers.dart';
+import '../../controllers/Doctor/certificate_controllers.dart';
 import '../../models/patient_model.dart';
 import '../../utils/buttons.dart';
 import '../../utils/constants.dart';

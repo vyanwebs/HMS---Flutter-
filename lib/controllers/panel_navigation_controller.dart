@@ -34,6 +34,8 @@ class PanelNavigationController extends GetxController {
         selectedMenu.value = DoctorPanelMenu.dashboard;
         break;
       case UserPanel.reception:
+        selectedMenu.value = ReceptionPanelMenu.opd;
+        break;
       case UserPanel.nurse:
       case UserPanel.pharmacy:
       case UserPanel.laboratory:
