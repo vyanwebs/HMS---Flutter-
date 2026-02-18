@@ -33,6 +33,7 @@ class _ModuleLoginScreenState extends State<ModuleLoginScreen> {
       'icon': Icons.person_outline,
       'title': 'Doctor',
       'description': 'Patient management and medical records',
+      'role': "doctor"
     },
 
     UserPanel.externalDoctor: {
@@ -40,6 +41,7 @@ class _ModuleLoginScreenState extends State<ModuleLoginScreen> {
       'icon': Icons.people_outline,
       'title': 'External Doctor',
       'description': 'External consultations and referrals',
+      'role': "external_doctor"
     },
 
     UserPanel.reception: {
@@ -47,6 +49,7 @@ class _ModuleLoginScreenState extends State<ModuleLoginScreen> {
       'icon': Icons.desktop_mac_outlined,
       'title': 'Reception',
       'description': 'Patient registration & billing',
+      'role': "receptionist"
     },
 
     UserPanel.nurse: {
@@ -54,6 +57,7 @@ class _ModuleLoginScreenState extends State<ModuleLoginScreen> {
       'icon': Icons.medical_services_outlined,
       'title': 'Nurse',
       'description': 'Patient care and ward monitoring',
+      'role': "nurse"
     },
 
     UserPanel.pharmacy: {
@@ -61,6 +65,7 @@ class _ModuleLoginScreenState extends State<ModuleLoginScreen> {
       'icon': Icons.local_pharmacy_outlined,
       'title': 'Pharmacy',
       'description': 'Medicine dispensing & inventory',
+      'role': "pharmacist"
     },
 
     UserPanel.laboratory: {
@@ -68,6 +73,7 @@ class _ModuleLoginScreenState extends State<ModuleLoginScreen> {
       'icon': Icons.science_outlined,
       'title': 'Laboratory',
       'description': 'Lab tests and report management',
+      'role': "lab"
     },
 
     UserPanel.diagnostics: {
@@ -75,6 +81,7 @@ class _ModuleLoginScreenState extends State<ModuleLoginScreen> {
       'icon': Icons.monitor_heart_outlined,
       'title': 'Diagnostics',
       'description': 'Radiology and diagnostic services',
+      'role': "diagnostic"
     },
 
     UserPanel.dialysis: {
@@ -82,6 +89,7 @@ class _ModuleLoginScreenState extends State<ModuleLoginScreen> {
       'icon': Icons.water_drop_outlined,
       'title': 'Dialysis',
       'description': 'Dialysis treatment management',
+      'role': "dialysis"
     },
 
     UserPanel.insurance: {
@@ -89,6 +97,7 @@ class _ModuleLoginScreenState extends State<ModuleLoginScreen> {
       'icon': Icons.security_outlined,
       'title': 'Insurance',
       'description': 'Insurance claims & approvals',
+      'role': "insurance"
     },
 
     UserPanel.patient: {
@@ -96,6 +105,7 @@ class _ModuleLoginScreenState extends State<ModuleLoginScreen> {
       'icon': Icons.accessibility_new_outlined,
       'title': 'Patient',
       'description': 'Personal health records & appointments',
+      'role': "patient"
     },
 
     UserPanel.admin: {
@@ -103,6 +113,7 @@ class _ModuleLoginScreenState extends State<ModuleLoginScreen> {
       'icon': Icons.admin_panel_settings_outlined,
       'title': 'Admin',
       'description': 'System configuration and user management',
+      'role': "admin"
     },
   };
 
@@ -112,6 +123,7 @@ class _ModuleLoginScreenState extends State<ModuleLoginScreen> {
     final moduleColor = moduleInfo['color'] as Color;
     final moduleIcon = moduleInfo['icon'] as IconData;
     final moduleTitle = moduleInfo['title'] as String;
+    final role = moduleInfo['role'] as String;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -195,8 +207,7 @@ class _ModuleLoginScreenState extends State<ModuleLoginScreen> {
                           children: [
                             // Badge
                             Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 18, vertical: 10),
+                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                               decoration: BoxDecoration(
                                 color: moduleColor.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(22),
@@ -221,8 +232,7 @@ class _ModuleLoginScreenState extends State<ModuleLoginScreen> {
                                 icon: Icons.person_outline,
                                 color: moduleColor,
                               ),
-                              validator: (v) =>
-                                  v!.isEmpty ? 'Enter username' : null,
+                              validator: (v) => v!.isEmpty ? 'Enter username' : null,
                             ),
 
                             const SizedBox(height: 20),
@@ -238,8 +248,8 @@ class _ModuleLoginScreenState extends State<ModuleLoginScreen> {
                                 suffix: IconButton(
                                   icon: Icon(
                                     _obscurePassword
-                                        ? Icons.visibility_off
-                                        : Icons.visibility,
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
                                   ),
                                   onPressed: () {
                                     setState(() {
@@ -248,8 +258,7 @@ class _ModuleLoginScreenState extends State<ModuleLoginScreen> {
                                   },
                                 ),
                               ),
-                              validator: (v) =>
-                                  v!.length < 6 ? 'Min 6 characters' : null,
+                              validator: (v) => v!.length < 6 ? 'Min 6 characters' : null,
                             ),
 
                             const SizedBox(height: 24),
@@ -261,16 +270,16 @@ class _ModuleLoginScreenState extends State<ModuleLoginScreen> {
                                 height: 48,
                                 child: ElevatedButton(
                                   onPressed: controller.isLoading.value
-                                      ? null
-                                      : () {
-                                          if (_formKey.currentState!.validate()) {
-                                            controller.login(
-                                              email: _usernameController.text.trim(),
-                                              password: _passwordController.text.trim(),
-                                              // panel: widget.panel,
-                                            );
-                                          }
-                                        },
+                                    ? null
+                                    : () {
+                                        if (_formKey.currentState!.validate()) {
+                                          controller.login(
+                                            email: _usernameController.text.trim(),
+                                            password: _passwordController.text.trim(),
+                                            role: role
+                                          );
+                                        }
+                                      },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: moduleColor,
                                     shape: RoundedRectangleBorder(
@@ -278,22 +287,22 @@ class _ModuleLoginScreenState extends State<ModuleLoginScreen> {
                                     ),
                                   ),
                                   child: controller.isLoading.value
-                                      ? const SizedBox(
-                                          width: 22,
-                                          height: 22,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: Colors.white,
-                                          ),
-                                        )
-                                      : const Text(
-                                          'LOGIN TO MODULE',
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.white,
-                                          ),
+                                    ? const SizedBox(
+                                        width: 22,
+                                        height: 22,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
                                         ),
+                                      )
+                                    : const Text(
+                                        'LOGIN TO MODULE',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                                 ),
                               ),
                             ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
-import '../../controllers/discharge_controllers.dart';
+import '../../controllers/Doctor/discharge_controllers.dart';
 import '../../models/patient_model.dart';
 import '../../utils/buttons.dart';
 import '../../utils/string_utils.dart';
@@ -453,7 +453,7 @@ class _DischargeSummaryState extends State<DischargeSummary> {
                 _actionButton('Sign and Finalize', Icons.verified,
                     const Color(0xFF16A34A), _signAndFinalize),
                 const SizedBox(width: 8),
-                // _actionButton('Voice Entry', Icons.mic, const Color(0xFF7C3AED), _voiceEntry),
+                _actionButton('Voice Entry', Icons.mic, const Color(0xFF7C3AED), _voiceEntry),
               ],
             ),
         ],
@@ -580,4 +580,7 @@ class _DischargeSummaryState extends State<DischargeSummary> {
     );
   }
 
+
+  void _voiceEntry() {
+  }
 }

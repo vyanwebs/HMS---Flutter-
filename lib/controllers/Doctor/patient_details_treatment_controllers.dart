@@ -3,12 +3,12 @@ import 'dart:developer';
 
 import 'package:get/get.dart';
 
-import '../models/prescription_model.dart';
-import '../models/traetment_model.dart';
-import '../services/api_service.dart';
-import '../services/apis.dart';
-import '../utils/overlay.dart';
-import '../utils/snackbar.dart';
+import '../../models/prescription_model.dart';
+import '../../models/traetment_model.dart';
+import '../../services/api_service.dart';
+import '../../services/apis.dart';
+import '../../utils/overlay.dart';
+import '../../utils/snackbar.dart';
 
 class PatientDetailsTreatmentControllers extends GetxController {
 

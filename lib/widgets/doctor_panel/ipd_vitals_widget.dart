@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../controllers/doctor_dashboard_controllers.dart';
+import '../../controllers/Doctor/doctor_dashboard_controllers.dart';
 import '../../helper_resposive_class/responsive_layout.dart';
+import '../../models/health_status_model.dart';
 import '../../models/patient_model.dart';
 import '../../utils/constants.dart';
 import '../../utils/text.dart';
-import 'recent_patients_widget.dart';
 
 class IPDVitalsView extends StatelessWidget {
   IPDVitalsView({super.key});

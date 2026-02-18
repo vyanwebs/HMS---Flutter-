@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'controllers/Doctor/patient_search_controllers.dart';
 import 'controllers/panel_navigation_controller.dart';
 import 'screens/splash_screen.dart';
 import 'utils/constants.dart';
@@ -14,6 +15,7 @@ import 'utils/constants.dart';
 
 void main() {
   Get.put(PanelNavigationController(), permanent: true);
+  Get.put(PatientSearchController(), permanent: true);
   runApp(const MyApp());
 }
 

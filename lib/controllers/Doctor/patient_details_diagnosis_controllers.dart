@@ -2,13 +2,13 @@ import 'dart:developer';
 
 import 'package:get/get.dart';
 
-import '../models/diagnosis_model.dart';
-import '../services/api_service.dart';
-import '../services/apis.dart';
-import '../utils/overlay.dart';
-import '../utils/snackbar.dart';
+import '../../models/diagnosis_model.dart';
+import '../../services/api_service.dart';
+import '../../services/apis.dart';
+import '../../utils/overlay.dart';
+import '../../utils/snackbar.dart';
 
-class PatientDetailsDiagnosisControllers extends GetxController {
+class DiagnosisControllers extends GetxController {
   RxBool isLoading = false.obs;
   final diagnosisList = <DiagnosisModel>[].obs;
 
@@ -107,10 +107,18 @@ class PatientDetailsDiagnosisControllers extends GetxController {
     }
   }
 
-  Future<void> createDiagnoses({
+  Future<bool> createDiagnoses({
     required String patientMongoId,
     required List<String> diagnoses,
   }) async {
+    if(diagnoses.isEmpty) {
+      AppSnackbar.show(
+        title: "Validation",
+        message: "Please add atleast one diagnosis",
+        type: AppSnackType.warning
+      );
+      return false;
+    }
     try {
       LoadingOverlayService.show(message: "Adding diagnoses...");
 
@@ -133,19 +141,20 @@ class PatientDetailsDiagnosisControllers extends GetxController {
 
       if (response['success'] == true) {
         await fetchDiagnoses(patientMongoId);
-        Get.back();
 
         AppSnackbar.show(
           title: "Success",
           message: "Diagnoses added successfully",
           type: AppSnackType.success,
         );
+        return true;
       } else {
         AppSnackbar.show(
           title: "Failed",
           message: response['message'] ?? "Unable to add diagnoses",
           type: AppSnackType.error,
         );
+        return false;
       }
     } catch (e, s) {
       log("❌ createDiagnoses failed", error: e, stackTrace: s);
@@ -155,8 +164,25 @@ class PatientDetailsDiagnosisControllers extends GetxController {
         message: "Something went wrong",
         type: AppSnackType.error,
       );
+      return false;
     } finally {
       LoadingOverlayService.hide();
     }
   }
+
+  final selectedDiagnoses = <String>[].obs;
+
+  void toggleDiagnosis(String d) {
+    if (selectedDiagnoses.contains(d)) {
+      selectedDiagnoses.remove(d);
+    } else {
+      selectedDiagnoses.add(d);
+    }
+  }
+
+  void addCustomDiagnosis(String d) {
+    if (d.trim().isEmpty) return;
+    selectedDiagnoses.add(d.trim());
+  }
+
 }

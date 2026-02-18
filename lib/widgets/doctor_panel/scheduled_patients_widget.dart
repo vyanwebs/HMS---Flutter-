@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/doctor_dashboard_controllers.dart';
+import '../../controllers/Doctor/doctor_dashboard_controllers.dart';
 import '../../controllers/panel_navigation_controller.dart';
 import '../../helper_resposive_class/responsive_layout.dart';
 import '../../models/patient_model.dart';

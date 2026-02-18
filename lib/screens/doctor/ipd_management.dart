@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hms/utils/images.dart';
+import 'package:hms/models/ipd_management_details_model.dart';
 
-import '../../controllers/ipd_management_controllers.dart';
+import '../../controllers/Doctor/ipd_management_controllers.dart';
 import '../../models/avatar_model.dart';
+import '../../utils/buttons.dart';
+import '../../utils/date_formatter.dart';
+import '../../utils/images.dart';
 import '../../utils/string_utils.dart';
 import '../../utils/text.dart';
 import '../../widgets/doctor_panel/stat_card_widget.dart';
@@ -266,9 +269,15 @@ class IpdManagement extends StatelessWidget {
 
   Widget _patientDetailsPanel() {
     return Obx(() {
-      final patient = ipdControllers.selectedPatient.value;
 
-      if (patient == null) {
+      /// 🔄 Show loader while fetching details
+      if (ipdControllers.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      final details = ipdControllers.patientDetails.value;
+
+      if (details == null) {
         return const Center(child: AppText("Select a patient"));
       }
 
@@ -286,43 +295,58 @@ class IpdManagement extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   AppText(
-                    patient.name,
+                    details.patient.name,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
-                  _statusBadge(patient.healthCondition),
+                  _statusBadge(details.patient.healthCondition),
                 ],
               ),
 
               const SizedBox(height: 8),
 
               AppText(
-                "${patient.age} Years • ${patient.gender}",
+                "${details.patient.age} Years • ${details.patient.gender}",
                 color: Colors.black54,
               ),
 
               const SizedBox(height: 20),
 
               /// INFO BLOCKS
-              Row(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: _InfoBlock(
-                      title: "Bed number",
-                      value: extractBedNumber(patient.bedAssign),
-                    ),
+
+                  /// Top Row
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _InfoBlock(
+                          title: "Bed number",
+                          value: extractBedNumber(details.patient.bedAssign),
+                        ),
+                      ),
+                      Expanded(
+                        child: _InfoBlock(
+                          title: "Ward",
+                          value: extractWardFromBedAssign(details.patient.bedAssign),
+                        ),
+                      ),
+                      Expanded(
+                        child: _InfoBlock(
+                          title: "Admission Date",
+                          value: dateFromDateTime(details.admission.admittedAt),
+                        ),
+                      ),
+                    ],
                   ),
-                  Expanded(
-                    child: _InfoBlock(
-                      title: "Ward",
-                      value: extractWardFromBedAssign(patient.bedAssign),
-                    ),
-                  ),
-                  Expanded(
-                    child: _InfoBlock(
-                      title: "Admission Code",
-                      value: patient.admissionCode,
-                    ),
+
+                  const SizedBox(height: 20),
+
+                  /// Diagnosis Row (FULL WIDTH)
+                  _InfoBlock(
+                    title: "Diagnosis",
+                    value: _buildDiagnosisText(details),
                   ),
                 ],
               ),
@@ -344,8 +368,8 @@ class IpdManagement extends StatelessWidget {
                     Expanded(
                       child: TabBarView(
                         children: [
-                          _vitalMonitoringTab(),
-                          _treatmentPlansTab(),
+                          _vitalMonitoringTab(details),
+                          _treatmentPlansTab(details),
                         ],
                       ),
                     ),
@@ -359,32 +383,48 @@ class IpdManagement extends StatelessWidget {
     });
   }
 
-  Widget _vitalMonitoringTab() {
+  String _buildDiagnosisText(IpdManagementDetailsModel details) {
+    final diagnosis = details.diagnosis;
+
+    if (diagnosis == null || diagnosis.diagnoses.isEmpty) {
+      return "N/A";
+    }
+
+    return diagnosis.diagnoses.join(", ");
+  }
+
+  Widget _vitalMonitoringTab(IpdManagementDetailsModel details) {
+    final vitals = details.vitals;
+
     return Padding(
       padding: const EdgeInsets.only(top: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
 
-          /// ================= HEADER (FIXED) =================
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              AppText(
-                "Vital signs",
-                fontWeight: FontWeight.w600,
-              ),
-              AppText(
-                "+ Add Reading",
-                color: Colors.blue,
-                fontWeight: FontWeight.w500,
+            children: [
+              const AppText("Vital signs", fontWeight: FontWeight.w600),
+              TextButton(
+                onPressed: () {},
+                child: const Row(
+                  children: [
+                    Icon(Icons.add, color: Colors.blue,),
+                    SizedBox(width: 4,),
+                    AppText(
+                      "Add Reading",
+                      color: Colors.blue,
+                      fontWeight: FontWeight.w500
+                    ),
+                  ],
+                )
               ),
             ],
           ),
 
           const SizedBox(height: 16),
 
-          /// ================= TABLE HEADER (FIXED) =================
           Container(
             padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
             decoration: BoxDecoration(
@@ -405,78 +445,150 @@ class IpdManagement extends StatelessWidget {
 
           const SizedBox(height: 8),
 
-          /// ================= SCROLLABLE CONTENT =================
           Expanded(
-            child: ListView.builder(
-              itemCount: 20,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 10,
-                    horizontal: 16,
-                  ),
-                  child: const Row(
-                    children: [
-                      Expanded(child: AppText("08:00 AM")),
-                      Expanded(child: AppText("120/80")),
-                      Expanded(child: AppText("72")),
-                      Expanded(child: AppText("98.6°F")),
-                      Expanded(child: AppText("98%")),
-                      Expanded(child: AppText("16")),
-                    ],
-                  ),
-                );
-              },
-            ),
+            child: vitals == null
+              ? const Center(child: AppText("No vitals recorded"))
+              : ListView(
+                  children: [
+                    _vitalRow(
+                      dateFromDateTime(vitals.recordedAt),
+                      vitals.bp,
+                      vitals.pulse.toString(),
+                      "${vitals.temperature}°F",
+                      "${vitals.spo2}%",
+                      vitals.respirationRate,
+                    ),
+                  ],
+                ),
           ),
         ],
       ),
     );
   }
 
-  Widget _treatmentPlansTab() {
+  Widget _vitalRow(
+    String time,
+    String bp,
+    String pulse,
+    String temp,
+    String spo2,
+    int respirationRate,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+      child: Row(
+        children: [
+          Expanded(child: AppText(time)),
+          Expanded(child: AppText(bp)),
+          Expanded(child: AppText(pulse)),
+          Expanded(child: AppText(temp)),
+          Expanded(child: AppText(spo2)),
+          Expanded(child: AppText(respirationRate.toString())),
+        ],
+      ),
+    );
+  }
+
+  Widget _treatmentPlansTab(IpdManagementDetailsModel details) {
+    final medication = details.medication;
+    final procedure = details.procedure;
+    final ivFluid = details.ivFluid;
+    final instruction = details.instruction;
+
+    final hasData =
+        medication != null ||
+        procedure != null ||
+        ivFluid != null ||
+        instruction != null;
+
     return ListView(
       children: [
 
-        _treatmentSectionCard(
-          title: "Medications",
-          items: const [
-            "Aspirin 75mg - Once daily",
-            "Atorvastatin 20mg - Once daily at bedtime",
-          ],
-        ),
+        /// ================= MEDICATIONS =================
+        if (medication != null)
+          _treatmentSectionCard(
+            title: "Medications",
+            items: [
+              "${medication.name} "
+              "(${medication.type}) "
+              "- ${medication.mealRelation} "
+              "[${medication.status}]"
+            ],
+          ),
 
-        const SizedBox(height: 20),
+        if (medication != null)
+          const SizedBox(height: 20),
 
-        _treatmentSectionCard(
-          title: "Procedures",
-          items: const [
-            "ECG monitoring - Every 6 hours",
-            "Blood tests - Daily morning",
-          ],
-        ),
+        /// ================= IV FLUIDS =================
+        if (ivFluid != null)
+          _treatmentSectionCard(
+            title: "IV Fluids",
+            items: [
+              "${ivFluid.name} "
+              "- ${ivFluid.quantity} "
+              "- ${ivFluid.duration} "
+              "[${ivFluid.status}]"
+            ],
+          ),
+
+        if (ivFluid != null)
+          const SizedBox(height: 20),
+
+        /// ================= PROCEDURES =================
+        if (procedure != null)
+          _treatmentSectionCard(
+            title: "Procedures",
+            items: [
+              "${procedure.procedure} "
+              "- ${procedure.frequency} "
+              "[${procedure.status}]"
+            ],
+          ),
+
+        if (procedure != null)
+          const SizedBox(height: 20),
+
+        /// ================= SPECIAL INSTRUCTIONS =================
+        if (instruction != null)
+          _treatmentSectionCard(
+            title: "Special Instructions",
+            items: [
+              "${instruction.instruction} "
+              "[${instruction.status}]"
+            ],
+          ),
+
+        if (instruction != null)
+          const SizedBox(height: 20),
+
+        /// ================= EMPTY STATE =================
+        if (!hasData)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 40),
+            child: Center(
+              child: AppText(
+                "No treatment plan available",
+                color: Colors.black54,
+              ),
+            ),
+          ),
 
         const SizedBox(height: 30),
 
+        /// ================= CHANGE PLAN BUTTON =================
         Align(
           alignment: Alignment.centerRight,
-          child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2C7EDB),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 14,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              elevation: 0,
-            ),
-            icon: const Icon(Icons.refresh, size: 18),
-            label: const Text("Change treatment plan"),
+          child: AppButton(
+            text: "Change treatment plan",
+            icon: Icons.refresh,
+            backgroundColor: const Color(0xFF2C7EDB),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            borderRadius: 8,
             onPressed: () {},
           ),
         ),
+
+        const SizedBox(height: 20),
       ],
     );
   }

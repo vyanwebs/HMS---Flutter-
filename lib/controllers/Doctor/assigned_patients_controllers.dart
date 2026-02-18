@@ -2,13 +2,13 @@ import 'dart:developer';
 
 import 'package:get/get.dart';
 
-import '../models/patient_model.dart';
-import '../models/teleconsultation_queue_model.dart';
-import '../services/api_service.dart';
-import '../services/apis.dart';
-import '../utils/enums.dart';
-import '../utils/overlay.dart';
-import '../utils/snackbar.dart';
+import '../../models/patient_model.dart';
+import '../../models/teleconsultation_queue_model.dart';
+import '../../services/api_service.dart';
+import '../../services/apis.dart';
+import '../../utils/enums.dart';
+import '../../utils/overlay.dart';
+import '../../utils/snackbar.dart';
 
 class AssignedPatientsControllers extends GetxController {
   RxBool isLoading = false.obs;

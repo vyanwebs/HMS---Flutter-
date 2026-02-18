@@ -1,8 +1,9 @@
 import 'package:get/get.dart';
 import 'package:hms/models/avatar_model.dart';
 
-import '../services/api_service.dart';
-import '../services/apis.dart';
+import '../../models/ipd_management_details_model.dart';
+import '../../services/api_service.dart';
+import '../../services/apis.dart';
 
 class IpdManagementControllers extends GetxController {
 
@@ -11,6 +12,9 @@ class IpdManagementControllers extends GetxController {
   final isLoading = false.obs;
   final patients = <PatientModel>[].obs;
   final errorMessage = "".obs;
+
+  final patientDetails = Rxn<IpdManagementDetailsModel>();
+  final detailsLoading = false.obs;
 
   // ================== Stat Cards ==============
 
@@ -30,6 +34,7 @@ class IpdManagementControllers extends GetxController {
 
   void selectPatient(PatientModel patient) {
     selectedPatient.value = patient;
+    fetchPatientDetails(patient.id);
   }
 
   /// ================= INIT =================
@@ -48,7 +53,7 @@ class IpdManagementControllers extends GetxController {
       errorMessage.value = "";
 
       final helper = NetworkHelper(
-        url: getIpdPatientsApi, 
+        url: getIpdPatientsApi,
       );
 
       final response = await helper.get(auth: true);
@@ -59,8 +64,13 @@ class IpdManagementControllers extends GetxController {
         final parsed = data.map((e) => PatientModel.fromJson(e)).toList();
 
         patients.assignAll(parsed);
+
         if (patients.isNotEmpty) {
+          // ✅ Select first patient
           selectedPatient.value = patients.first;
+
+          // ✅ FETCH DETAILS FOR FIRST PATIENT
+          await fetchPatientDetails(patients.first.id);
         }
       } else {
         errorMessage.value = response['message'] ?? "Failed to load patients";
@@ -71,6 +81,31 @@ class IpdManagementControllers extends GetxController {
       print("IPD fetch error: $e");
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  // ==================== FETCH PATIENT DETAILS ===================
+
+  Future<void> fetchPatientDetails(String patientMongoId) async {
+    try {
+      detailsLoading.value = true;
+
+      final helper = NetworkHelper(
+        url: "$getIpdManagementDetailsApi/$patientMongoId",
+      );
+
+      final response = await helper.get(auth: true);
+
+      if (response['success'] == true) {
+        patientDetails.value = IpdManagementDetailsModel.fromJson(response['data']);
+      } else {
+        patientDetails.value = null;
+      }
+    } catch (e) {
+      print("Details fetch error: $e");
+      patientDetails.value = null;
+    } finally {
+      detailsLoading.value = false;
     }
   }
 

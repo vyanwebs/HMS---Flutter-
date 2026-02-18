@@ -32,6 +32,25 @@ enum DoctorPanelMenu implements PanelMenu {
   const DoctorPanelMenu(this.label);
 }
 
+enum ReceptionPanelMenu implements PanelMenu {
+  dashboard('Dashboard'),
+  inbox('Inbox'),
+  appointments('Appointments'),
+  patientDirectory('Patient Directory'),
+  ipd('IPD'),
+  opd('OPD'),
+  discharge('Discharge'),
+  doctors('Doctors'),
+  billing('Billing'),
+  analysis('Analysis'),
+  settings('Settings');
+
+  @override
+  final String label;
+
+  const ReceptionPanelMenu(this.label);
+}
+
 enum PatientTabType {
   opd,
   ipd,

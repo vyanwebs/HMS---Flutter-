@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import '../../../utils/buttons.dart';
 import '../../../utils/constants.dart';
 import '../../../utils/text.dart';
-import '../../controllers/patient_details_treatment_controllers.dart';
+import '../../controllers/Doctor/patient_details_treatment_controllers.dart';
 import '../../models/patient_model.dart';
 import '../../models/traetment_model.dart';
 

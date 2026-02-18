@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../models/lab_test_request_model.dart';
-import '../services/api_service.dart';
-import '../services/apis.dart';
-import '../utils/overlay.dart';
-import '../utils/snackbar.dart';
+import '../../models/lab_test_request_model.dart';
+import '../../services/api_service.dart';
+import '../../services/apis.dart';
+import '../../utils/overlay.dart';
+import '../../utils/snackbar.dart';
 
 class LabTestControllers extends GetxController {
 

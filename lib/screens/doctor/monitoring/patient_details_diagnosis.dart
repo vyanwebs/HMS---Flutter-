@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mdi_icons/flutter_mdi_icons.dart';
 import 'package:get/get.dart';
 
-import '../../../controllers/patient_details_diagnosis_controllers.dart';
+import '../../../controllers/Doctor/patient_details_diagnosis_controllers.dart';
 import '../../../models/patient_model.dart';
 import '../../../utils/buttons.dart';
 import '../../../utils/constants.dart';
@@ -18,7 +18,7 @@ class PatientDetailsDiagnosis extends StatefulWidget {
 }
 
 class _PatientDetailsDiagnosisState extends State<PatientDetailsDiagnosis> {
-  final diagnosisController = Get.put(PatientDetailsDiagnosisControllers());
+  final diagnosisController = Get.put(DiagnosisControllers());
 
   @override
   void initState() {
@@ -404,7 +404,7 @@ class AddDiagnosisDialog extends StatefulWidget {
 class _AddDiagnosisDialogState extends State<AddDiagnosisDialog> {
 
   final TextEditingController diagnosisCtrl = TextEditingController();
-  final diagnosisController = Get.find<PatientDetailsDiagnosisControllers>();
+  final diagnosisController = Get.find<DiagnosisControllers>();
 
   final _formKey = GlobalKey<FormState>();
   final FocusNode _diagnosisFocus = FocusNode();
@@ -623,17 +623,21 @@ class _AddDiagnosisDialogState extends State<AddDiagnosisDialog> {
     );
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     final isValid = _formKey.currentState!.validate();
     if (!isValid) {
       FocusScope.of(context).requestFocus(_diagnosisFocus);
       return;
     }
 
-    diagnosisController.createDiagnoses(
+    final status = await diagnosisController.createDiagnoses(
       patientMongoId: widget.patient.id,
       diagnoses: diagnoses,
     );
+    
+    if (status && mounted) {
+      Navigator.of(context).pop();
+    }
   }
 }
 

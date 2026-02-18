@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/doctor_dashboard_controllers.dart';
+import '../../controllers/Doctor/doctor_dashboard_controllers.dart';
 import '../../controllers/panel_navigation_controller.dart';
-import '../../models/recent_patient_model.dart';
+import '../../models/health_status_model.dart';
 import '../../models/patient_model.dart';
 import '../../screens/doctor/patient_details.dart';
 import '../../utils/constants.dart';
@@ -167,7 +167,7 @@ class RecentPatientsView extends StatelessWidget {
               ),
       
               // ================= STATUS =================
-              _statusBadge(item.currentHealthCondition ?? "N/A"),
+              _statusBadge(item.currentHealthCondition),
             ],
           ),
         ),
@@ -201,20 +201,20 @@ class RecentPatientsView extends StatelessWidget {
   //   );
   // }
 
-  Widget _initialsAvatar(PatientModel patient, double size) {
-    return Container(
-      color: const Color(0xFF2383E2),
-      alignment: Alignment.center,
-      child: Text(
-        patient.initials,
-        style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-          fontSize: size * 0.45,
-        ),
-      ),
-    );
-  }
+  // Widget _initialsAvatar(PatientModel patient, double size) {
+  //   return Container(
+  //     color: const Color(0xFF2383E2),
+  //     alignment: Alignment.center,
+  //     child: Text(
+  //       patient.initials,
+  //       style: TextStyle(
+  //         color: Colors.white,
+  //         fontWeight: FontWeight.bold,
+  //         fontSize: size * 0.45,
+  //       ),
+  //     ),
+  //   );
+  // }
 
   // ================= STATUS BADGE =================
 
@@ -272,14 +272,4 @@ class RecentPatientsView extends StatelessWidget {
         );
     }
   }
-}
-
-class HealthStatusConfig {
-  final String label;
-  final Color color;
-
-  const HealthStatusConfig({
-    required this.label,
-    required this.color,
-  });
 }

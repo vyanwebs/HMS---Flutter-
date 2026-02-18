@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../controllers/teleconsultation_controllers.dart';
+import '../../controllers/Doctor/teleconsultation_controllers.dart';
 import '../../models/teleconsultation_model.dart';
 import '../../utils/buttons.dart';
 import '../../utils/text.dart';

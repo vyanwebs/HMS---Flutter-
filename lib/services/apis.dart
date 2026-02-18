@@ -6,6 +6,7 @@ String baseUrl = isProd ? "https://docnex-hms.onrender.com" : "https://docnex-hm
 
 String getStatCardApi = "$baseUrl/api/dashboard/doctor";
 String doctorLoginApi = "$baseUrl/api/doctor/login";
+String staffLoginApi = "$baseUrl/api/staff/login";
 String getRecentPatientsApi = "$baseUrl/api/doctor/get-patients";
 String getTodaysPatientsApi = "$baseUrl/api/doctor/get-today-patients";
 String getTaskApi = "$baseUrl/api/task/get-all";
@@ -61,7 +62,11 @@ String deleteMultiLabTestRequestApi = "$baseUrl/api/lab-test-request/delete-mult
 String getIpdPatientsApi = "$baseUrl/api/doctor/ipd-patients";
 String createDischargeSummaryApi = "$baseUrl/api/discharge-summary/create";
 String viewDischargeSummaryApi = "$baseUrl/api/discharge-summary/view";
-String CreateinvestigationApi = "$baseUrl/api/investigation/create";
-String UpdateinvetationApi = "$baseUrl/api/investigation/update-by-id/";
-String invetationbyidApi = "$baseUrl/api/investigation/get-by-patient-mongo-id";
- 
+String getIpdManagementDetailsApi = "$baseUrl/api/doctor/ipd-management-details";
+String createSymptomsApi = "$baseUrl/api/symptoms/create-symptoms";
+String getMedicinelistApi = "$baseUrl/api/medicine/table?limit=50";
+String createconsultationApi = "$baseUrl/api/consultation-form/create";
+String fetchAllSymptomsApi = "$baseUrl/api/symptoms/fetch-all-symptoms";
+String deleteSymptomsApi = "$baseUrl/api/symptoms";
+String filterSymptomsApi = "$baseUrl/api/symptoms/name";
+String followupVitalsApi = "$baseUrl/api/vital";
