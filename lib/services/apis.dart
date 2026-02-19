@@ -1,6 +1,6 @@
 bool isProd = true;
 
-String baseUrl = isProd ? "https://docnex-hms.onrender.com" : "https://docnex-hms.onrender.com";
+String baseUrl = isProd ? "https://docnex-backend.onrender.com" : "https://docnex-hms.onrender.com";
 
 // ============== Doctor Panel ===============
 

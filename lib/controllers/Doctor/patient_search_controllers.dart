@@ -52,8 +52,8 @@ class PatientSearchController extends GetxController {
 
       final encoded = Uri.encodeQueryComponent(name);
       final url = name.isEmpty
-          ? getPatientByNameApi
-          : "$getPatientByNameApi?name=$encoded";
+        ? getPatientByNameApi
+        : "$getPatientByNameApi?name=$encoded";
 
       final helper = NetworkHelper(url: url);
       final response = await helper.get(auth: true);
@@ -114,8 +114,7 @@ class PatientModel {
   String get displayName => '$name - $patientId';
 
   @override
-  bool operator ==(Object other) =>
-      other is PatientModel && other.id == id;
+  bool operator ==(Object other) => other is PatientModel && other.id == id;
 
   @override
   int get hashCode => id.hashCode;

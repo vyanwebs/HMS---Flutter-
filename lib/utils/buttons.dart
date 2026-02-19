@@ -5,7 +5,7 @@ import 'constants.dart';
 
 class AppButton extends StatefulWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final bool isLoading;
   final Color backgroundColor;
   final Color textColor;

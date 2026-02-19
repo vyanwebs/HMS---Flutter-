@@ -104,13 +104,18 @@ class PatientDetailsControllers extends GetxController {
     }
   }
 
-  Future<void> createInvestigation({
+  Future<bool> createInvestigation({
+      required String patientMongoId,
     required String patientId,
     required String investigationType,
     required String priority,
     required String scheduledDateTime,
     required String reasonForInvestigation,
     required String clinicalHistory,
+    required String investigationDetails,  
+      required PatientModel patient,
+    // required now
+
   }) async {
     try {
       LoadingOverlayService.show(message: "Creating investigation...");
@@ -126,6 +131,7 @@ class PatientDetailsControllers extends GetxController {
           "scheduledDateAndTime": scheduledDateTime,
           "reasonForInvestigation": reasonForInvestigation.trim(),
           "clinicalHistory": clinicalHistory.trim(),
+          "investigationDetails": investigationDetails.trim(),
         },
       );
 
@@ -138,6 +144,7 @@ class PatientDetailsControllers extends GetxController {
           message: "Investigation request created successfully",
           type: AppSnackType.success,
         );
+        return true;
 
       } else {
         AppSnackbar.show(
@@ -145,6 +152,7 @@ class PatientDetailsControllers extends GetxController {
           message: response['message'] ?? "Unable to create investigation",
           type: AppSnackType.error,
         );
+        return false;
       }
     } catch (e, s) {
       log("❌ createInvestigation failed", error: e, stackTrace: s);
@@ -154,6 +162,7 @@ class PatientDetailsControllers extends GetxController {
         message: "Something went wrong",
         type: AppSnackType.error,
       );
+      return false;
     }
   }
 

@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import '../../controllers/Doctor/patient_history_controllers.dart';
 import '../../controllers/Doctor/patient_search_controllers.dart';
 import '../../utils/text.dart';
+import '../../widgets/patient_selector_widget.dart';
 
 class PatientHistory extends StatefulWidget {
   const PatientHistory({super.key});
@@ -22,6 +23,7 @@ class _PatientHistoryState extends State<PatientHistory> {
 
   @override
   void dispose() {
+    searchController.clearSearch();
     _searchController.dispose();
     super.dispose();
   }
@@ -215,31 +217,13 @@ class _PatientHistoryState extends State<PatientHistory> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const AppText('Select patient', fontSize: 12),
-                    const SizedBox(height: 6),
-                    GestureDetector(
-                      onTap: _openPatientSearchSheet,
-                      child: Container(
-                        height: 44,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF8FAFC),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
-                        ),
-                        alignment: Alignment.centerLeft,
-                        child: Obx(() {
-                          final patient = searchController.selectedPatient.value;
-                          return AppText(
-                            patient != null
-                              ? patient.displayName
-                              : "Search patient",
-                            color: patient != null
-                              ? Colors.black
-                              : Colors.black45,
-                          );
-                        }),
-                      ),
+                    CustomPatientSearchField(
+                      label: "Select patient",
+                      onChanged: (patient) {
+                        if (patient != null) {
+                          historyController.fetchPatientHistory(patient.patientId);
+                        }
+                      },
                     ),
                   ],
                 ),
@@ -252,85 +236,6 @@ class _PatientHistoryState extends State<PatientHistory> {
           ),
         ],
       ),
-    );
-  }
-
-  void _openPatientSearchSheet() {
-    Get.bottomSheet(
-      Container(
-        height: MediaQuery.of(context).size.height * 0.8,
-        padding: const EdgeInsets.all(16),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-        ),
-        child: Column(
-          children: [
-            const SizedBox(height: 8),
-
-            /// Search Field
-            TextField(
-              controller: searchController.searchController,
-              autofocus: true,
-              decoration: InputDecoration(
-                hintText: "Search patient...",
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: Obx(() => searchController.isLoading.value
-                    ? const Padding(
-                        padding: EdgeInsets.all(12),
-                        child: SizedBox(
-                          height: 16,
-                          width: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      )
-                    : const SizedBox()),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            /// Patient List
-            Expanded(
-              child: Obx(() {
-                final patients = searchController.patients;
-
-                if (searchController.isLoading.value && patients.isEmpty) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-
-                if (patients.isEmpty) {
-                  return const Center(
-                    child: AppText("Start typing to search"),
-                  );
-                }
-
-                return ListView.builder(
-                  itemCount: patients.length,
-                  itemBuilder: (context, index) {
-                    final patient = patients[index];
-
-                    return ListTile(
-                      title: AppText(patient.displayName),
-                      onTap: () {
-                        searchController.selectPatient(patient);
-                        searchController.clearSearch();
-                        Get.back();
-                      },
-                    );
-                  },
-                );
-              }),
-            ),
-          ],
-        ),
-      ),
-      isScrollControlled: true,
     );
   }
 
@@ -398,8 +303,11 @@ class _PatientHistoryState extends State<PatientHistory> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.person_outline,
-                          size: 14, color: Colors.black45),
+                      const Icon(
+                        Icons.person_outline,
+                        size: 14,
+                        color: Colors.black45
+                      ),
                       const SizedBox(width: 4),
                       AppText(
                         doctor,

@@ -1,9 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/Reception/opd_registration_controller.dart';
 import '../../utils/buttons.dart';
+import '../../utils/images.dart';
+import '../../utils/snackbar.dart';
 import '../../utils/text.dart';
+import '../../widgets/patient_selector_widget.dart';
 
 class OPDScreen extends StatelessWidget {
   OPDScreen({super.key});
@@ -42,10 +46,7 @@ class OPDScreen extends StatelessWidget {
               /// 🔥 IMPORTANT: Give Stepper remaining height
               Expanded(
                 child: controller.isEmergency.value
-                  ? SingleChildScrollView(
-                      padding: const EdgeInsets.all(20),
-                      child: _emergencyForm(),
-                    )
+                  ? _emergencyForm()
                   : _opdForm(),
               ),
             ],
@@ -54,6 +55,8 @@ class OPDScreen extends StatelessWidget {
       ),
     );
   }
+
+  // ========================= OPD FORM =============================
 
   Widget _opdForm() {
     return Column(
@@ -176,6 +179,7 @@ class OPDScreen extends StatelessWidget {
     );
   }
 
+  // ================== OPD FIRST STEP =======================
   Widget _opdRegistrationStep() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,17 +204,16 @@ class OPDScreen extends StatelessWidget {
 
         Align(
           alignment: Alignment.centerRight,
-          child: ElevatedButton(
-            onPressed: () {
-              controller.opdStep.value = 1;
-            },
-            child: const Text("Continue"),
+          child: AppButton(
+            onPressed: () => controller.opdStep.value = 1,
+            text: "Continue",
           ),
         ),
       ],
     );
   }
 
+  // ================== OPD SECOND STEP =======================
   Widget _opdReviewStep() {
     return Container(
       padding: const EdgeInsets.all(24),
@@ -248,8 +251,9 @@ class OPDScreen extends StatelessWidget {
                     children: [
                       const CircleAvatar(
                         radius: 45,
-                        backgroundImage: AssetImage("assets/avatar.png"),
+                        backgroundImage: AssetImage(userImage),
                       ),
+                      // PatientAvatar(patient: ,)
                       const SizedBox(height: 15),
                       const AppText(
                         "Jennifer Davis",
@@ -316,28 +320,20 @@ class OPDScreen extends StatelessWidget {
             children: [
               SizedBox(
                 width: 120,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey,
-                  ),
-                  onPressed: () {
-                    controller.opdStep.value = 0;
-                  },
-                  child: const Text("Edit"),
+                child: AppButton(
+                  onPressed: () => controller.opdStep.value = 0,
+                  backgroundColor: Colors.grey,
+                  text: "Back",
                 ),
               ),
               const SizedBox(width: 20),
               SizedBox(
                 width: 160,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                  ),
-                  onPressed: () {
-                    controller.opdStep.value = 2;
-                  },
-                  child: const Text("Assign Doctor"),
-                ),
+                child: AppButton(
+                  onPressed: () => controller.opdStep.value = 2,
+                  backgroundColor: Colors.green,
+                  text: "Assign Doctor",
+                )
               ),
             ],
           )
@@ -346,180 +342,369 @@ class OPDScreen extends StatelessWidget {
     );
   }
 
+  // ================== OPD THIRD STEP =======================
   Widget _assignDoctorStep() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
 
+        /// Step Title
         const AppText(
           "Assign Doctor",
           fontSize: 18,
           fontWeight: FontWeight.w600,
         ),
 
-        const SizedBox(height: 25),
+        const SizedBox(height: 20),
 
+        /// Patient Info Card (Top strip)
         Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade300),
+            color: const Color(0xFFE8EEF5),
+            borderRadius: BorderRadius.circular(10),
           ),
-          child: Column(
+          child: Row(
             children: [
-
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  hintText: "Select doctor",
-                  filled: true,
-                  fillColor: const Color(0xFFF7F9FC),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2383E2),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                items: const [
-                  DropdownMenuItem(
-                    value: "Dr. Ankit Birla",
-                    child: Text("Dr. Ankit Birla"),
-                  ),
-                  DropdownMenuItem(
-                    value: "Dr. Rahul Mehta",
-                    child: Text("Dr. Rahul Mehta"),
-                  ),
-                ],
-                onChanged: (val) {
-                  controller.selectedDoctor.value = val ?? "";
-                },
+                child: const Icon(Icons.person, color: Colors.white),
               ),
-
-              const SizedBox(height: 30),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+              const SizedBox(width: 12),
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextButton(
-                    onPressed: () {
-                      controller.opdStep.value = 1;
-                    },
-                    child: const Text("Back"),
+                  AppText(
+                    "Patient ID - #Pat1234567",
+                    fontWeight: FontWeight.w600,
                   ),
-                  const SizedBox(width: 15),
-                  ElevatedButton(
-                    onPressed: () {
-                      controller.opdStep.value = 3;
-                    },
-                    child: const Text("Continue"),
+                  SizedBox(height: 4),
+                  AppText(
+                    "Admission ID - 1234567899",
+                    fontSize: 12,
+                    color: Colors.black54,
                   ),
                 ],
               )
             ],
           ),
-        )
+        ),
+
+        const SizedBox(height: 25),
+
+        const AppText(
+          "Available doctors",
+          fontWeight: FontWeight.w600,
+        ),
+
+        const SizedBox(height: 16),
+
+        /// Doctors Grid
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final width = constraints.maxWidth;
+
+            int crossAxisCount;
+
+            if (width < 600) {
+              crossAxisCount = 1; // Mobile
+            } else if (width < 840) {
+              crossAxisCount = 2; // Tablet portrait
+            } else if (width < 1200) {
+              crossAxisCount = 3; // Tablet landscape / small desktop
+            } else {
+              crossAxisCount = 4; // Desktop
+            }
+
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: 10,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: 20,
+                mainAxisSpacing: 20,
+                mainAxisExtent: 260, // MUCH better than aspectRatio
+              ),
+              itemBuilder: (context, index) {
+                return _doctorCard(index);
+              },
+            );
+          },
+        ),
+
+        const SizedBox(height: 30),
+
+        /// Bottom Buttons
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            TextButton(
+              onPressed: () {
+                controller.opdStep.value = 1;
+              },
+              child: const AppText("Back"),
+            ),
+            const SizedBox(width: 15),
+            AppButton(
+              onPressed: controller.selectedDoctor.value.isEmpty
+                ? null
+                : () {
+                    controller.opdStep.value = 3;
+                  },
+              text: "Continue",
+            ),
+          ],
+        ),
       ],
     );
   }
 
-  Widget _finalReviewStep() {
-    return Container();
-  // Column(
-  //   crossAxisAlignment: CrossAxisAlignment.start,
-  //   children: [
+  Widget _doctorCard(int index) {
+    const doctorName = "Dr. Jennifer Davis";
+    final doctorKey = doctorName + index.toString();
 
-  //     const AppText(
-  //       "Final Review",
-  //       fontSize: 18,
-  //       fontWeight: FontWeight.w600,
-  //     ),
+    return Obx(() {
+      final isSelected =
+          controller.selectedDoctor.value == doctorKey;
 
-  //     const SizedBox(height: 25),
-
-  //     Container(
-  //       padding: const EdgeInsets.all(20),
-  //       decoration: BoxDecoration(
-  //         color: const Color(0xFFF7F9FC),
-  //         borderRadius: BorderRadius.circular(12),
-  //         border: Border.all(color: Colors.grey.shade300),
-  //       ),
-  //       child: Column(
-  //         crossAxisAlignment: CrossAxisAlignment.start,
-  //         children: [
-
-  //           const AppText(
-  //             "Patient Information",
-  //             fontWeight: FontWeight.w600,
-  //           ),
-  //           const SizedBox(height: 15),
-
-  //           AppText("Name: ${controller.patientName.value}"),
-  //           AppText("Gender: ${controller.gender.value}"),
-  //           AppText("Age: ${controller.age.value}"),
-  //           AppText("Phone: ${controller.phone.value}"),
-
-  //           const SizedBox(height: 20),
-
-  //           const AppText(
-  //             "Assigned Doctor",
-  //             fontWeight: FontWeight.w600,
-  //           ),
-  //           const SizedBox(height: 10),
-
-  //           AppText(controller.selectedDoctor.value),
-
-  //         ],
-  //       ),
-  //     ),
-
-  //     const SizedBox(height: 30),
-
-  //     Row(
-  //       mainAxisAlignment: MainAxisAlignment.end,
-  //       children: [
-  //         TextButton(
-  //           onPressed: () {
-  //             controller.opdStep.value = 2;
-  //           },
-  //           child: const Text("Back"),
-  //         ),
-  //         const SizedBox(width: 15),
-  //         ElevatedButton(
-  //           style: ElevatedButton.styleFrom(
-  //             backgroundColor: Colors.green,
-  //           ),
-  //           onPressed: () {
-  //             // 🔥 Final API call
-              
-  //           },
-  //           child: const Text("Confirm & Register"),
-  //         ),
-  //       ],
-  //     )
-  //   ],
-  // );
-  }
-
-  Widget _opdStepItem(int number, String title, int currentStep) {
-    final active = number == currentStep;
-
-    return Column(
-      children: [
-        CircleAvatar(
-          radius: 18,
-          backgroundColor:
-              active ? const Color(0xFF2383E2) : Colors.grey.shade300,
-          child: Text(
-            "$number",
-            style: TextStyle(
-              color: active ? Colors.white : Colors.black,
+      return InkWell(
+        onTap: () {
+          controller.selectedDoctor.value = doctorKey;
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected
+                  ? const Color(0xFF2383E2)
+                  : Colors.grey.shade300,
+              width: isSelected ? 2 : 1,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 8,
+              )
+            ],
+          ),
+          child: Column(
+            children: [
+              const CircleAvatar(
+                radius: 35,
+                backgroundImage: AssetImage(userImage),
+              ),
+              const SizedBox(height: 12),
+              const AppText(
+                "Dr. Jennifer Davis",
+                fontWeight: FontWeight.w600,
+              ),
+              const SizedBox(height: 6),
+              const AppText(
+                "drjennifer@gmail.com",
+                fontSize: 11,
+                color: Colors.black54,
+              ),
+              const SizedBox(height: 4),
+              const AppText(
+                "Experience - 2 years",
+                fontSize: 11,
+                color: Colors.black54,
+              ),
+              const SizedBox(height: 4),
+              const AppText(
+                "Assigned patients - 15",
+                fontSize: 11,
+                color: Colors.black54,
+              ),
+              const Spacer(),
+              Container(
+                height: 36,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2383E2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const AppText(
+                  "Assign patient",
+                  color: Colors.white,
+                  fontSize: 12,
+                ),
+              )
+            ],
           ),
         ),
-        const SizedBox(height: 6),
-        Text(
-          title,
-          style: const TextStyle(fontSize: 13),
-        ),
-      ],
+      );
+    });
+  }
+
+  // ================== OPD LAST STEP =======================
+  Widget _finalReviewStep() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
+          const AppText(
+            "OPD Registration - Final Review",
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+
+          const SizedBox(height: 30),
+
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+            
+                /// LEFT SIDE – Patient Card
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF7F9FC),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Column(
+                      children: [
+            
+                        const CircleAvatar(
+                          radius: 45,
+                          backgroundImage: AssetImage(userImage),
+                        ),
+            
+                        const SizedBox(height: 15),
+            
+                        const AppText(
+                          "Jennifer Davis",
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+            
+                        const SizedBox(height: 6),
+            
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.shade100,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const AppText(
+                            "OPD",
+                            fontSize: 12,
+                          ),
+                        ),
+            
+                        const SizedBox(height: 20),
+            
+                        Divider(color: Colors.grey.shade300),
+            
+                        const SizedBox(height: 15),
+            
+                        /// 🔵 Assigned Doctor
+                        const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.medical_services_outlined,
+                              size: 16,
+                              color: Color(0xFF2383E2)
+                            ),
+                            SizedBox(width: 6),
+                            AppText(
+                              "Assigned doctor - Dr. Ankit Sharma",
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+            
+                const SizedBox(width: 25),
+            
+                /// RIGHT SIDE – Basic Info
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF7F9FC),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppText(
+                          "Basic information",
+                          fontWeight: FontWeight.w600,
+                        ),
+                        SizedBox(height: 15),
+                        AppText("Age : 23 years"),
+                        SizedBox(height: 8),
+                        AppText("Gender : Male"),
+                        SizedBox(height: 8),
+                        AppText("Contact : +91 9876543210"),
+                        SizedBox(height: 8),
+                        AppText("Address : Pune"),
+                        SizedBox(height: 8),
+                        AppText("Weight : 55 kg"),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 35),
+
+          /// Bottom Buttons
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+
+              SizedBox(
+                width: 120,
+                child: AppButton(
+                  onPressed: () => controller.opdStep.value = 2,
+                  backgroundColor: Colors.grey,
+                  text: "Back",
+                ),
+              ),
+
+              const SizedBox(width: 20),
+
+              SizedBox(
+                width: 180,
+                child: AppButton(
+                  onPressed: () {},
+                  text: "Register patient",
+                )
+              ),
+            ],
+          )
+        ],
+      ),
     );
   }
 
@@ -542,94 +727,117 @@ class OPDScreen extends StatelessWidget {
       ),
     );
   }
-
+  
+  // ================== EMERGENCY FORM =======================
   Widget _emergencyForm() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
-        /// 🔵 Title
-        const AppText(
-          "Emergency Registration",
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-        ),
-
-        const SizedBox(height: 20),
-
-        _buildEmergencyStepIndicator(),
-
+        _buildEmergencyStepper(),
         const SizedBox(height: 25),
 
-        _buildEmergencyPersonalInfoCard(),
-
-        const SizedBox(height: 30),
-
-        _buildEmergencyBottomBar(),
+        Expanded(
+          child: Obx(() {
+            switch (controller.currentStep.value) {
+              case 1:
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: _buildEmergencyPersonalInfoCard()
+                );
+              case 2:
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: _buildEmergencyDetailsStep()
+                );
+              case 3:
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: _buildBedAssignmentStep()
+                );
+              default:
+                return const SizedBox();
+            }
+          }),
+        ),
       ],
     );
   }
 
-  Widget _buildEmergencyStepIndicator() {
+  Widget _buildEmergencyStepper() {
     return Obx(() {
-      final step = controller.currentStep.value;
+      final step = controller.currentStep.value - 1;
 
       return Container(
-        padding: const EdgeInsets.symmetric(vertical: 20),
+        padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 30),
         decoration: BoxDecoration(
-          color: const Color(0xFFF1F4F8),
+          color: const Color(0xFFEFF3F8),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _emergencyStepItem(1, "Patient Info", "Basic details", step),
-            _emergencyStepItem(2, "Emergency Details", "Medical information", step),
-            _emergencyStepItem(3, "Review", "Confirm & admit", step),
+            _emergencyStepItem(0, "Patient Info", step),
+            _stepLine(step >= 1),
+            _emergencyStepItem(1, "Emergency Details", step),
+            _stepLine(step >= 2),
+            _emergencyStepItem(2, "Review", step),
           ],
         ),
       );
     });
   }
 
-  Widget _emergencyStepItem(
-    int number,
-    String title,
-    String subtitle,
-    int currentStep,
-  ) {
-    final active = number == currentStep;
+  Widget _emergencyStepItem(int index, String title, int currentStep) {
+    final isActive = index == currentStep;
+    final isCompleted = index < currentStep;
 
-    return Column(
-      children: [
-        CircleAvatar(
-          radius: 18,
-          backgroundColor:
-              active ? const Color(0xFF2383E2) : Colors.grey.shade300,
-          child: AppText(
-            "$number",
-            color: active ? Colors.white : Colors.black,
+    return Expanded(
+      child: Column(
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isActive
+                  ? const Color(0xFF2383E2)
+                  : isCompleted
+                      ? const Color(0xFF2383E2)
+                      : Colors.grey.shade300,
+            ),
+            child: Center(
+              child: isCompleted
+                  ? const Icon(Icons.check, color: Colors.white, size: 20)
+                  : Text(
+                      "${index + 1}",
+                      style: TextStyle(
+                        color: isActive ? Colors.white : Colors.black,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+            ),
           ),
-        ),
-        const SizedBox(height: 6),
-        AppText(title, fontWeight: FontWeight.w600),
-        AppText(
-          subtitle,
-          fontSize: 12,
-          color: Colors.grey,
-        ),
-      ],
+          const SizedBox(height: 8),
+          AppText(
+            title,
+            fontSize: 13,
+            fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+            color: Colors.black87,
+          )
+        ],
+      ),
     );
   }
 
+  // ================== EMERGENCY FIRST STEP ======================
   Widget _buildEmergencyPersonalInfoCard() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
     
         /// Section Title
-        Row(
-          children: const [
+        const Row(
+          children: [
             Icon(Icons.person_outline, size: 20),
             SizedBox(width: 8),
             AppText(
@@ -757,42 +965,588 @@ class OPDScreen extends StatelessWidget {
             ),
           ],
         ),
+        const SizedBox(height: 40),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            SizedBox(
+              width: 120,
+              child: AppButton(
+                onPressed: () {
+                  // If this is first step, maybe do nothing or exit
+                  controller.currentStep.value = 1; 
+                },
+                backgroundColor: Colors.grey,
+                text: "Back",
+              ),
+            ),
+            const SizedBox(width: 15),
+            SizedBox(
+              width: 140,
+              child: AppButton(
+                onPressed: () {
+                  controller.currentStep.value = 2;
+                },
+                text: "Continue",
+              ),
+            ),
+          ],
+        ),
+
       ],
     );
   }
 
-  Widget _buildEmergencyBottomBar() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        TextButton(
-          onPressed: () {},
-          child: const Text("Previous"),
-        ),
-        Row(
+  // ================== EMERGENCY SECOND STEP ======================
+  Widget _buildEmergencyDetailsStep() {
+    return Form(
+      key: controller.emergencyDetailsFormKey,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextButton(
-              onPressed: () {},
-              child: const Text("Cancel"),
+
+            const AppText(
+              "Emergency Details",
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
             ),
-            const SizedBox(width: 15),
-            SizedBox(
-              width: 120,
-              height: 42,
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2383E2),
-                  shape: RoundedRectangleBorder(
+
+            const SizedBox(height: 25),
+
+            /// ===================== MAIN CARD =====================
+            _sectionCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+
+                  /// Department + Staff
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _dropdownFormField(
+                          label: "Department *",
+                          items: ["Cardiology", "Orthopedic", "General"],
+                          onChanged: (v) => controller.department.value = v ?? "",
+                          validator: (v) =>
+                              v == null || v.isEmpty ? "Required" : null,
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: _dropdownFormField(
+                          label: "Attending Staff",
+                          items: ["Dr. Smith", "Dr. John"],
+                          onChanged: (v) => controller.attendingStaff.value = v ?? "",
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 25),
+
+                  /// Triage Level
+                  const AppText("Triage Level *"),
+                  const SizedBox(height: 10),
+                  Obx(() => Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: ["Immediate", "Urgent", "Semi-Urgent", "Non-Urgent"]
+                            .map((e) => _selectionChip(
+                                  label: e,
+                                  selected: controller.triageLevel.value == e,
+                                  onTap: () => controller.triageLevel.value = e,
+                                ))
+                            .toList(),
+                      )),
+
+                  const SizedBox(height: 25),
+
+                  /// Arrival Mode
+                  const AppText("Arrival Mode *"),
+                  const SizedBox(height: 10),
+                  Obx(() => Wrap(
+                        spacing: 12,
+                        children: ["Ambulance", "Walk-in", "Referral"]
+                            .map((e) => _selectionChip(
+                                  label: e,
+                                  selected: controller.arrivalMode.value == e,
+                                  onTap: () => controller.arrivalMode.value = e,
+                                ))
+                            .toList(),
+                      )),
+
+                  const SizedBox(height: 25),
+
+                  /// Chief Complaint
+                  _textFormField(
+                    label: "Chief Complaint *",
+                    hint: "Describe the main complaint...",
+                    maxLines: 3,
+                    validator: (v) =>
+                        v == null || v.isEmpty ? "Required" : null,
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 25),
+
+            /// ===================== VITAL SIGNS =====================
+            _sectionCard(
+              title: "Vital Signs (Optional)",
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _textFormField(
+                          label: "Blood Pressure",
+                          hint: "120/80",
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: _textFormField(
+                          label: "Heart Rate",
+                          hint: "72",
+                          keyboardType: TextInputType.number,
+                          validator: (v) {
+                            if (v != null && v.isNotEmpty) {
+                              if (int.tryParse(v) == null) {
+                                return "Invalid number";
+                              }
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _textFormField(
+                          label: "Temperature",
+                          hint: "98.6",
+                          keyboardType: TextInputType.number,
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: _textFormField(
+                          label: "Oxygen Saturation",
+                          hint: "98",
+                          keyboardType: TextInputType.number,
+                          validator: (v) {
+                            if (v != null && v.isNotEmpty) {
+                              final value = int.tryParse(v);
+                              if (value == null || value < 0 || value > 100) {
+                                return "0 - 100 only";
+                              }
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 25),
+
+            /// ===================== NOTES =====================
+            _sectionCard(
+              title: "Additional Notes",
+              child: _textFormField(
+                hint: "Any additional information...",
+                maxLines: 3,
+              ),
+            ),
+
+            const SizedBox(height: 35),
+
+            /// Buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: 120,
+                  child: AppButton(
+                    onPressed: () => controller.currentStep.value = 1,
+                    backgroundColor: Colors.grey,
+                    text: "Back",
+                  ),
+                ),
+                const SizedBox(width: 15),
+                SizedBox(
+                  width: 140,
+                  child: AppButton(
+                    onPressed: () {
+                      if (controller.emergencyDetailsFormKey.currentState!
+                          .validate()) {
+
+                        if (controller.triageLevel.value.isEmpty) {
+                          AppSnackbar.show(
+                            title: "Error",
+                            message: "Select triage level",
+                            type: AppSnackType.error
+                          );
+                          return;
+                        }
+
+                        if (controller.arrivalMode.value.isEmpty) {
+                          AppSnackbar.show(
+                            title: "Error",
+                            message: "Select arrival mode",
+                            type: AppSnackType.error
+                          );
+                          return;
+                        }
+
+                        controller.currentStep.value = 3;
+                      }
+                    },
+                    text: "Continue",
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _sectionCard({String? title, required Widget child}) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF7F9FC),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (title != null) ...[
+            AppText(title, fontWeight: FontWeight.w600),
+            const SizedBox(height: 20),
+          ],
+          child,
+        ],
+      ),
+    );
+  }
+
+  Widget _dropdownFormField({
+    required String label,
+    required List<String> items,
+    String? Function(String?)? validator,
+    required void Function(String?) onChanged,
+  }) {
+    return DropdownButtonFormField<String>(
+      decoration: InputDecoration(
+        labelText: label,
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+      items: items
+          .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+          .toList(),
+      validator: validator,
+      onChanged: onChanged,
+    );
+  }
+
+  Widget _textFormField({
+    String? label,
+    String? hint,
+    int maxLines = 1,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      maxLines: maxLines,
+      keyboardType: keyboardType,
+      validator: validator,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+  }
+
+  Widget _selectionChip({
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        decoration: BoxDecoration(
+          color: selected ? const Color(0xFF2383E2) : Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: AppText(
+          label,
+          color: selected ? Colors.white : Colors.black,
+        ),
+      ),
+    );
+  }
+
+  // ================== EMERGENCY THIRD STEP ======================
+  Widget _buildBedAssignmentStep() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+
+        const AppText(
+          "Bed Assignment",
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+        ),
+
+        const SizedBox(height: 25),
+
+        /// ================= Ward Dropdown =================
+        _sectionCard(
+          child: Obx(() => DropdownButtonFormField<String>(
+                value: controller.selectedWard.value,
+                decoration: InputDecoration(
+                  labelText: "Select Ward",
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text("Continue"),
+                items: [
+                  "General Ward (40 Beds)",
+                  "ICU (10 Beds)",
+                  "Private Ward (15 Beds)"
+                ]
+                    .map((e) =>
+                        DropdownMenuItem(value: e, child: Text(e)))
+                    .toList(),
+                onChanged: (v) =>
+                    controller.selectedWard.value = v ?? "",
+              )),
+        ),
+
+        const SizedBox(height: 25),
+
+        /// ================= Stats Row =================
+        Obx(() => Row(
+              children: [
+                _statCard(
+                    "Total Beds",
+                    controller.totalBeds.value.toString(),
+                    Icons.bed_outlined,
+                    Colors.blue),
+                const SizedBox(width: 20),
+                _statCard(
+                    "Available",
+                    controller.availableBeds.value.toString(),
+                    Icons.check_circle_outline,
+                    Colors.green),
+                const SizedBox(width: 20),
+                _statCard(
+                    "Occupied",
+                    controller.occupiedBeds.value.toString(),
+                    Icons.person_outline,
+                    Colors.red),
+                const SizedBox(width: 20),
+                _statCard(
+                    "Occupancy Rate",
+                    "${((controller.occupiedBeds.value / controller.totalBeds.value) * 100).toStringAsFixed(1)}%",
+                    Icons.calendar_today_outlined,
+                    Colors.orange),
+              ],
+            )),
+
+        const SizedBox(height: 30),
+
+        const Center(
+          child: AppText(
+            "Bed Layout - General Ward",
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+
+        const SizedBox(height: 20),
+
+        /// ================= Bed Grid =================
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final width = constraints.maxWidth;
+
+            int crossAxisCount;
+            if (width < 600) {
+              crossAxisCount = 4;
+            } else if (width < 900) {
+              crossAxisCount = 6;
+            } else {
+              crossAxisCount = 8;
+            }
+
+            return Obx(() => GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: controller.totalBeds.value,
+                  gridDelegate:
+                      SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    mainAxisExtent: 70,
+                  ),
+                  itemBuilder: (context, index) {
+                    final bedNumber = "A-${index + 1}";
+                    final isOccupied =
+                        index >= controller.availableBeds.value;
+                    final isSelected =
+                        controller.selectedBed.value == bedNumber;
+
+                    return InkWell(
+                      onTap: isOccupied
+                          ? null
+                          : () => controller.selectedBed.value =
+                              bedNumber,
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: isOccupied
+                              ? Colors.red.shade50
+                              : Colors.green.shade50,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: isSelected
+                                ? const Color(0xFF2383E2)
+                                : isOccupied
+                                    ? Colors.red.shade300
+                                    : Colors.green.shade300,
+                            width: isSelected ? 2 : 1,
+                          ),
+                        ),
+                        child: Column(
+                          mainAxisAlignment:
+                              MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              isOccupied
+                                  ? Icons.person
+                                  : Icons.check_circle,
+                              size: 18,
+                              color: isOccupied
+                                  ? Colors.red
+                                  : Colors.green,
+                            ),
+                            const SizedBox(height: 4),
+                            AppText(
+                              bedNumber,
+                              fontSize: 12,
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ));
+          },
+        ),
+
+        const SizedBox(height: 35),
+
+        /// ================= Bottom Buttons =================
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            SizedBox(
+              width: 120,
+              child: AppButton(
+                onPressed: () => controller.currentStep.value = 2,
+                backgroundColor: Colors.grey,
+                text: "Back",
               ),
-            )
+            ),
+            const SizedBox(width: 20),
+            SizedBox(
+              width: 180,
+              child: AppButton(
+                onPressed: controller.selectedBed.value.isEmpty
+                    ? null
+                    : () {
+                        // Submit logic
+                      },
+                text: "Register patient",
+              ),
+            ),
           ],
-        )
+        ),
       ],
+    );
+  }
+
+  Widget _statCard(String title, String value, IconData icon, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF7F9FC),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(icon, color: color, size: 18),
+                ),
+                const Spacer(),
+                AppText(
+                  value,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                )
+              ],
+            ),
+            const SizedBox(height: 10),
+            AppText(
+              title,
+              fontSize: 12,
+              color: Colors.black54,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -870,9 +1624,22 @@ class OPDScreen extends StatelessWidget {
         const SizedBox(height: 12),
         Row(
           children: [
-            Expanded(child: _textField("Search patient")),
+            Expanded(
+              child: CustomPatientSearchField(
+                label: "",
+                onChanged: (patient) {
+                  if (kDebugMode) {
+                    print(patient?.displayName);
+                  }
+                },
+              ),
+            ),
             const SizedBox(width: 20),
-            Expanded(child: _textField("Patient id result")),
+            Expanded(
+              child: _textField(
+                "Patient id result"
+              )
+            ),
           ],
         )
       ],

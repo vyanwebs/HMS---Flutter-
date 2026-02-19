@@ -24,12 +24,10 @@ class PatientDetailsInvestigationPage extends StatefulWidget {
   });
 
   @override
-  State<PatientDetailsInvestigationPage> createState() =>
-      _PatientDetailsInvestigationPageState();
+  State<PatientDetailsInvestigationPage> createState() => _PatientDetailsInvestigationPageState();
 }
 
-class _PatientDetailsInvestigationPageState
-    extends State<PatientDetailsInvestigationPage> {
+class _PatientDetailsInvestigationPageState extends State<PatientDetailsInvestigationPage> {
   late final InvestigationController _controller;
   bool _isControllerInitialized = false;
 
@@ -53,8 +51,7 @@ class _PatientDetailsInvestigationPageState
   }
 
   void _showNewInvestigationDialog() {
-    final String? doctorMongoId = widget.doctorMongoId ?? 
-                                   _getDoctorIdFromOtherSource();
+    final String? doctorMongoId = widget.doctorMongoId ??  _getDoctorIdFromOtherSource();
     
     showDialog(
       context: context,

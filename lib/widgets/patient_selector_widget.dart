@@ -100,16 +100,16 @@ class CustomPatientSearchField extends StatelessWidget {
                 hintText: "Search patient...",
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: Obx(() => controller.isLoading.value
-                    ? const Padding(
-                        padding: EdgeInsets.all(12),
-                        child: SizedBox(
-                          height: 16,
-                          width: 16,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2),
-                        ),
-                      )
-                    : const SizedBox()),
+                  ? const Padding(
+                      padding: EdgeInsets.all(12),
+                      child: SizedBox(
+                        height: 16,
+                        width: 16,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2),
+                      ),
+                    )
+                  : const SizedBox()),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),

@@ -258,7 +258,7 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
           return OPDScreen();
 
         case ReceptionPanelMenu.ipd:
-          return const IPDScreen();
+          return IPDScreen();
 
         case ReceptionPanelMenu.patientDirectory:
           return const PatientDirectory();

@@ -1,836 +1,716 @@
 import 'package:flutter/material.dart';
-import 'package:hms/models/ipd_patient_model.dart';
-import 'package:hms/screens/reception/patient_components/patient_admission_screen.dart';
-import 'package:hms/screens/reception/patient_components/patient_details_screen.dart';
-import 'package:hms/screens/reception/patient_components/patient_notes_screen.dart';
-import 'package:hms/screens/reception/patient_components/patient_discharge_screen.dart';
+import 'package:get/get.dart';
 
-class IPDScreen extends StatefulWidget {
-  const IPDScreen({super.key});
+import '../../controllers/Reception/reception_ipd_controllers.dart';
+import '../../utils/buttons.dart';
+import '../../utils/text.dart';
+import '../../widgets/doctor_panel/stat_card_widget.dart';
 
-  @override
-  State<IPDScreen> createState() => _IPDScreenState();
-}
+class IPDScreen extends StatelessWidget {
+  IPDScreen({super.key});
 
-class _IPDScreenState extends State<IPDScreen> {
-  List<IPDPatient> ipdPatients = [
-    IPDPatient(
-      id: 'P10002',
-      name: 'Sarah Johnson',
-      age: 32,
-      gender: 'Female',
-      ward: 'Ward A',
-      bedNo: 'A-101',
-      admissionDate: '2024-01-14',
-      doctor: 'Dr. Sharma',
-      status: 'Stable',
-      diagnosis: 'Hypertension',
-      contactNumber: '+1-555-0123',
-      address: '123 Main St, New York',
-      emergencyContact: '+1-555-0124',
-      insuranceProvider: 'HealthFirst Inc.',
-      insurancePolicyNo: 'HF-789012',
-      medications: ['Metformin 500mg', 'Lisinopril 10mg'],
-      labReports: ['Blood Test Report', 'Urine Analysis'],
-    ),
-    IPDPatient(
-      id: 'P10004',
-      name: 'Emily Davis',
-      age: 29,
-      gender: 'Female',
-      ward: 'ICU',
-      bedNo: 'ICU-03',
-      admissionDate: '2024-01-12',
-      doctor: 'Dr. Patel',
-      status: 'Critical',
-      diagnosis: 'Pneumonia',
-      contactNumber: '+1-555-0125',
-      address: '456 Oak Ave, Boston',
-      emergencyContact: '+1-555-0126',
-      insuranceProvider: 'MediCare Plus',
-      insurancePolicyNo: 'MC-345678',
-    ),
-    IPDPatient(
-      id: 'P10006',
-      name: 'David Miller',
-      age: 55,
-      gender: 'Male',
-      ward: 'Ward B',
-      bedNo: 'B-205',
-      admissionDate: '2024-01-10',
-      doctor: 'Dr. Gupta',
-      status: 'Improving',
-      diagnosis: 'Diabetes Type 2',
-      contactNumber: '+1-555-0127',
-      address: '789 Pine Rd, Chicago',
-      emergencyContact: '+1-555-0128',
-      insuranceProvider: 'Blue Cross',
-      insurancePolicyNo: 'BC-901234',
-    ),
-    IPDPatient(
-      id: 'P10008',
-      name: 'Lisa Taylor',
-      age: 42,
-      gender: 'Female',
-      ward: 'Ward A',
-      bedNo: 'A-102',
-      admissionDate: '2024-01-08',
-      doctor: 'Dr. Sharma',
-      status: 'Stable',
-      diagnosis: 'Arthritis',
-      contactNumber: '+1-555-0129',
-      address: '321 Elm St, Los Angeles',
-      emergencyContact: '+1-555-0130',
-      insuranceProvider: 'Aetna Health',
-      insurancePolicyNo: 'AH-567890',
-    ),
-  ];
-
-  String _selectedFilter = 'All';
-  final List<String> _filters = [
-    'All',
-    'Ward A',
-    'Ward B',
-    'ICU',
-    'Private Rooms'
-  ];
-  final TextEditingController _searchController = TextEditingController();
-
-  List<IPDPatient> get _filteredPatients {
-    if (_selectedFilter == 'All') {
-      return ipdPatients;
-    }
-    return ipdPatients
-        .where((patient) => patient.ward == _selectedFilter)
-        .toList();
-  }
+  final ipdControllers = Get.put(ReceptionIPDControllers());
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(25),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+    return Padding(
+      padding: const EdgeInsets.all(20),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with Admit Button
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Inpatient Department (IPD)',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2D3748),
-                ),
-              ),
-              ElevatedButton.icon(
-                onPressed: _admitPatient,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4299E1),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
-                ),
-                icon: const Icon(Icons.add, size: 18),
-                label: const Text('Admit Patient'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
 
-          // Stats Cards
-          Row(
-            children: [
-              _buildIPDStatCard('Total Admitted', '${ipdPatients.length}',
-                  Icons.bed_outlined, const Color(0xFF4299E1)),
-              const SizedBox(width: 20),
-              _buildIPDStatCard(
-                  'ICU Patients',
-                  '${ipdPatients.where((p) => p.ward == 'ICU').length}',
-                  Icons.medical_services,
-                  const Color(0xFFF56565)),
-              const SizedBox(width: 20),
-              _buildIPDStatCard('Available Beds', '15', Icons.king_bed,
-                  const Color(0xFF48BB78)),
-              const SizedBox(width: 20),
-              _buildIPDStatCard('Today\'s Admissions', '1', Icons.person_add,
-                  const Color(0xFFED8936)),
-            ],
-          ),
+          /// ================= STAT CARDS =================
+          _statCards(),
 
-          const SizedBox(height: 30),
+          const SizedBox(height: 25),
 
-          // Filter and Search Bar
-          Row(
-            children: [
-              // Filter Chips
-              Expanded(
-                child: Wrap(
-                  spacing: 8,
-                  children: _filters.map((filter) {
-                    final isSelected = _selectedFilter == filter;
-                    return ChoiceChip(
-                      label: Text(filter),
-                      selected: isSelected,
-                      onSelected: (selected) {
-                        setState(() {
-                          _selectedFilter = selected ? filter : 'All';
-                        });
-                      },
-                      backgroundColor: Colors.white,
-                      selectedColor: const Color(0xFF4299E1),
-                      labelStyle: TextStyle(
-                        color:
-                            isSelected ? Colors.white : const Color(0xFF718096),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        side: BorderSide(
-                          color: isSelected
-                              ? const Color(0xFF4299E1)
-                              : const Color(0xFFE2E8F0),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-
-              // Search Bar
-              Container(
-                width: 300,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF7FAFC),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                ),
-                child: Row(
-                  children: [
-                    const SizedBox(width: 12),
-                    const Icon(Icons.search,
-                        color: Color(0xFF718096), size: 20),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: TextField(
-                        controller: _searchController,
-                        decoration: const InputDecoration(
-                          hintText: 'Search patients...',
-                          border: InputBorder.none,
-                          hintStyle: TextStyle(
-                            color: Color(0xFFA0AEC0),
-                            fontSize: 14,
-                          ),
-                        ),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF2D3748),
-                        ),
-                        onChanged: (value) {
-                          setState(() {});
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 20),
-
-          // IPD Patients Table
-          Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: const Color(0xFFE2E8F0)),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
+          /// ================= MAIN BODY =================
+          Expanded(
+            child: Row(
               children: [
-                // Table Header
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF7FAFC),
-                    border:
-                        Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
-                  ),
-                  child: const Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Patient ID',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF2D3748),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          'Name',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF2D3748),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          'Ward/Bed',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF2D3748),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          'Admission Date',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF2D3748),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          'Doctor',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF2D3748),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          'Status',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF2D3748),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          'Actions',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF2D3748),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+
+                /// LEFT - PATIENT LIST
+                Expanded(
+                  flex: 3,
+                  child: _patientsList(),
                 ),
 
-                // Table Rows
-                ..._filteredPatients.where((patient) {
-                  final searchTerm = _searchController.text.toLowerCase();
-                  return searchTerm.isEmpty ||
-                      patient.name.toLowerCase().contains(searchTerm) ||
-                      patient.id.toLowerCase().contains(searchTerm) ||
-                      patient.ward.toLowerCase().contains(searchTerm);
-                }).map((patient) => Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(color: Colors.grey.shade200),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              patient.id,
-                              style: const TextStyle(
-                                color: Color(0xFF4299E1),
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              patient.name,
-                              style: const TextStyle(
-                                color: Color(0xFF2D3748),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  patient.ward,
-                                  style: const TextStyle(
-                                    color: Color(0xFF2D3748),
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                Text(
-                                  'Bed: ${patient.bedNo}',
-                                  style: const TextStyle(
-                                    color: Color(0xFF718096),
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              patient.admissionDate,
-                              style: const TextStyle(
-                                color: Color(0xFF718096),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              patient.doctor,
-                              style: const TextStyle(
-                                color: Color(0xFF4299E1),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: patient.status == 'Critical'
-                                    ? const Color(0xFFF56565).withValues(alpha: 0.1)
-                                    : patient.status == 'Stable'
-                                        ? const Color(0xFF48BB78)
-                                            .withValues(alpha: 0.1)
-                                        : patient.status == 'Improving'
-                                            ? const Color(0xFFED8936)
-                                                .withValues(alpha: 0.1)
-                                            : const Color(0xFF4299E1)
-                                                .withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                patient.status,
-                                style: TextStyle(
-                                  color: patient.status == 'Critical'
-                                      ? const Color(0xFFF56565)
-                                      : patient.status == 'Stable'
-                                          ? const Color(0xFF48BB78)
-                                          : patient.status == 'Improving'
-                                              ? const Color(0xFFED8936)
-                                              : const Color(0xFF4299E1),
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: Row(
-                              children: [
-                                IconButton(
-                                  onPressed: () => _viewPatientDetails(patient),
-                                  icon: const Icon(Icons.visibility_outlined,
-                                      size: 18, color: Color(0xFF4299E1)),
-                                  tooltip: 'View Details',
-                                ),
-                                IconButton(
-                                  onPressed: () => _editPatient(patient),
-                                  icon: const Icon(Icons.edit_outlined,
-                                      size: 18, color: Color(0xFF48BB78)),
-                                  tooltip: 'Edit',
-                                ),
-                                IconButton(
-                                  onPressed: () => _addNotes(patient),
-                                  icon: const Icon(Icons.notes_outlined,
-                                      size: 18, color: Color(0xFFED8936)),
-                                  tooltip: 'Add Notes',
-                                ),
-                                IconButton(
-                                  onPressed: () => _dischargePatient(patient),
-                                  icon: const Icon(Icons.exit_to_app_outlined,
-                                      size: 18, color: Color(0xFFF56565)),
-                                  tooltip: 'Discharge',
-                                ),
-                                PopupMenuButton<dynamic>(
-                                  icon: const Icon(Icons.more_vert,
-                                      color: Color(0xFF718096)),
-                                  itemBuilder: (context) {
-                                    return [
-                                      PopupMenuItem<dynamic>(
-                                        value: 'duplicate',
-                                        child: const Row(
-                                          children: [
-                                            Icon(Icons.copy, size: 18),
-                                            SizedBox(width: 8),
-                                            Text('Duplicate'),
-                                          ],
-                                        ),
-                                      ),
-                                      const PopupMenuDivider(),
-                                      PopupMenuItem<dynamic>(
-                                        value: 'delete',
-                                        child: const Row(
-                                          children: [
-                                            Icon(Icons.delete,
-                                                size: 18, color: Colors.red),
-                                            SizedBox(width: 8),
-                                            Text('Delete'),
-                                          ],
-                                        ),
-                                      ),
-                                    ];
-                                  },
-                                  onSelected: (value) {
-                                    if (value == 'duplicate') {
-                                      _duplicatePatient(patient);
-                                    } else if (value == 'delete') {
-                                      _deletePatient(patient);
-                                    }
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    )),
+                const SizedBox(width: 25),
+
+                /// RIGHT - IPD DETAILS
+                Expanded(
+                  flex: 5,
+                  child: _ipdDetailsPanel(),
+                ),
               ],
             ),
-          ),
-
-          const SizedBox(height: 30),
-
-          // Ward Status
-          const Text(
-            'Ward Status',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF2D3748),
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          Row(
-            children: [
-              _buildWardStatusCard('Ward A', 20, 15, 5),
-              const SizedBox(width: 20),
-              _buildWardStatusCard('Ward B', 25, 20, 5),
-              const SizedBox(width: 20),
-              _buildWardStatusCard('ICU', 10, 8, 2),
-              const SizedBox(width: 20),
-              _buildWardStatusCard('Private Rooms', 15, 10, 5),
-            ],
-          ),
+          )
         ],
       ),
     );
   }
 
-  Widget _buildIPDStatCard(
-      String title, String value, IconData icon, Color color) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withValues(alpha: 0.2)),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(icon, color: Colors.white, size: 24),
-            ),
-            const SizedBox(width: 15),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
-                ),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF718096),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // ==============================================================
+  // STAT CARDS (Like your dashboard)
+  // ==============================================================
 
-  Widget _buildWardStatusCard(
-      String ward, int totalBeds, int occupied, int available) {
-    final wardPatients = ipdPatients.where((p) => p.ward == ward).length;
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  ward,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2D3748),
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: wardPatients == 0
-                        ? const Color(0xFF48BB78).withValues(alpha: 0.1)
-                        : wardPatients <= 5
-                            ? const Color(0xFFED8936).withValues(alpha: 0.1)
-                            : const Color(0xFFF56565).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '$wardPatients Patients',
-                    style: TextStyle(
-                      color: wardPatients == 0
-                          ? const Color(0xFF48BB78)
-                          : wardPatients <= 5
-                              ? const Color(0xFFED8936)
-                              : const Color(0xFFF56565),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 15),
-            _buildBedStatus('Total Beds', totalBeds, const Color(0xFF4299E1)),
-            const SizedBox(height: 10),
-            _buildBedStatus('Occupied', occupied, const Color(0xFFF56565)),
-            const SizedBox(height: 10),
-            _buildBedStatus('Available', available, const Color(0xFF48BB78)),
-            const SizedBox(height: 10),
-            _buildBedStatus(
-                'Current Patients', wardPatients, const Color(0xFFED8936)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBedStatus(String label, int count, Color color) {
+  Widget _statCards() {
     return Row(
       children: [
-        Container(
-          width: 8,
-          height: 8,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
-        ),
-        const SizedBox(width: 10),
+
         Expanded(
-          child: Text(
-            label,
-            style: const TextStyle(
-              color: Color(0xFF718096),
+          child: StatCardWidget(
+            title: "Total patients",
+            value: "30",
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFF2C7EDB), Color(0xFFE1F0FF)],
             ),
+            imagePath: 'assets/images/box1.png',
           ),
         ),
-        Text(
-          '$count',
-          style: TextStyle(
-            color: color,
-            fontWeight: FontWeight.bold,
+
+        const SizedBox(width: 12),
+
+        Expanded(
+          child: StatCardWidget(
+            title: "Bed assigned",
+            value: "20",
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFF00B894), Color(0xFFE3FCFA)],
+            ),
+            imagePath: 'assets/images/box2.png',
+          ),
+        ),
+
+        const SizedBox(width: 12),
+
+        Expanded(
+          child: StatCardWidget(
+            title: "Need update",
+            value: "12",
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFF00C9C9), Color(0xFFDFFFFF)],
+            ),
+            imagePath: 'assets/images/box3.png',
           ),
         ),
       ],
     );
   }
 
-  // Action Methods
-  void _admitPatient() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const PatientAdmissionScreen(),
-      ),
-    );
+  // ==============================================================
+  // LEFT PANEL – PATIENT LIST
+  // ==============================================================
 
-    if (result != null && result is IPDPatient) {
-      setState(() {
-        ipdPatients.add(result);
-      });
+  Widget _patientsList() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: _cardDecoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Patient ${result.name} admitted successfully'),
-          backgroundColor: const Color(0xFF48BB78),
-        ),
-      );
-    }
-  }
-
-  void _viewPatientDetails(IPDPatient patient) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PatientDetailsScreen(patient: patient),
-      ),
-    );
-  }
-
-  void _editPatient(IPDPatient patient) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PatientAdmissionScreen(patientToEdit: patient),
-      ),
-    );
-
-    if (result != null && result is IPDPatient) {
-      setState(() {
-        final index = ipdPatients.indexWhere((p) => p.id == patient.id);
-        if (index != -1) {
-          ipdPatients[index] = result;
-        }
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Patient ${result.name} updated successfully'),
-          backgroundColor: const Color(0xFF48BB78),
-        ),
-      );
-    }
-  }
-
-  void _addNotes(IPDPatient patient) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PatientNotesScreen(patient: patient),
-      ),
-    );
-  }
-
-  void _dischargePatient(IPDPatient patient) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PatientDischargeScreen(patient: patient),
-      ),
-    );
-
-    if (result != null && result is IPDPatient) {
-      setState(() {
-        ipdPatients.removeWhere((p) => p.id == patient.id);
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Patient ${patient.name} discharged successfully'),
-          backgroundColor: const Color(0xFF48BB78),
-        ),
-      );
-    }
-  }
-
-  void _duplicatePatient(IPDPatient patient) {
-    final duplicatedPatient = patient.copyWith(
-      id: '${patient.id}-COPY',
-      bedNo: '${patient.bedNo}-COPY',
-    );
-
-    setState(() {
-      ipdPatients.add(duplicatedPatient);
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Patient ${patient.name} duplicated'),
-        backgroundColor: const Color(0xFF4299E1),
-      ),
-    );
-  }
-
-  void _deletePatient(IPDPatient patient) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Patient'),
-        content: Text('Are you sure you want to delete ${patient.name}?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+          const AppText(
+            "Patients list",
+            fontWeight: FontWeight.w600,
           ),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                ipdPatients.removeWhere((p) => p.id == patient.id);
-              });
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Patient ${patient.name} deleted'),
-                  backgroundColor: const Color(0xFFF56565),
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFF56565),
+
+          const SizedBox(height: 15),
+
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: 6,
+              itemBuilder: (_, index) => _patientTile(index),
             ),
-            child: const Text('Delete'),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _patientTile(int index) {
+    return Obx(() {
+      final isSelected = ipdControllers.selectedIndex.value == index;
+
+      return InkWell(
+        onTap: () => ipdControllers.selectedIndex.value = index,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          margin: const EdgeInsets.only(bottom: 14),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: isSelected
+              ? const Color(0xFFEAF2FF)
+              : Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected
+                ? const Color(0xFF2C7EDB)
+                : const Color(0xFFE2E8F0),
+              width: isSelected ? 1.5 : 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              /// ===== Top Row =====
+              Row(
+                children: [
+
+                  const CircleAvatar(radius: 18),
+                  // PatientAvatar(patient: ,),
+                  const SizedBox(width: 10),
+
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppText(
+                          "John Smith",
+                          fontWeight: FontWeight.w600,
+                        ),
+                        SizedBox(height: 4),
+                        AppText(
+                          "Age : 45 yr / male",
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  _greyChip("No bed assigned"),
+                ],
+              ),
+
+              const SizedBox(height: 12),
+
+              /// ===== Bottom Row =====
+              Row(
+                children: [
+
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppText(
+                          "Bed : B-205",
+                          fontSize: 12,
+                        ),
+                        SizedBox(height: 4),
+                        AppText(
+                          "Ward : General",
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  _redOutlineChip("Need update"),
+                ],
+              )
+            ],
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _greyChip(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: AppText(
+        text,
+        fontSize: 11,
+        color: Colors.black87,
+      ),
+    );
+  }
+
+  Widget _redOutlineChip(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.red.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.red),
+      ),
+      child: const AppText(
+        "Need update",
+        fontSize: 11,
+        color: Colors.red,
+      ),
+    );
+  }
+
+  // ==============================================================
+  // RIGHT PANEL – IPD DETAILS
+  // ==============================================================
+
+  Widget _ipdDetailsPanel() {
+    return Container(
+      decoration: _cardDecoration(),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            /// ================= PATIENT HEADER =================
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEFF3F8),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                children: [
+
+                  const CircleAvatar(radius: 24),
+
+                  const SizedBox(width: 12),
+
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppText(
+                          "Maria George",
+                          fontWeight: FontWeight.w600,
+                        ),
+                        SizedBox(height: 4),
+                        AppText(
+                          "ID: PAT123 • Age: 23 • Male",
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      _statusChip(
+                        "IPD details pending",
+                        Colors.orange,
+                      ),
+                      const SizedBox(height: 6),
+                      _statusChip(
+                        "Admit note - ICU",
+                        Colors.green,
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            /// ================= IPD DETAILS =================
+            const AppText(
+              "IPD details",
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+
+            const SizedBox(height: 20),
+
+            _label("Reason for admission"),
+            const SizedBox(height: 6),
+            _textField("Enter reason for admission"),
+
+            const SizedBox(height: 18),
+
+            _label("Symptoms"),
+            const SizedBox(height: 6),
+            _textField("Enter patient symptoms"),
+
+            const SizedBox(height: 18),
+
+            _label("Initial diagnosis"),
+            const SizedBox(height: 6),
+            _textField("Enter diagnosis"),
+
+            const SizedBox(height: 30),
+
+            /// ================= BED ASSIGNMENT =================
+            const AppText(
+              "Bed assignment",
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+
+            const SizedBox(height: 15),
+
+            _dropdownField(),
+
+            const SizedBox(height: 20),
+
+            const AppText(
+              "Available beds",
+              fontWeight: FontWeight.w500,
+            ),
+
+            const SizedBox(height: 12),
+
+            Wrap(
+              spacing: 14,
+              runSpacing: 14,
+              children: List.generate(
+                10,
+                (index) => _styledBedBox(
+                  "A-${index + 1}",
+                  index == 0,     // selected
+                  index == 2 || index == 4, // occupied sample
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 35),
+            _depositManagementSection(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _depositManagementSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+
+        /// ===== Title =====
+        const AppText(
+          "Deposit management",
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+
+        const SizedBox(height: 15),
+
+        /// ===== Receipt Summary Strip =====
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFEAF2FB),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            children: [
+
+              /// Header Row
+              Row(
+                children: [
+                  const Icon(Icons.account_balance_wallet_outlined, size: 18),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: AppText(
+                      "Deposit receipt (1 Generated)",
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade100,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const AppText(
+                      "Total Rs 1870",
+                      fontSize: 11,
+                      color: Colors.blue,
+                    ),
+                  )
+                ],
+              ),
+
+              const SizedBox(height: 15),
+
+              /// Receipt Card
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+
+                    /// Receipt Number Circle
+                    Container(
+                      width: 30,
+                      height: 30,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.blue),
+                      ),
+                      child: const AppText(
+                        "1",
+                        fontSize: 12,
+                      ),
+                    ),
+
+                    const SizedBox(width: 12),
+
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AppText(
+                            "Rs 880",
+                            fontWeight: FontWeight.w600,
+                          ),
+                          SizedBox(height: 4),
+                          AppText(
+                            "Receipt id - Rec123456789",
+                            fontSize: 11,
+                            color: Colors.grey,
+                          ),
+                          SizedBox(height: 2),
+                          AppText(
+                            "04-02-2025 • 8:24 a.m.",
+                            fontSize: 11,
+                            color: Colors.grey,
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    Icon(Icons.visibility_outlined,
+                        size: 18, color: Colors.grey.shade600),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 30),
+
+        /// ===== Add New Deposit Receipt =====
+        const AppText(
+          "Add new deposit receipt",
+          fontWeight: FontWeight.w600,
+        ),
+
+        const SizedBox(height: 15),
+
+        Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
+          ),
+          child: Column(
+            children: [
+
+              Row(
+                children: [
+
+                  /// Amount Field
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const AppText("Create deposit receipt"),
+                        const SizedBox(height: 6),
+                        _textField("Enter deposit amount"),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(width: 20),
+
+                  /// Payment Mode
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const AppText("Payment mode"),
+                        const SizedBox(height: 6),
+                        _dropdownField(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 15),
+
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const AppText("Remark (optional)"),
+                  const SizedBox(height: 6),
+                  _textField("Enter remark"),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
+              AppButton(
+                onPressed: () {},
+                text: "Create deposit receipt",
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 35),
+
+        /// ===== Bottom Buttons =====
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            AppButton(
+              onPressed: () {},
+              icon: Icons.receipt,
+              iconIsLast: false,
+              text: "Generate IPD Bill",
+            ),
+            const SizedBox(width: 15),
+            AppButton(
+              onPressed: () {},
+              icon: Icons.receipt,
+              iconIsLast: false,
+              backgroundColor: Colors.grey,
+              text: "Update & assign bed",
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _statusChip(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: AppText(
+        text,
+        fontSize: 11,
+        color: color,
+      ),
+    );
+  }
+
+  Widget _label(String text) {
+    return AppText(
+      text,
+      fontSize: 13,
+      fontWeight: FontWeight.w500,
+    );
+  }
+
+  Widget _styledBedBox(
+    String label,
+    bool selected,
+    bool occupied,
+  ) {
+    Color bgColor;
+    Color borderColor;
+
+    if (selected) {
+      bgColor = const Color(0xFFDFF7E6);
+      borderColor = Colors.green;
+    } else if (occupied) {
+      bgColor = Colors.grey.shade300;
+      borderColor = Colors.grey;
+    } else {
+      bgColor = Colors.grey.shade200;
+      borderColor = Colors.grey.shade400;
+    }
+
+    return Container(
+      width: 70,
+      height: 70,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: borderColor),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            selected
+                ? Icons.check_circle
+                : occupied
+                    ? Icons.lock
+                    : Icons.bed_outlined,
+            size: 18,
+            color: borderColor,
+          ),
+          const SizedBox(height: 4),
+          AppText(
+            label,
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ==============================================================
+  // COMMON UI
+  // ==============================================================
+
+  Widget _textField(String hint) {
+    return TextField(
+      decoration: InputDecoration(
+        hintText: hint,
+        filled: true,
+        fillColor: const Color(0xFFF7F9FC),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+  }
+
+  Widget _dropdownField() {
+    return DropdownButtonFormField<String>(
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: const Color(0xFFF7F9FC),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+      items: const [
+        DropdownMenuItem(value: "general", child: Text("General ward")),
+        DropdownMenuItem(value: "icu", child: Text("ICU")),
+      ],
+      onChanged: (v) {},
+    );
+  }
+
+  BoxDecoration _cardDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: const Color(0xFFE2E8F0)),
     );
   }
 }
