@@ -448,7 +448,6 @@
 //   /// Check if there's an error
 //   bool hasError() => errorMessage.value.isNotEmpty;
 // }
-
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../models/investigation_model.dart';
