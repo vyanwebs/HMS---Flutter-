@@ -204,6 +204,8 @@ class InvestigationController extends GetxController {
     }
   }
 
+
+
   /// NEW: Create Investigation using InvestigationModel (preferred)
   // Future<bool> createInvestigationFromModel(InvestigationModel investigation) async {
   //   return createInvestigation(
@@ -223,57 +225,80 @@ class InvestigationController extends GetxController {
   //   );
   // }
 
-  /// Update Investigation
-  Future<bool> updateInvestigation({
-    required String investigationId,
-    required String patientMongoId,
-    Map<String, dynamic>? updateData,
-  }) async {
-    try {
-      isLoading.value = true;
-      errorMessage.value = '';
+  // /// Update Investigation
+  // Future<bool> updateInvestigation({
+  //   required String investigationId,
+  //   required String patientMongoId,
+  //   Map<String, dynamic>? updateData,
+  // }) async {
+  //   try {
+  //     isLoading.value = true;
+  //     errorMessage.value = '';
       
-      final String url = "$baseUrl/api/investigation/update/$investigationId";
-      print("📤 PATCH Request URL: $url");
-      print("📤 Update Data: $updateData");
+  //     final String url = "$baseUrl/api/investigation/update/$investigationId";
+  //     print("📤 PATCH Request URL: $url");
+  //     print("📤 Update Data: $updateData");
       
-      final helper = NetworkHelper(url: url);
-      final response = await helper.patch(body: updateData ?? {}, auth: true);
+  //     final helper = NetworkHelper(url: url);
+  //     final response = await helper.patch(body: updateData ?? {}, auth: true);
 
-      print("📥 PATCH Response: $response");
+  //     print("📥 PATCH Response: $response");
 
-      if (response['success'] == true) {
-        AppSnackbar.show(
-          title: 'Success',
-          message: response['message'] ?? 'Investigation updated successfully',
-          type: AppSnackType.success,
-        );
+  //     if (response['success'] == true) {
+  //       AppSnackbar.show(
+  //         title: 'Success',
+  //         message: response['message'] ?? 'Investigation updated successfully',
+  //         type: AppSnackType.success,
+  //       );
         
-        // Refresh the list
-        await getInvestigationsByPatientId(patientMongoId);
-        return true;
-      } else {
-        errorMessage.value = response['message'] ?? 'Failed to update investigation';
-        AppSnackbar.show(
-          title: 'Failed',
-          message: errorMessage.value,
-          type: AppSnackType.error,
-        );
-        return false;
-      }
-    } catch (e) {
-      errorMessage.value = e.toString();
-      print("❌ PATCH Error: $e");
-      AppSnackbar.show(
-        title: 'Error', 
-        message: e.toString(), 
-        type: AppSnackType.error
-      );
-      return false;
-    } finally {
-      isLoading.value = false;
+  //       // Refresh the list
+  //       await getInvestigationsByPatientId(patientMongoId);
+  //       return true;
+  //     } else {
+  //       errorMessage.value = response['message'] ?? 'Failed to update investigation';
+  //       AppSnackbar.show(
+  //         title: 'Failed',
+  //         message: errorMessage.value,
+  //         type: AppSnackType.error,
+  //       );
+  //       return false;
+  //     }
+  //   } catch (e) {
+  //     errorMessage.value = e.toString();
+  //     print("❌ PATCH Error: $e");
+  //     AppSnackbar.show(
+  //       title: 'Error', 
+  //       message: e.toString(), 
+  //       type: AppSnackType.error
+  //     );
+  //     return false;
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
+
+Future<bool> updateInvestigation({
+  required String investigationId,
+  required String patientMongoId,
+  required Map<String, dynamic> data,
+}) async {
+  isLoading.value = true;
+  try {
+    final String url = "$updateinvestigationApi/$investigationId";
+    final helper = NetworkHelper(url: url);
+    final response = await helper.patch(body: data, auth: true);
+
+    if (response['success'] == true) {
+      await getInvestigationsByPatientId(patientMongoId);
+      return true;
     }
+    return false;
+  } catch (e) {
+    return false;
+  } finally {
+    isLoading.value = false;
   }
+}
 
   /// Delete Investigation - OPTIMIZED VERSION
   Future<bool> deleteInvestigation({
