@@ -11,7 +11,7 @@ import '../main_dashboard.dart';
 import 'analysis_screen.dart';
 import 'billing.dart';
 import 'discharge_screen.dart';
-import 'doctors_screen.dart';
+import 'doctor_management_screen.dart';
 import 'ipd_screen.dart';
 import 'opd_screen.dart';
 import 'patient_directory.dart';
@@ -267,7 +267,7 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
           return const DischargeScreen();
 
         case ReceptionPanelMenu.doctors:
-          return const DoctorsScreen();
+          return const DoctorManagementScreen();
 
         case ReceptionPanelMenu.billing:
           return const BillingScreen();
