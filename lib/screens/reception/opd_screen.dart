@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/Reception/opd_registration_controller.dart';
@@ -208,7 +209,13 @@ class OPDScreen extends StatelessWidget {
           Align(
             alignment: Alignment.centerRight,
             child: AppButton(
-              onPressed: () => controller.opdStep.value = 1,
+              onPressed: () {
+                final form = controller.opdFormKey.currentState;
+
+                if (form != null && form.validate()) {
+                  controller.opdStep.value = 1;
+                }
+              },
               text: "Continue",
             ),
           ),
@@ -518,11 +525,17 @@ class OPDScreen extends StatelessWidget {
             ),
             const SizedBox(width: 15),
             AppButton(
-              onPressed: controller.selectedDoctor.value.isEmpty
-                ? null
-                : () {
-                    controller.opdStep.value = 3;
-                  },
+              onPressed: () {
+                if(controller.selectedDoctor.value.isEmpty) {
+                  AppSnackbar.show(
+                    title: "Assign Doctor",
+                    message: "Please assign a doctor",
+                    type: AppSnackType.warning
+                  );
+                } else {
+                  controller.opdStep.value = 3;
+                }
+              },
               text: "Continue",
             ),
           ],
@@ -549,27 +562,20 @@ class OPDScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isSelected
-                ? const Color(0xFF2383E2)
-                : Colors.grey.shade300,
+                  ? const Color(0xFF2383E2)
+                  : Colors.grey.shade300,
               width: isSelected ? 2 : 1,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 8,
-              )
-            ],
           ),
           child: Column(
             children: [
 
-              /// Avatar
-              CircleAvatar(
+              /// ✅ DOCTOR AVATAR
+              PatientAvatar(
+                name: doctor.name,
+                imageUrl: doctor.avatar.url,
+                googleDriveLink: doctor.avatar.googleDriveLink,
                 radius: 35,
-                child: AppText(
-                  doctor.name[0].toUpperCase(),
-                  fontSize: 22,
-                ),
               ),
 
               const SizedBox(height: 12),
@@ -602,14 +608,14 @@ class OPDScreen extends StatelessWidget {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: doctor.isAvailableToday
-                    ? const Color(0xFF2383E2)
-                    : Colors.grey,
+                      ? const Color(0xFF2383E2)
+                      : Colors.grey,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: AppText(
                   doctor.isAvailableToday
-                    ? "Assign patient"
-                    : "Unavailable",
+                      ? "Assign patient"
+                      : "Unavailable",
                   color: Colors.white,
                   fontSize: 12,
                 ),
@@ -1339,9 +1345,9 @@ class OPDScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
         ),
       ),
-      items: items
-          .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-          .toList(),
+      items: items.map(
+        (e) => DropdownMenuItem(value: e, child: Text(e))
+      ).toList(),
       validator: validator,
       onChanged: onChanged,
     );
@@ -1581,7 +1587,7 @@ class OPDScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.15),
+                    color: color.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(icon, color: color, size: 18),
@@ -1716,16 +1722,16 @@ class OPDScreen extends StatelessWidget {
           fontWeight: FontWeight.w600
         ),
         const SizedBox(height: 15),
-
+    
         _textFormField(
           controller: controller.nameController,
           label: "Full name",
           hint: "Enter full name",
           validator: controller.validateRequired,
         ),
-
+    
         const SizedBox(height: 15),
-
+    
         Row(
         children: [
           Expanded(
@@ -1733,7 +1739,12 @@ class OPDScreen extends StatelessWidget {
               controller: controller.ageController,
               label: "Age",
               hint: "Enter age",
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(3)
+              ],
               validator: controller.validateAge,
+              
               keyboardType: TextInputType.number,
             ),
           ),
@@ -1743,6 +1754,11 @@ class OPDScreen extends StatelessWidget {
               controller: controller.weightController,
               label: "Weight",
               hint: "Enter weight",
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(3)
+              ],
+              validator: controller.validateWeight,
             ),
           ),
           const SizedBox(width: 15),
@@ -1751,24 +1767,29 @@ class OPDScreen extends StatelessWidget {
               controller: controller.phoneController,
               label: "Phone number",
               hint: "Enter phone number",
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                // LengthLimitingTextInputFormatter(10),
+              ],
+              validator: controller.validatePhone,
             ),
           ),
         ],
       ),
-
+    
         const SizedBox(height: 15),
-
+    
         _textFormField(
           controller: controller.addressController,
           label: "Address",
           hint: "Enter address",
         ),
-
+    
         const SizedBox(height: 15),
-
+    
         const AppText("Gender"),
         const SizedBox(height: 10),
-
+    
         Obx(
           () => Row(
             children: [
@@ -1858,7 +1879,7 @@ class OPDScreen extends StatelessWidget {
             /// ================= DEFAULT =================
             return const CircleAvatar(
               radius: 45,
-              child: Icon(Icons.person),
+              child: Icon(Icons.image),
             );
           }),
 
@@ -1899,6 +1920,7 @@ class OPDScreen extends StatelessWidget {
     int maxLines = 1,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return TextFormField(
       controller: controller,
@@ -1906,6 +1928,7 @@ class OPDScreen extends StatelessWidget {
       maxLines: maxLines,
       keyboardType: keyboardType,
       validator: validator,
+      inputFormatters: inputFormatters,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,

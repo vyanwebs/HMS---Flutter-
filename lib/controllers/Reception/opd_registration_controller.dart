@@ -26,7 +26,7 @@ class OPDRegistrationController extends GetxController {
 
   final patientAvatarUrl = "".obs;
 
-  final gender = "".obs;
+  final gender = "Male".obs;
   final currentAdmissionType = "".obs;
 
   String get reviewName => nameController.text;
@@ -252,8 +252,8 @@ class OPDRegistrationController extends GetxController {
 
   @override
   void onInit() {
-    fetchDoctors();
     super.onInit();
+    fetchDoctors();
   }
 
   final doctors = <DoctorModel>[].obs;

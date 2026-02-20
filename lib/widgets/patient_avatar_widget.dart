@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../utils/text.dart';
 
@@ -20,17 +21,41 @@ class PatientAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final resolvedImage = _resolveImage();
 
-    /// ✅ IMAGE AVAILABLE
+    /// ✅ IMAGE AVAILABLE (CACHED)
     if (resolvedImage != null && resolvedImage.isNotEmpty) {
-      return CircleAvatar(
-        radius: radius,
-        backgroundColor: Colors.grey.shade200,
-        backgroundImage: NetworkImage(resolvedImage),
-        onBackgroundImageError: (_, __) {},
+      return ClipOval(
+        child: CachedNetworkImage(
+          imageUrl: resolvedImage,
+          width: radius * 2,
+          height: radius * 2,
+          fit: BoxFit.cover,
+
+          /// loading placeholder
+          placeholder: (_, __) => Container(
+            width: radius * 2,
+            height: radius * 2,
+            color: Colors.grey.shade200,
+            alignment: Alignment.center,
+            child: SizedBox(
+              width: radius,
+              height: radius,
+              child: const CircularProgressIndicator(strokeWidth: 2),
+            ),
+          ),
+
+          /// error fallback
+          errorWidget: (_, __, ___) => _initialAvatar(),
+        ),
       );
     }
 
-    /// ✅ FALLBACK INITIALS
+    /// ✅ INITIALS FALLBACK
+    return _initialAvatar();
+  }
+
+  /// ================= INITIAL AVATAR =================
+
+  Widget _initialAvatar() {
     return CircleAvatar(
       radius: radius,
       backgroundColor: Colors.blue.shade100,
@@ -46,11 +71,11 @@ class PatientAvatar extends StatelessWidget {
   /// ================= IMAGE RESOLVER =================
 
   String? _resolveImage() {
-    if (imageUrl != null && imageUrl!.isNotEmpty) {
+    if (imageUrl?.isNotEmpty == true) {
       return imageUrl;
     }
 
-    if (googleDriveLink != null && googleDriveLink!.isNotEmpty) {
+    if (googleDriveLink?.isNotEmpty == true) {
       return _convertDriveLink(googleDriveLink!);
     }
 
@@ -60,8 +85,6 @@ class PatientAvatar extends StatelessWidget {
   /// ================= GOOGLE DRIVE FIX =================
 
   String _convertDriveLink(String link) {
-    if (!link.contains("drive.google.com")) return link;
-
     final reg = RegExp(r'/d/(.*?)/');
     final match = reg.firstMatch(link);
 

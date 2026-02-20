@@ -79,6 +79,7 @@ import 'package:get/get.dart';
 import '../../models/reception_panel/doctor_model.dart';
 import '../../services/api_service.dart';
 import '../../services/apis.dart';
+import '../../utils/snackbar.dart';
 
 class DoctorManagementController extends GetxController {
   final RxList<Doctor> allDoctors = <Doctor>[].obs;
@@ -169,29 +170,18 @@ class DoctorManagementController extends GetxController {
                         const Duration(seconds: 2), // <-- auto dismiss after 2s
                   );
                 } else {
-                  Get.snackbar(
-                    "Error",
-                    "Failed to delete doctor",
-                    backgroundColor: Colors.red,
-                    colorText: Colors.white,
-                    snackPosition: SnackPosition.TOP,
-                    margin: const EdgeInsets.all(10),
-                    borderRadius: 8,
-                    maxWidth: 330,
-                    duration: const Duration(seconds: 2),
+                  AppSnackbar.show(
+                    title: "Error",
+                    message: "Failed to delete doctor",
+                    type: AppSnackType.error
                   );
                 }
               } catch (e, s) {
                 log("❌ deleteDoctor Error", error: e, stackTrace: s);
-                Get.snackbar(
-                  "Error",
-                  "An error occurred",
-                  backgroundColor: Colors.red,
-                  colorText: Colors.white,
-                  snackPosition: SnackPosition.TOP,
-                  margin: const EdgeInsets.all(10),
-                  borderRadius: 8,
-                  duration: const Duration(seconds: 2),
+                AppSnackbar.show(
+                  title: "Error",
+                  message: "An error occurred",
+                  type: AppSnackType.error
                 );
               } finally {
                 isLoading.value = false;
