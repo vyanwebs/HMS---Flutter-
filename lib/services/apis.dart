@@ -71,3 +71,5 @@ String fetchAllSymptomsApi = "$baseUrl/api/symptoms/fetch-all-symptoms";
 String deleteSymptomsApi = "$baseUrl/api/symptoms";
 String filterSymptomsApi = "$baseUrl/api/symptoms/name";
 String followupVitalsApi = "$baseUrl/api/vital";
+String searchPatientsByNameApi = "$baseUrl/api/patient/get-by-name";
+String getAllDoctorsApi = "$baseUrl/api/doctor/get-all";

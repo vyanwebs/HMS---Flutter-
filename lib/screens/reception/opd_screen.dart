@@ -1,13 +1,16 @@
-import 'package:flutter/foundation.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/Reception/opd_registration_controller.dart';
+import '../../models/doctor_model.dart';
 import '../../utils/buttons.dart';
 import '../../utils/images.dart';
 import '../../utils/snackbar.dart';
 import '../../utils/text.dart';
-import '../../widgets/patient_selector_widget.dart';
+import '../../widgets/custom_patient_search_widget.dart';
+import '../../widgets/patient_avatar_widget.dart';
 
 class OPDScreen extends StatelessWidget {
   OPDScreen({super.key});
@@ -148,12 +151,10 @@ class OPDScreen extends StatelessWidget {
             child: Center(
               child: isCompleted
                   ? const Icon(Icons.check, color: Colors.white, size: 20)
-                  : Text(
+                  : AppText(
                       "${index + 1}",
-                      style: TextStyle(
-                        color: isActive ? Colors.white : Colors.black,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      color: isActive ? Colors.white : Colors.black,
+                      fontWeight: FontWeight.w600,
                     ),
             ),
           ),
@@ -181,164 +182,212 @@ class OPDScreen extends StatelessWidget {
 
   // ================== OPD FIRST STEP =======================
   Widget _opdRegistrationStep() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-
-        _sectionHeader("OPD Registration"),
-
-        const SizedBox(height: 25),
-
-        _searchSection(),
-        const SizedBox(height: 25),
-
-        _personalInfoSection(),
-        const SizedBox(height: 25),
-
-        _visitInfoSection(),
-        const SizedBox(height: 25),
-
-        _photoUploadSection(),
-
-        const SizedBox(height: 30),
-
-        Align(
-          alignment: Alignment.centerRight,
-          child: AppButton(
-            onPressed: () => controller.opdStep.value = 1,
-            text: "Continue",
+    return Form(
+      key: controller.opdFormKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+      
+          _sectionHeader("OPD Registration"),
+      
+          const SizedBox(height: 25),
+      
+          _searchSection(),
+          const SizedBox(height: 25),
+      
+          _personalInfoSection(),
+          const SizedBox(height: 25),
+      
+          _visitInfoSection(),
+          const SizedBox(height: 25),
+      
+          _photoUploadSection(),
+      
+          const SizedBox(height: 30),
+      
+          Align(
+            alignment: Alignment.centerRight,
+            child: AppButton(
+              onPressed: () => controller.opdStep.value = 1,
+              text: "Continue",
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   // ================== OPD SECOND STEP =======================
   Widget _opdReviewStep() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    return Obx(
+      () => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
 
-          const AppText(
-            "OPD Registration - Review",
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
+            const AppText(
+              "OPD Registration - Review",
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
 
-          const SizedBox(height: 25),
+            const SizedBox(height: 25),
 
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
 
-              /// Patient Card
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF7F9FC),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  child: Column(
-                    children: [
-                      const CircleAvatar(
-                        radius: 45,
-                        backgroundImage: AssetImage(userImage),
-                      ),
-                      // PatientAvatar(patient: ,)
-                      const SizedBox(height: 15),
-                      const AppText(
-                        "Jennifer Davis",
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      const SizedBox(height: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Colors.orange.shade100,
-                          borderRadius: BorderRadius.circular(20),
+                /// Patient Card
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF7F9FC),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Column(
+                      children: [
+                        Obx(() {
+
+                          final patient = controller.selectedPatient.value;
+
+                          /// 1️⃣ Uploaded Image (Highest Priority)
+                          if (controller.selectedImageBytes.value != null) {
+                            return CircleAvatar(
+                              radius: 45,
+                              backgroundImage: MemoryImage(controller.selectedImageBytes.value!),
+                            );
+                          }
+
+                          if (controller.selectedImagePath.value.isNotEmpty) {
+                            return CircleAvatar(
+                              radius: 45,
+                              backgroundImage: FileImage(File(controller.selectedImagePath.value)),
+                            );
+                          }
+
+                          /// 2️⃣ Existing Patient Avatar
+                          if (patient != null && (patient.avatar.url.isNotEmpty || patient.avatar.googleDriveLink.isNotEmpty)) {
+                            return PatientAvatar(
+                              name: patient.name,
+                              imageUrl: patient.avatar.url,
+                              googleDriveLink: patient.avatar.googleDriveLink,
+                              radius: 45,
+                            );
+                          }
+
+                          /// 3️⃣ Default
+                          return const CircleAvatar(
+                            radius: 45,
+                            backgroundImage: AssetImage(userImage),
+                          );
+                        }),
+                        // PatientAvatar(patient: ,)
+                        const SizedBox(height: 15),
+                        AppText(
+                          controller.reviewName.isEmpty
+                            ? "Patient Name"
+                            : controller.reviewName,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
                         ),
-                        child: const AppText(
-                          "OPD",
-                          fontSize: 12,
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.shade100,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: AppText(
+                            controller.currentAdmissionType.value,
+                            fontSize: 12,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(width: 25),
+
+                /// Basic Info Card
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF7F9FC),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+
+                        const AppText(
+                          "Basic information",
+                          fontWeight: FontWeight.w600,
                         ),
-                      )
-                    ],
+
+                        const SizedBox(height: 15),
+
+                        AppText("Patient ID : ${controller.reviewPatientId}"),
+                        const SizedBox(height: 8),
+
+                        AppText("Age : ${controller.reviewAge} years"),
+                        const SizedBox(height: 8),
+
+                        AppText("Gender : ${controller.reviewGender}"),
+                        const SizedBox(height: 8),
+
+                        AppText("Contact : ${controller.reviewPhone}"),
+                        const SizedBox(height: 8),
+
+                        AppText("Address : ${controller.reviewAddress}"),
+                        const SizedBox(height: 8),
+
+                        AppText("Weight : ${controller.reviewWeight} kg"),
+                      ],
+                    ),
                   ),
                 ),
-              ),
+              ],
+            ),
 
-              const SizedBox(width: 25),
+            const SizedBox(height: 30),
 
-              /// Basic Info Card
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF7F9FC),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  child: const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppText(
-                        "Basic information",
-                        fontWeight: FontWeight.w600,
-                      ),
-                      SizedBox(height: 15),
-                      AppText("Age : 23 years"),
-                      SizedBox(height: 8),
-                      AppText("Gender : Male"),
-                      SizedBox(height: 8),
-                      AppText("Contact : +91 9876543210"),
-                      SizedBox(height: 8),
-                      AppText("Address : Pune"),
-                      SizedBox(height: 8),
-                      AppText("Weight : 55 kg"),
-                    ],
+            /// Bottom Buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 120,
+                  child: AppButton(
+                    onPressed: () => controller.opdStep.value = 0,
+                    backgroundColor: Colors.grey,
+                    text: "Back",
                   ),
                 ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 30),
-
-          /// Bottom Buttons
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                width: 120,
-                child: AppButton(
-                  onPressed: () => controller.opdStep.value = 0,
-                  backgroundColor: Colors.grey,
-                  text: "Back",
+                const SizedBox(width: 20),
+                SizedBox(
+                  width: 160,
+                  child: AppButton(
+                    onPressed: () => controller.opdStep.value = 2,
+                    backgroundColor: Colors.green,
+                    text: "Assign Doctor",
+                  )
                 ),
-              ),
-              const SizedBox(width: 20),
-              SizedBox(
-                width: 160,
-                child: AppButton(
-                  onPressed: () => controller.opdStep.value = 2,
-                  backgroundColor: Colors.green,
-                  text: "Assign Doctor",
-                )
-              ),
-            ],
-          )
-        ],
-      ),
+              ],
+            )
+          ],
+        ),
+      )
     );
   }
 
@@ -407,34 +456,51 @@ class OPDScreen extends StatelessWidget {
         /// Doctors Grid
         LayoutBuilder(
           builder: (context, constraints) {
+
             final width = constraints.maxWidth;
 
             int crossAxisCount;
 
             if (width < 600) {
-              crossAxisCount = 1; // Mobile
+              crossAxisCount = 1;
             } else if (width < 840) {
-              crossAxisCount = 2; // Tablet portrait
+              crossAxisCount = 2;
             } else if (width < 1200) {
-              crossAxisCount = 3; // Tablet landscape / small desktop
+              crossAxisCount = 3;
             } else {
-              crossAxisCount = 4; // Desktop
+              crossAxisCount = 4;
             }
 
-            return GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: 10,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount,
-                crossAxisSpacing: 20,
-                mainAxisSpacing: 20,
-                mainAxisExtent: 260, // MUCH better than aspectRatio
-              ),
-              itemBuilder: (context, index) {
-                return _doctorCard(index);
-              },
-            );
+            return Obx(() {
+
+              if (controller.isDoctorLoading.value) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+
+              if (controller.doctors.isEmpty) {
+                return const Center(
+                  child: AppText("No doctors available"),
+                );
+              }
+
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: controller.doctors.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: 20,
+                  mainAxisSpacing: 20,
+                  mainAxisExtent: 260,
+                ),
+                itemBuilder: (context, index) {
+                  final doctor = controller.doctors[index];
+                  return _doctorCard(doctor);
+                },
+              );
+            });
           },
         ),
 
@@ -465,17 +531,14 @@ class OPDScreen extends StatelessWidget {
     );
   }
 
-  Widget _doctorCard(int index) {
-    const doctorName = "Dr. Jennifer Davis";
-    final doctorKey = doctorName + index.toString();
-
+  Widget _doctorCard(DoctorModel doctor) {
     return Obx(() {
-      final isSelected =
-          controller.selectedDoctor.value == doctorKey;
+
+      final isSelected = controller.selectedDoctor.value == doctor.id;
 
       return InkWell(
         onTap: () {
-          controller.selectedDoctor.value = doctorKey;
+          controller.selectedDoctor.value = doctor.id;
         },
         borderRadius: BorderRadius.circular(12),
         child: AnimatedContainer(
@@ -486,56 +549,67 @@ class OPDScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isSelected
-                  ? const Color(0xFF2383E2)
-                  : Colors.grey.shade300,
+                ? const Color(0xFF2383E2)
+                : Colors.grey.shade300,
               width: isSelected ? 2 : 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 blurRadius: 8,
               )
             ],
           ),
           child: Column(
             children: [
-              const CircleAvatar(
+
+              /// Avatar
+              CircleAvatar(
                 radius: 35,
-                backgroundImage: AssetImage(userImage),
+                child: AppText(
+                  doctor.name[0].toUpperCase(),
+                  fontSize: 22,
+                ),
               ),
+
               const SizedBox(height: 12),
-              const AppText(
-                "Dr. Jennifer Davis",
+
+              AppText(
+                doctor.name,
                 fontWeight: FontWeight.w600,
               ),
+
               const SizedBox(height: 6),
-              const AppText(
-                "drjennifer@gmail.com",
+
+              AppText(
+                doctor.email,
                 fontSize: 11,
                 color: Colors.black54,
               ),
+
               const SizedBox(height: 4),
-              const AppText(
-                "Experience - 2 years",
+
+              AppText(
+                doctor.staffId,
                 fontSize: 11,
                 color: Colors.black54,
               ),
-              const SizedBox(height: 4),
-              const AppText(
-                "Assigned patients - 15",
-                fontSize: 11,
-                color: Colors.black54,
-              ),
+
               const Spacer(),
+
               Container(
                 height: 36,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2383E2),
+                  color: doctor.isAvailableToday
+                    ? const Color(0xFF2383E2)
+                    : Colors.grey,
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const AppText(
-                  "Assign patient",
+                child: AppText(
+                  doctor.isAvailableToday
+                    ? "Assign patient"
+                    : "Unavailable",
                   color: Colors.white,
                   fontSize: 12,
                 ),
@@ -831,395 +905,400 @@ class OPDScreen extends StatelessWidget {
 
   // ================== EMERGENCY FIRST STEP ======================
   Widget _buildEmergencyPersonalInfoCard() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-    
-        /// Section Title
-        const Row(
-          children: [
-            Icon(Icons.person_outline, size: 20),
-            SizedBox(width: 8),
-            AppText(
-              "Personal Information",
-              fontWeight: FontWeight.w600,
-            ),
-          ],
-        ),
-    
-        const SizedBox(height: 20),
-    
-        /// Full Name
-        _requiredLabel("Full Name"),
-        const SizedBox(height: 6),
-        _textField("Enter patient's full name"),
-    
-        const SizedBox(height: 20),
-    
-        /// Gender + DOB
-        Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _requiredLabel("Gender"),
-                  const SizedBox(height: 8),
-                  Obx(
-                    () => Row(
-                      children: [
-                        _genderButton("Male"),
-                        const SizedBox(width: 10),
-                        _genderButton("Female"),
-                        const SizedBox(width: 10),
-                        _genderButton("Other"),
-                      ],
+    return Form(
+      key: controller.emergencyPersonalFormKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+      
+          /// Section Title
+          const Row(
+            children: [
+              Icon(Icons.person_outline, size: 20),
+              SizedBox(width: 8),
+              AppText(
+                "Personal Information",
+                fontWeight: FontWeight.w600,
+              ),
+            ],
+          ),
+      
+          const SizedBox(height: 20),
+      
+          /// Full Name
+          _requiredLabel("Full Name"),
+          const SizedBox(height: 6),
+          _textFormField(
+            controller: controller.emergencyNameController,
+            hint: "Enter patient's full name",
+            validator: controller.validateRequired,
+          ),
+      
+          const SizedBox(height: 20),
+      
+          /// Gender + DOB
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _requiredLabel("Gender"),
+                    const SizedBox(height: 8),
+                    Obx(
+                      () => Row(
+                        children: [
+                          _genderButton("Male"),
+                          const SizedBox(width: 10),
+                          _genderButton("Female"),
+                          const SizedBox(width: 10),
+                          _genderButton("Other"),
+                        ],
+                      )
+                    ),
+                  ],
+                ),
+              ),
+      
+              const SizedBox(width: 20),
+      
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _requiredLabel("Date of Birth"),
+                    const SizedBox(height: 6),
+                    _dateField(),
+                  ],
+                ),
+              ),
+            ],
+          ),
+      
+          const SizedBox(height: 20),
+      
+          /// Contact
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _requiredLabel("Contact Number"),
+                    const SizedBox(height: 6),
+                    _textFormField(
+                      controller: controller.emergencyPhoneController,
+                      hint: "Enter mobile number",
+                      icon: Icons.phone,
+                      keyboardType: TextInputType.phone,
+                      validator: controller.validatePhone,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const AppText("Emergency Contact"),
+                    const SizedBox(height: 6),
+                    _textFormField(
+                      controller: controller.emergencyAltPhoneController,
+                      hint: "Emergency contact number",
+                      icon: Icons.person,
+                      keyboardType: TextInputType.phone,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+      
+          const SizedBox(height: 20),
+      
+          /// Address
+          const AppText("Address"),
+          const SizedBox(height: 6),
+          _textFormField(
+            controller: controller.emergencyAddressController,
+            hint: "Current address",
+            icon: Icons.location_on_outlined,
+          ),
+      
+          const SizedBox(height: 20),
+      
+          /// ID Section
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const AppText("ID Type"),
+                    const SizedBox(height: 6),
+                    _dropdownField(),
+                    const SizedBox(height: 4),
+                    const AppText(
+                      "For patient identification",
+                      fontSize: 12,
+                      color: Colors.grey,
                     )
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-    
-            const SizedBox(width: 20),
-    
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _requiredLabel("Date of Birth"),
-                  const SizedBox(height: 6),
-                  _dateField(),
-                ],
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const AppText("ID Number"),
+                    const SizedBox(height: 6),
+                    _textFormField(
+                      controller: controller.emergencyIdNumberController,
+                      hint: "Enter ID number",
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-    
-        const SizedBox(height: 20),
-    
-        /// Contact
-        Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _requiredLabel("Contact Number"),
-                  const SizedBox(height: 6),
-                  _textField("Enter mobile number", icon: Icons.phone),
-                ],
+            ],
+          ),
+          const SizedBox(height: 40),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              SizedBox(
+                width: 120,
+                child: AppButton(
+                  onPressed: () {
+                    // If this is first step, maybe do nothing or exit
+                    controller.currentStep.value = 1; 
+                  },
+                  backgroundColor: Colors.grey,
+                  text: "Back",
+                ),
               ),
-            ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const AppText("Emergency Contact"),
-                  const SizedBox(height: 6),
-                  _textField("Emergency contact number", icon: Icons.person),
-                ],
+              const SizedBox(width: 15),
+              SizedBox(
+                width: 140,
+                child: AppButton(
+                  onPressed: () {
+                    controller.currentStep.value = 2;
+                  },
+                  text: "Continue",
+                ),
               ),
-            ),
-          ],
-        ),
-    
-        const SizedBox(height: 20),
-    
-        /// Address
-        const AppText("Address"),
-        const SizedBox(height: 6),
-        _textField("Current address", icon: Icons.location_on_outlined),
-    
-        const SizedBox(height: 20),
-    
-        /// ID Section
-        Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const AppText("ID Type"),
-                  const SizedBox(height: 6),
-                  _dropdownField(),
-                  const SizedBox(height: 4),
-                  const AppText(
-                    "For patient identification",
-                    fontSize: 12,
-                    color: Colors.grey,
-                  )
-                ],
-              ),
-            ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const AppText("ID Number"),
-                  const SizedBox(height: 6),
-                  _textField("Enter ID number"),
-                ],
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 40),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            SizedBox(
-              width: 120,
-              child: AppButton(
-                onPressed: () {
-                  // If this is first step, maybe do nothing or exit
-                  controller.currentStep.value = 1; 
-                },
-                backgroundColor: Colors.grey,
-                text: "Back",
-              ),
-            ),
-            const SizedBox(width: 15),
-            SizedBox(
-              width: 140,
-              child: AppButton(
-                onPressed: () {
-                  controller.currentStep.value = 2;
-                },
-                text: "Continue",
-              ),
-            ),
-          ],
-        ),
-
-      ],
+            ],
+          ),
+      
+        ],
+      ),
     );
   }
 
   // ================== EMERGENCY SECOND STEP ======================
   Widget _buildEmergencyDetailsStep() {
-    return Form(
-      key: controller.emergencyDetailsFormKey,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-
-            const AppText(
-              "Emergency Details",
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-
-            const SizedBox(height: 25),
-
-            /// ===================== MAIN CARD =====================
-            _sectionCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-
-                  /// Department + Staff
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _dropdownFormField(
-                          label: "Department *",
-                          items: ["Cardiology", "Orthopedic", "General"],
-                          onChanged: (v) => controller.department.value = v ?? "",
-                          validator: (v) =>
-                              v == null || v.isEmpty ? "Required" : null,
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Expanded(
-                        child: _dropdownFormField(
-                          label: "Attending Staff",
-                          items: ["Dr. Smith", "Dr. John"],
-                          onChanged: (v) => controller.attendingStaff.value = v ?? "",
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  /// Triage Level
-                  const AppText("Triage Level *"),
-                  const SizedBox(height: 10),
-                  Obx(() => Wrap(
-                        spacing: 12,
-                        runSpacing: 12,
-                        children: ["Immediate", "Urgent", "Semi-Urgent", "Non-Urgent"]
-                            .map((e) => _selectionChip(
-                                  label: e,
-                                  selected: controller.triageLevel.value == e,
-                                  onTap: () => controller.triageLevel.value = e,
-                                ))
-                            .toList(),
-                      )),
-
-                  const SizedBox(height: 25),
-
-                  /// Arrival Mode
-                  const AppText("Arrival Mode *"),
-                  const SizedBox(height: 10),
-                  Obx(() => Wrap(
-                        spacing: 12,
-                        children: ["Ambulance", "Walk-in", "Referral"]
-                            .map((e) => _selectionChip(
-                                  label: e,
-                                  selected: controller.arrivalMode.value == e,
-                                  onTap: () => controller.arrivalMode.value = e,
-                                ))
-                            .toList(),
-                      )),
-
-                  const SizedBox(height: 25),
-
-                  /// Chief Complaint
-                  _textFormField(
-                    label: "Chief Complaint *",
-                    hint: "Describe the main complaint...",
-                    maxLines: 3,
-                    validator: (v) =>
-                        v == null || v.isEmpty ? "Required" : null,
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 25),
-
-            /// ===================== VITAL SIGNS =====================
-            _sectionCard(
-              title: "Vital Signs (Optional)",
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _textFormField(
-                          label: "Blood Pressure",
-                          hint: "120/80",
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Expanded(
-                        child: _textFormField(
-                          label: "Heart Rate",
-                          hint: "72",
-                          keyboardType: TextInputType.number,
-                          validator: (v) {
-                            if (v != null && v.isNotEmpty) {
-                              if (int.tryParse(v) == null) {
-                                return "Invalid number";
-                              }
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _textFormField(
-                          label: "Temperature",
-                          hint: "98.6",
-                          keyboardType: TextInputType.number,
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Expanded(
-                        child: _textFormField(
-                          label: "Oxygen Saturation",
-                          hint: "98",
-                          keyboardType: TextInputType.number,
-                          validator: (v) {
-                            if (v != null && v.isNotEmpty) {
-                              final value = int.tryParse(v);
-                              if (value == null || value < 0 || value > 100) {
-                                return "0 - 100 only";
-                              }
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 25),
-
-            /// ===================== NOTES =====================
-            _sectionCard(
-              title: "Additional Notes",
-              child: _textFormField(
-                hint: "Any additional information...",
-                maxLines: 3,
-              ),
-            ),
-
-            const SizedBox(height: 35),
-
-            /// Buttons
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+    
+          const AppText(
+            "Emergency Details",
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+    
+          const SizedBox(height: 25),
+    
+          /// ===================== MAIN CARD =====================
+          _sectionCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  width: 120,
-                  child: AppButton(
-                    onPressed: () => controller.currentStep.value = 1,
-                    backgroundColor: Colors.grey,
-                    text: "Back",
-                  ),
+    
+                /// Department + Staff
+                Row(
+                  children: [
+                    Expanded(
+                      child: _dropdownFormField(
+                        label: "Department *",
+                        items: ["Cardiology", "Orthopedic", "General"],
+                        onChanged: (v) => controller.department.value = v ?? "",
+                        validator: (v) =>
+                            v == null || v.isEmpty ? "Required" : null,
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: _dropdownFormField(
+                        label: "Attending Staff",
+                        items: ["Dr. Smith", "Dr. John"],
+                        onChanged: (v) => controller.attendingStaff.value = v ?? "",
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 15),
-                SizedBox(
-                  width: 140,
-                  child: AppButton(
-                    onPressed: () {
-                      if (controller.emergencyDetailsFormKey.currentState!
-                          .validate()) {
-
-                        if (controller.triageLevel.value.isEmpty) {
-                          AppSnackbar.show(
-                            title: "Error",
-                            message: "Select triage level",
-                            type: AppSnackType.error
-                          );
-                          return;
-                        }
-
-                        if (controller.arrivalMode.value.isEmpty) {
-                          AppSnackbar.show(
-                            title: "Error",
-                            message: "Select arrival mode",
-                            type: AppSnackType.error
-                          );
-                          return;
-                        }
-
-                        controller.currentStep.value = 3;
-                      }
-                    },
-                    text: "Continue",
-                  ),
+    
+                const SizedBox(height: 25),
+    
+                /// Triage Level
+                const AppText("Triage Level *"),
+                const SizedBox(height: 10),
+                Obx(() => Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: ["Immediate", "Urgent", "Semi-Urgent", "Non-Urgent"]
+                          .map((e) => _selectionChip(
+                                label: e,
+                                selected: controller.triageLevel.value == e,
+                                onTap: () => controller.triageLevel.value = e,
+                              ))
+                          .toList(),
+                    )),
+    
+                const SizedBox(height: 25),
+    
+                /// Arrival Mode
+                const AppText("Arrival Mode *"),
+                const SizedBox(height: 10),
+                Obx(() => Wrap(
+                      spacing: 12,
+                      children: ["Ambulance", "Walk-in", "Referral"]
+                          .map((e) => _selectionChip(
+                                label: e,
+                                selected: controller.arrivalMode.value == e,
+                                onTap: () => controller.arrivalMode.value = e,
+                              ))
+                          .toList(),
+                    )),
+    
+                const SizedBox(height: 25),
+    
+                /// Chief Complaint
+                _textFormField(
+                  controller: controller.chiefComplaintController,
+                  label: "Chief Complaint *",
+                  maxLines: 3,
+                  validator: controller.validateRequired,
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+    
+          const SizedBox(height: 25),
+    
+          /// ===================== VITAL SIGNS =====================
+          _sectionCard(
+            title: "Vital Signs (Optional)",
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: _textFormField(
+                        controller: controller.bloodPressureController,
+                        label: "Blood Pressure",
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: _textFormField(
+                        controller: controller.heartRateController,
+                        label: "Heart Rate",
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                  ],
+                ),
+    
+                const SizedBox(height: 20),
+    
+                Row(
+                  children: [
+                    Expanded(
+                      child: _textFormField(
+                        controller: controller.temperatureController,
+                        label: "Temperature",
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: _textFormField(
+                        controller: controller.oxygenController,
+                        label: "Oxygen Saturation",
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+    
+          const SizedBox(height: 25),
+    
+          /// ===================== NOTES =====================
+          _sectionCard(
+            title: "Additional Notes",
+            child: _textFormField(
+              controller: controller.additionalNotesController,
+              hint: "Any additional information...",
+              maxLines: 3,
+            ),
+          ),
+    
+          const SizedBox(height: 35),
+    
+          /// Buttons
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              SizedBox(
+                width: 120,
+                child: AppButton(
+                  onPressed: () => controller.currentStep.value = 1,
+                  backgroundColor: Colors.grey,
+                  text: "Back",
+                ),
+              ),
+              const SizedBox(width: 15),
+              SizedBox(
+                width: 140,
+                child: AppButton(
+                  onPressed: () {
+                    if (controller.emergencyPersonalFormKey.currentState!
+                        .validate()) {
+    
+                      if (controller.triageLevel.value.isEmpty) {
+                        AppSnackbar.show(
+                          title: "Error",
+                          message: "Select triage level",
+                          type: AppSnackType.error
+                        );
+                        return;
+                      }
+    
+                      if (controller.arrivalMode.value.isEmpty) {
+                        AppSnackbar.show(
+                          title: "Error",
+                          message: "Select arrival mode",
+                          type: AppSnackType.error
+                        );
+                        return;
+                      }
+    
+                      controller.currentStep.value = 3;
+                    }
+                  },
+                  text: "Continue",
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -1265,29 +1344,6 @@ class OPDScreen extends StatelessWidget {
           .toList(),
       validator: validator,
       onChanged: onChanged,
-    );
-  }
-
-  Widget _textFormField({
-    String? label,
-    String? hint,
-    int maxLines = 1,
-    TextInputType? keyboardType,
-    String? Function(String?)? validator,
-  }) {
-    return TextFormField(
-      maxLines: maxLines,
-      keyboardType: keyboardType,
-      validator: validator,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
     );
   }
 
@@ -1623,22 +1679,27 @@ class OPDScreen extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: CustomPatientSearchField(
-                label: "",
+              child: CustomAllPatientSearchField(
                 onChanged: (patient) {
-                  if (kDebugMode) {
-                    print(patient?.displayName);
+                  if (patient != null) {
+                    controller.setPatient(patient);
+                  } else {
+                    controller.clearPatient();
                   }
                 },
               ),
             ),
             const SizedBox(width: 20),
             Expanded(
-              child: _textField(
-                "Patient id result"
-              )
+              child: _textFormField(
+                controller: controller.patientIdController,
+                label: "Patient id",
+                hint: "Patient id result",
+                enabled: !controller.isExistingPatient,
+              ),
             ),
           ],
         )
@@ -1656,23 +1717,52 @@ class OPDScreen extends StatelessWidget {
         ),
         const SizedBox(height: 15),
 
-        _textField("Enter full name"),
-
-        const SizedBox(height: 15),
-
-        Row(
-          children: [
-            Expanded(child: _textField("Age")),
-            const SizedBox(width: 15),
-            Expanded(child: _textField("Weight")),
-            const SizedBox(width: 15),
-            Expanded(child: _textField("Phone number")),
-          ],
+        _textFormField(
+          controller: controller.nameController,
+          label: "Full name",
+          hint: "Enter full name",
+          validator: controller.validateRequired,
         ),
 
         const SizedBox(height: 15),
 
-        _textField("Address"),
+        Row(
+        children: [
+          Expanded(
+            child: _textFormField(
+              controller: controller.ageController,
+              label: "Age",
+              hint: "Enter age",
+              validator: controller.validateAge,
+              keyboardType: TextInputType.number,
+            ),
+          ),
+          const SizedBox(width: 15),
+          Expanded(
+            child: _textFormField(
+              controller: controller.weightController,
+              label: "Weight",
+              hint: "Enter weight",
+            ),
+          ),
+          const SizedBox(width: 15),
+          Expanded(
+            child: _textFormField(
+              controller: controller.phoneController,
+              label: "Phone number",
+              hint: "Enter phone number",
+            ),
+          ),
+        ],
+      ),
+
+        const SizedBox(height: 15),
+
+        _textFormField(
+          controller: controller.addressController,
+          label: "Address",
+          hint: "Enter address",
+        ),
 
         const SizedBox(height: 15),
 
@@ -1726,23 +1816,61 @@ class OPDScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.blue),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(Icons.image, color: Colors.blue),
-          ),
+          Obx(() {
+
+            final patient = controller.selectedPatient.value;
+
+            /// ================= NEW UPLOADED IMAGE =================
+            if (controller.selectedImageBytes.value != null) {
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.memory(
+                  controller.selectedImageBytes.value!,
+                  width: 90,
+                  height: 90,
+                  fit: BoxFit.cover,
+                ),
+              );
+            }
+
+            if (controller.selectedImagePath.value.isNotEmpty) {
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.file(
+                  File(controller.selectedImagePath.value),
+                  width: 90,
+                  height: 90,
+                  fit: BoxFit.cover,
+                ),
+              );
+            }
+
+            /// ================= EXISTING PATIENT AVATAR =================
+            if (patient != null) {
+              return PatientAvatar(
+                name: patient.name,
+                imageUrl: patient.avatar.url,
+                googleDriveLink: patient.avatar.googleDriveLink,
+                radius: 45,
+              );
+            }
+
+            /// ================= DEFAULT =================
+            return const CircleAvatar(
+              radius: 45,
+              child: Icon(Icons.person),
+            );
+          }),
+
           const SizedBox(width: 20),
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const AppText(
                   "Upload image",
-                  fontWeight: FontWeight.w600
+                  fontWeight: FontWeight.w600,
                 ),
                 const SizedBox(height: 6),
                 const AppText(
@@ -1756,18 +1884,30 @@ class OPDScreen extends StatelessWidget {
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
   }
 
-  Widget _textField(
-    String hint, {
+  Widget _textFormField({
+    required TextEditingController controller,
+    String? label,
+    String? hint,
     IconData? icon,
+    bool enabled = true,
+    int maxLines = 1,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
   }) {
-    return TextField(
+    return TextFormField(
+      controller: controller,
+      enabled: enabled,
+      maxLines: maxLines,
+      keyboardType: keyboardType,
+      validator: validator,
       decoration: InputDecoration(
+        labelText: label,
         hintText: hint,
         prefixIcon: icon != null ? Icon(icon, size: 18) : null,
         filled: true,
@@ -1775,8 +1915,6 @@ class OPDScreen extends StatelessWidget {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
       ),
     );
   }

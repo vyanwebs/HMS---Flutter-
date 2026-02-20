@@ -98,6 +98,31 @@ class NetworkHelper {
     }
   }
 
+  /// GET with Params
+  Future<Map<String, dynamic>> getWithParams({
+    bool auth = false,
+    Map<String, dynamic>? query,
+  }) async {
+    try {
+
+      final uri = Uri.parse(url).replace(
+        queryParameters:
+            query?.map((k, v) => MapEntry(k, v.toString())),
+      );
+
+      final response = await http.get(
+        uri,
+        headers: await _headers(auth: auth),
+      );
+
+      return _processResponse(response);
+
+    } catch (e) {
+      _logError(e);
+      return {"success": false, "message": "Network error"};
+    }
+  }
+
   /// RESPONSE HANDLER
   Map<String, dynamic> _processResponse(http.Response response) {
     if (response.statusCode == 200 || response.statusCode == 201) {
