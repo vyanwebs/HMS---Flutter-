@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'bindings/app_binding.dart';
 import 'screens/splash_screen.dart';
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
       // locale: DevicePreview.locale(context),
       // builder: DevicePreview.appBuilder,
       theme: ThemeData(
+        textTheme: GoogleFonts.poppinsTextTheme(),
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.info),
         primaryColor: AppColors.primary,
         primarySwatch: Colors.blue,

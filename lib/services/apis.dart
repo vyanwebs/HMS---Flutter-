@@ -74,4 +74,9 @@ String followupVitalsApi = "$baseUrl/api/vital";
 String searchPatientsByNameApi = "$baseUrl/api/patient/get-by-name";
 String getAllDoctorsApi = "$baseUrl/api/doctor/get-all";
 String deletedoctorApi = "$baseUrl/api/doctor/delete";
+String createPatientApi = "$baseUrl/api/patient/createPatientByPhoneNumber";
+String updatePatientByIdApi = "$baseUrl/api/patient/update-by-id";
+String getAllOPDPatientsApi = "$baseUrl/api/patient/get-opd-patients";
+String getDoctorByNameApi = "$baseUrl/api/doctor/getDoctorByName";
+String transferPatientToDoctorApi = "$baseUrl/api/patient-doctor-assignment/re-assign";
 

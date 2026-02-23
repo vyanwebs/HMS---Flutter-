@@ -588,7 +588,7 @@ class OPDScreen extends StatelessWidget {
               const SizedBox(height: 6),
 
               AppText(
-                doctor.email,
+                "Gmail :- ${doctor.email}",
                 fontSize: 11,
                 color: Colors.black54,
               ),
@@ -596,7 +596,7 @@ class OPDScreen extends StatelessWidget {
               const SizedBox(height: 4),
 
               AppText(
-                doctor.staffId,
+                "Experience :- ${doctor.experience}",
                 fontSize: 11,
                 color: Colors.black54,
               ),
@@ -608,14 +608,14 @@ class OPDScreen extends StatelessWidget {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: doctor.isAvailableToday
-                      ? const Color(0xFF2383E2)
-                      : Colors.grey,
+                    ? const Color(0xFF2383E2)
+                    : Colors.grey,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: AppText(
                   doctor.isAvailableToday
-                      ? "Assign patient"
-                      : "Unavailable",
+                    ? "Assign patient"
+                    : "Unavailable",
                   color: Colors.white,
                   fontSize: 12,
                 ),
@@ -629,162 +629,209 @@ class OPDScreen extends StatelessWidget {
 
   // ================== OPD LAST STEP =======================
   Widget _finalReviewStep() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    return Obx(() {
 
-          const AppText(
-            "OPD Registration - Final Review",
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
+      final patient = controller.selectedPatient.value;
+      final doctor = controller.selectedDoctorModel;
 
-          const SizedBox(height: 30),
+      return Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
 
-          IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-            
-                /// LEFT SIDE – Patient Card
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF7F9FC),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade300),
-                    ),
-                    child: Column(
-                      children: [
-            
-                        const CircleAvatar(
-                          radius: 45,
-                          backgroundImage: AssetImage(userImage),
-                        ),
-            
-                        const SizedBox(height: 15),
-            
-                        const AppText(
-                          "Jennifer Davis",
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-            
-                        const SizedBox(height: 6),
-            
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.orange.shade100,
-                            borderRadius: BorderRadius.circular(20),
+            const AppText(
+              "OPD Registration - Final Review",
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+
+            const SizedBox(height: 30),
+
+            IntrinsicHeight(
+              child: Row(
+                children: [
+
+                  /// ================= PATIENT CARD =================
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: _cardDecoration(),
+                      child: Column(
+                        children: [
+
+                          /// Avatar Priority
+                          _finalAvatar(patient),
+
+                          const SizedBox(height: 15),
+
+                          AppText(
+                            controller.reviewName,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                           ),
-                          child: const AppText(
-                            "OPD",
-                            fontSize: 12,
+
+                          const SizedBox(height: 6),
+
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.orange.shade100,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: AppText(
+                              controller.currentAdmissionType.value,
+                              fontSize: 12,
+                            ),
                           ),
-                        ),
-            
-                        const SizedBox(height: 20),
-            
-                        Divider(color: Colors.grey.shade300),
-            
-                        const SizedBox(height: 15),
-            
-                        /// 🔵 Assigned Doctor
-                        const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.medical_services_outlined,
-                              size: 16,
-                              color: Color(0xFF2383E2)
-                            ),
-                            SizedBox(width: 6),
-                            AppText(
-                              "Assigned doctor - Dr. Ankit Sharma",
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ],
-                        )
-                      ],
+
+                          const SizedBox(height: 20),
+                          Divider(color: Colors.grey.shade300),
+
+                          const SizedBox(height: 15),
+
+                          /// Assigned Doctor
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.medical_services_outlined,
+                                size: 16,
+                                color: Color(0xFF2383E2),
+                              ),
+                              const SizedBox(width: 6),
+                              AppText(
+                                doctor != null
+                                    ? "Assigned doctor - ${doctor.name}"
+                                    : "No doctor assigned",
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
                     ),
                   ),
+
+                  const SizedBox(width: 25),
+
+                  /// ================= BASIC INFO =================
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: _cardDecoration(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+
+                          const AppText(
+                            "Basic information",
+                            fontWeight: FontWeight.w600,
+                          ),
+
+                          const SizedBox(height: 15),
+
+                          AppText("Patient ID : ${controller.reviewPatientId}"),
+                          const SizedBox(height: 8),
+
+                          AppText("Age : ${controller.reviewAge} years"),
+                          const SizedBox(height: 8),
+
+                          AppText("Gender : ${controller.reviewGender}"),
+                          const SizedBox(height: 8),
+
+                          AppText("Contact : ${controller.reviewPhone}"),
+                          const SizedBox(height: 8),
+
+                          AppText("Address : ${controller.reviewAddress}"),
+                          const SizedBox(height: 8),
+
+                          AppText("Weight : ${controller.reviewWeight} kg"),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 35),
+
+            /// ================= BUTTONS =================
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 120,
+                  child: AppButton(
+                    onPressed: () => controller.opdStep.value = 2,
+                    backgroundColor: Colors.grey,
+                    text: "Back",
+                  ),
                 ),
-            
-                const SizedBox(width: 25),
-            
-                /// RIGHT SIDE – Basic Info
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF7F9FC),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade300),
-                    ),
-                    child: const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        AppText(
-                          "Basic information",
-                          fontWeight: FontWeight.w600,
-                        ),
-                        SizedBox(height: 15),
-                        AppText("Age : 23 years"),
-                        SizedBox(height: 8),
-                        AppText("Gender : Male"),
-                        SizedBox(height: 8),
-                        AppText("Contact : +91 9876543210"),
-                        SizedBox(height: 8),
-                        AppText("Address : Pune"),
-                        SizedBox(height: 8),
-                        AppText("Weight : 55 kg"),
-                      ],
-                    ),
+                const SizedBox(width: 20),
+                SizedBox(
+                  width: 180,
+                  child: AppButton(
+                    onPressed: controller.registerPatient,
+                    text: "Register patient",
                   ),
                 ),
               ],
-            ),
-          ),
+            )
+          ],
+        ),
+      );
+    });
+  }
 
-          const SizedBox(height: 35),
+  Widget _finalAvatar(patient) {
 
-          /// Bottom Buttons
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+    /// uploaded bytes
+    if (controller.selectedImageBytes.value != null) {
+      return CircleAvatar(
+        radius: 45,
+        backgroundImage:
+            MemoryImage(controller.selectedImageBytes.value!),
+      );
+    }
 
-              SizedBox(
-                width: 120,
-                child: AppButton(
-                  onPressed: () => controller.opdStep.value = 2,
-                  backgroundColor: Colors.grey,
-                  text: "Back",
-                ),
-              ),
+    /// uploaded file
+    if (controller.selectedImagePath.value.isNotEmpty) {
+      return CircleAvatar(
+        radius: 45,
+        backgroundImage:
+            FileImage(File(controller.selectedImagePath.value)),
+      );
+    }
 
-              const SizedBox(width: 20),
+    /// existing patient
+    if (patient != null) {
+      return PatientAvatar(
+        name: patient.name,
+        imageUrl: patient.avatar.url,
+        googleDriveLink: patient.avatar.googleDriveLink,
+        radius: 45,
+      );
+    }
 
-              SizedBox(
-                width: 180,
-                child: AppButton(
-                  onPressed: () {},
-                  text: "Register patient",
-                )
-              ),
-            ],
-          )
-        ],
-      ),
+    return const CircleAvatar(
+      radius: 45,
+      child: Icon(Icons.person),
+    );
+  }
+
+  BoxDecoration _cardDecoration() {
+    return BoxDecoration(
+      color: const Color(0xFFF7F9FC),
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: Colors.grey.shade300),
     );
   }
 
@@ -997,6 +1044,9 @@ class OPDScreen extends StatelessWidget {
                       hint: "Enter mobile number",
                       icon: Icons.phone,
                       keyboardType: TextInputType.phone,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly
+                      ],
                       validator: controller.validatePhone,
                     ),
                   ],
@@ -1013,6 +1063,9 @@ class OPDScreen extends StatelessWidget {
                       controller: controller.emergencyAltPhoneController,
                       hint: "Emergency contact number",
                       icon: Icons.person,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly
+                      ],
                       keyboardType: TextInputType.phone,
                     ),
                   ],
@@ -1036,6 +1089,7 @@ class OPDScreen extends StatelessWidget {
       
           /// ID Section
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Column(
@@ -1074,21 +1128,24 @@ class OPDScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               SizedBox(
-                width: 120,
-                child: AppButton(
-                  onPressed: () {
-                    // If this is first step, maybe do nothing or exit
-                    controller.currentStep.value = 1; 
-                  },
-                  backgroundColor: Colors.grey,
-                  text: "Back",
-                ),
-              ),
-              const SizedBox(width: 15),
-              SizedBox(
                 width: 140,
                 child: AppButton(
                   onPressed: () {
+                    final form = controller.emergencyPersonalFormKey.currentState;
+
+                    if (form == null || !form.validate()) {
+                      return;
+                    }
+
+                    if (controller.gender.value.isEmpty) {
+                      AppSnackbar.show(
+                        title: "Gender required",
+                        message: "Please select gender",
+                        type: AppSnackType.error,
+                      );
+                      return;
+                    }
+
                     controller.currentStep.value = 2;
                   },
                   text: "Continue",
@@ -1120,76 +1177,79 @@ class OPDScreen extends StatelessWidget {
     
           /// ===================== MAIN CARD =====================
           _sectionCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-    
-                /// Department + Staff
-                Row(
-                  children: [
-                    Expanded(
-                      child: _dropdownFormField(
-                        label: "Department *",
-                        items: ["Cardiology", "Orthopedic", "General"],
-                        onChanged: (v) => controller.department.value = v ?? "",
-                        validator: (v) =>
-                            v == null || v.isEmpty ? "Required" : null,
+            child: Form(
+              key: controller.emergencyDetailsFormKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  
+                  /// Department + Staff
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _dropdownFormField(
+                          label: "Department *",
+                          items: ["Cardiology", "Orthopedic", "General"],
+                          onChanged: (v) => controller.department.value = v ?? "",
+                          validator: (v) =>
+                              v == null || v.isEmpty ? "Required" : null,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 20),
-                    Expanded(
-                      child: _dropdownFormField(
-                        label: "Attending Staff",
-                        items: ["Dr. Smith", "Dr. John"],
-                        onChanged: (v) => controller.attendingStaff.value = v ?? "",
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: _dropdownFormField(
+                          label: "Attending Staff",
+                          items: ["Dr. Smith", "Dr. John"],
+                          onChanged: (v) => controller.attendingStaff.value = v ?? "",
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-    
-                const SizedBox(height: 25),
-    
-                /// Triage Level
-                const AppText("Triage Level *"),
-                const SizedBox(height: 10),
-                Obx(() => Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: ["Immediate", "Urgent", "Semi-Urgent", "Non-Urgent"]
-                          .map((e) => _selectionChip(
-                                label: e,
-                                selected: controller.triageLevel.value == e,
-                                onTap: () => controller.triageLevel.value = e,
-                              ))
-                          .toList(),
-                    )),
-    
-                const SizedBox(height: 25),
-    
-                /// Arrival Mode
-                const AppText("Arrival Mode *"),
-                const SizedBox(height: 10),
-                Obx(() => Wrap(
-                      spacing: 12,
-                      children: ["Ambulance", "Walk-in", "Referral"]
-                          .map((e) => _selectionChip(
-                                label: e,
-                                selected: controller.arrivalMode.value == e,
-                                onTap: () => controller.arrivalMode.value = e,
-                              ))
-                          .toList(),
-                    )),
-    
-                const SizedBox(height: 25),
-    
-                /// Chief Complaint
-                _textFormField(
-                  controller: controller.chiefComplaintController,
-                  label: "Chief Complaint *",
-                  maxLines: 3,
-                  validator: controller.validateRequired,
-                ),
-              ],
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 25),
+                  
+                  /// Triage Level
+                  const AppText("Triage Level *"),
+                  const SizedBox(height: 10),
+                  Obx(() => Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: ["Immediate", "Urgent", "Semi-Urgent", "Non-Urgent"]
+                            .map((e) => _selectionChip(
+                                  label: e,
+                                  selected: controller.triageLevel.value == e,
+                                  onTap: () => controller.triageLevel.value = e,
+                                ))
+                            .toList(),
+                      )),
+                  
+                  const SizedBox(height: 25),
+                  
+                  /// Arrival Mode
+                  const AppText("Arrival Mode *"),
+                  const SizedBox(height: 10),
+                  Obx(() => Wrap(
+                        spacing: 12,
+                        children: ["Ambulance", "Walk-in", "Referral"]
+                            .map((e) => _selectionChip(
+                                  label: e,
+                                  selected: controller.arrivalMode.value == e,
+                                  onTap: () => controller.arrivalMode.value = e,
+                                ))
+                            .toList(),
+                      )),
+                  
+                  const SizedBox(height: 25),
+                  
+                  /// Chief Complaint
+                  _textFormField(
+                    controller: controller.chiefComplaintController,
+                    label: "Chief Complaint *",
+                    maxLines: 3,
+                    validator: controller.validateRequired,
+                  ),
+                ],
+              ),
             ),
           ),
     
@@ -1275,8 +1335,7 @@ class OPDScreen extends StatelessWidget {
                 width: 140,
                 child: AppButton(
                   onPressed: () {
-                    if (controller.emergencyPersonalFormKey.currentState!
-                        .validate()) {
+                    if (controller.emergencyPersonalFormKey.currentState!.validate()) {
     
                       if (controller.triageLevel.value.isEmpty) {
                         AppSnackbar.show(
@@ -1704,7 +1763,7 @@ class OPDScreen extends StatelessWidget {
                 controller: controller.patientIdController,
                 label: "Patient id",
                 hint: "Patient id result",
-                enabled: !controller.isExistingPatient,
+                enabled: false,
               ),
             ),
           ],
@@ -1943,8 +2002,15 @@ class OPDScreen extends StatelessWidget {
   }
 
   Widget _dateField() {
-    return TextField(
+    return TextFormField(
+      controller: controller.emergencyDobController,
       readOnly: true,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return "Date of birth required";
+        }
+        return null;
+      },
       onTap: () async {
         final date = await showDatePicker(
           context: Get.context!,
@@ -1955,6 +2021,9 @@ class OPDScreen extends StatelessWidget {
 
         if (date != null) {
           controller.selectedDate.value = date;
+
+          controller.emergencyDobController.text =
+              "${date.day}/${date.month}/${date.year}";
         }
       },
       decoration: InputDecoration(

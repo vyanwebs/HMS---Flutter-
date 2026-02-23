@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
 
 import 'storage_service.dart';
 
@@ -10,9 +12,12 @@ class NetworkHelper {
   NetworkHelper({required this.url});
 
   /// COMMON HEADERS
-  Future<Map<String, String>> _headers({bool auth = false}) async {
+  Future<Map<String, String>> _headers({
+    bool auth = false,
+    bool isMultipart = false,
+  }) async {
     final headers = {
-      "Content-Type": "application/json",
+      if (!isMultipart) "Content-Type": "application/json",
       "Accept": "application/json",
     };
 
@@ -83,6 +88,60 @@ class NetworkHelper {
     return response;
   }
 
+  Future<Map<String, dynamic>> postMultipart({
+    required Map<String, String> fields,
+    String? filePath,
+    Uint8List? fileBytes,
+    String? fileName,
+    String fileKey = "avatar",
+    bool auth = true,
+  }) async {
+    try {
+      final request = http.MultipartRequest("POST", Uri.parse(url));
+
+      request.headers.addAll(
+        await _headers(auth: auth, isMultipart: true),
+      );
+
+      request.fields.addAll(fields);
+
+      /// DESKTOP / MOBILE FILE
+      if (filePath != null && filePath.isNotEmpty) {
+        final mimeType = lookupMimeType(filePath);
+
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            fileKey,
+            filePath,
+            contentType: mimeType != null ? MediaType.parse(mimeType) : null,
+          ),
+        );
+      }
+
+      /// WEB FILE
+      if (fileBytes != null && fileName != null) {
+        final mimeType = lookupMimeType(fileName);
+
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            fileKey,
+            fileBytes,
+            filename: fileName,
+            contentType: mimeType != null ? MediaType.parse(mimeType) : null,
+          ),
+        );
+      }
+
+      final streamed = await request.send();
+      final response = await http.Response.fromStream(streamed);
+
+      return _processResponse(response);
+    } catch (e) {
+      _logError(e);
+      return {"success": false};
+    }
+  }
+  
   /// GET
   Future<Map<String, dynamic>> get({bool auth = false}) async {
     try {
@@ -175,6 +234,64 @@ class NetworkHelper {
       return {"success": false, "message": "Network error"};
     }
   }
+
+  Future<Map<String, dynamic>> patchMultipart({
+    required Map<String, String> fields,
+    String? filePath,
+    Uint8List? fileBytes,
+    String? fileName,
+    String fileKey = "avatar",
+    bool auth = true,
+    }) async {
+    try {
+      final request =
+          http.MultipartRequest("PATCH", Uri.parse(url));
+
+      request.headers.addAll(
+        await _headers(auth: auth, isMultipart: true),
+      );
+
+      /// ✅ ADD FIELDS
+      request.fields.addAll(fields);
+
+      /// MOBILE / DESKTOP
+      if (filePath != null && filePath.isNotEmpty) {
+        final mimeType = lookupMimeType(filePath);
+
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            fileKey,
+            filePath,
+            contentType:
+                mimeType != null ? MediaType.parse(mimeType) : null,
+          ),
+        );
+      }
+
+      /// WEB
+      if (fileBytes != null && fileName != null) {
+        final mimeType = lookupMimeType(fileName);
+
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            fileKey,
+            fileBytes,
+            filename: fileName,
+            contentType:
+                mimeType != null ? MediaType.parse(mimeType) : null,
+          ),
+        );
+      }
+
+      final streamed = await request.send();
+      final response = await http.Response.fromStream(streamed);
+
+      return _processResponse(response);
+    } catch (e) {
+      _logError(e);
+      return {"success": false};
+    }
+    }
 
   /// DELETE
   Future<Map<String, dynamic>> delete({

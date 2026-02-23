@@ -7,6 +7,7 @@ import '../../models/doctor_model.dart';
 import '../../models/patient_search_model.dart';
 import '../../services/api_service.dart';
 import '../../services/apis.dart';
+import '../../utils/overlay.dart';
 import '../../utils/snackbar.dart';
 
 class OPDRegistrationController extends GetxController {
@@ -50,11 +51,8 @@ class OPDRegistrationController extends GetxController {
 
   RxInt currentStep = 1.obs;
 
-  void registerPatient() {
-    print("Registering patient...");
-  }
-
   final emergencyPersonalFormKey = GlobalKey<FormState>();
+  final emergencyDetailsFormKey = GlobalKey<FormState>();
 
   final department = "".obs;
   final attendingStaff = "".obs;
@@ -154,6 +152,14 @@ class OPDRegistrationController extends GetxController {
     return null;
   }
 
+  DoctorModel? get selectedDoctorModel {
+    if (selectedDoctor.value.isEmpty) return null;
+
+    return doctors.firstWhereOrNull(
+      (d) => d.id == selectedDoctor.value,
+    );
+  }
+
   // =====================================================
   // AUTO FILL FROM SEARCH
   // =====================================================
@@ -196,9 +202,34 @@ class OPDRegistrationController extends GetxController {
   // SUBMIT VALIDATION
   // =====================================================
 
+  // bool validateForm() {
+
+  //   if (!opdFormKey.currentState!.validate()) {
+  //     return false;
+  //   }
+
+  //   if (gender.value.isEmpty) {
+  //     AppSnackbar.show(
+  //       title: "Error",
+  //       message: "Please select gender",
+  //       type: AppSnackType.error,
+  //     );
+  //     return false;
+  //   }
+
+  //   return true;
+  // }
+
   bool validateForm() {
 
-    if (!opdFormKey.currentState!.validate()) {
+    final form = opdFormKey.currentState;
+
+    if (form == null) {
+      debugPrint("Form not mounted");
+      return true;
+    }
+
+    if (!form.validate()) {
       return false;
     }
 
@@ -216,15 +247,13 @@ class OPDRegistrationController extends GetxController {
 
   /// Selected Image
   final selectedImagePath = "".obs;
+  final selectedFileName = "".obs;
   final selectedImageBytes = Rxn<Uint8List>();
 
   /// ================= PICK IMAGE =================
   Future<void> pickImage() async {
-
     try {
-
       final result = await FilePicker.platform.pickFiles(
-        type: FileType.image,
         allowMultiple: false,
         withData: kIsWeb,
       );
@@ -233,18 +262,19 @@ class OPDRegistrationController extends GetxController {
 
       final file = result.files.first;
 
+      selectedFileName.value = file.name;
+
       /// WEB
       if (kIsWeb) {
         selectedImageBytes.value = file.bytes;
       }
 
-      /// MOBILE + DESKTOP
+      /// MOBILE / DESKTOP
       else {
         selectedImagePath.value = file.path!;
       }
-
     } catch (e) {
-      print("Image pick error: $e");
+      debugPrint("Image pick error: $e");
     }
   }
 
@@ -282,6 +312,176 @@ class OPDRegistrationController extends GetxController {
     } finally {
       isDoctorLoading.value = false;
     }
+  }
+
+  // ==================== REGISTER ======================
+
+  Future<void> registerPatient() async {
+    try {
+
+      /// ================= VALIDATION =================
+      if (!isEmergency.value) {
+        if (!validateForm()) return;
+      } else {
+        if (!emergencyPersonalFormKey.currentState!.validate()) return;
+      }
+
+      if (selectedDoctor.value.isEmpty) {
+        AppSnackbar.show(
+          title: "Assign Doctor",
+          message: "Please assign doctor",
+          type: AppSnackType.warning,
+        );
+        return;
+      }
+
+      LoadingOverlayService.show(
+        message: "Processing patient...",
+      );
+
+
+      /// ================= COMMON DATA =================
+      final Map<String, String> fields = {
+        "name": isEmergency.value
+            ? emergencyNameController.text
+            : nameController.text,
+
+        "age": ageController.text,
+        "gender": gender.value,
+
+        "mobileNumber": isEmergency.value
+            ? emergencyPhoneController.text
+            : phoneController.text,
+
+        "address": isEmergency.value
+            ? emergencyAddressController.text
+            : addressController.text,
+
+        "currentAdmissionType":
+            isEmergency.value ? "EMERGENCY" : "OPD",
+
+        "currentDoctorAssigned": selectedDoctor.value,
+      };
+
+      /// OPD fields
+      if (!isEmergency.value) {
+        fields["weight"] = weightController.text;
+        fields["isRevisit"] = isRevisit.value.toString();
+      }
+
+      /// Emergency fields
+      if (isEmergency.value) {
+        fields.addAll({
+          "triageLevel": triageLevel.value,
+          "arrivalMode": arrivalMode.value,
+          "department": department.value,
+          "chiefComplaint": chiefComplaintController.text,
+        });
+      }
+
+      Map<String, dynamic> response;
+
+      /// ===================================================
+      /// ✅ EXISTING PATIENT → UPDATE
+      /// ===================================================
+      if (selectedPatient.value != null) {
+
+        final patientId = selectedPatient.value!.id;
+
+        final helper = NetworkHelper(
+          url: "$updatePatientByIdApi/$patientId",
+        );
+
+        response = await helper.patchMultipart(
+          fields: fields,
+          filePath: selectedImagePath.value.isNotEmpty
+            ? selectedImagePath.value
+            : null,
+          fileBytes: selectedImageBytes.value,
+          fileName: selectedFileName.value,
+          auth: true,
+        );
+      }
+
+      /// ===================================================
+      /// ✅ NEW PATIENT → CREATE
+      /// ===================================================
+      else {
+
+        final helper = NetworkHelper(
+          url: createPatientApi,
+        );
+
+        response = await helper.postMultipart(
+          fields: fields,
+          filePath: selectedImagePath.value.isNotEmpty
+            ? selectedImagePath.value
+            : null,
+          fileBytes: selectedImageBytes.value,
+          fileName: selectedFileName.value,
+          auth: true,
+        );
+      }
+
+      LoadingOverlayService.hide();
+
+      /// ================= RESPONSE =================
+
+      if (response["success"] == true) {
+
+        AppSnackbar.show(
+          title: "Success",
+          message: selectedPatient.value != null
+              ? "Patient updated successfully"
+              : "Patient registered successfully",
+          type: AppSnackType.success,
+        );
+
+        resetForm();
+
+        opdStep.value = 0;
+        currentStep.value = 1;
+      } else {
+        AppSnackbar.show(
+          title: "Failed",
+          message: response["message"] ?? "Operation failed",
+          type: AppSnackType.error,
+        );
+      }
+
+    } catch (e) {
+
+      LoadingOverlayService.hide();
+
+      AppSnackbar.show(
+        title: "Error",
+        message: e.toString(),
+        type: AppSnackType.error,
+      );
+    }
+  } 
+
+  void resetForm() {
+
+    selectedPatient.value = null;
+
+    patientIdController.clear();
+    nameController.clear();
+    ageController.clear();
+    phoneController.clear();
+    addressController.clear();
+    weightController.clear();
+
+    emergencyNameController.clear();
+    emergencyPhoneController.clear();
+    emergencyAddressController.clear();
+    chiefComplaintController.clear();
+
+    selectedImagePath.value = "";
+    selectedImageBytes.value = null;
+
+    selectedDoctor.value = "";
+    gender.value = "Male";
   }
 
   @override

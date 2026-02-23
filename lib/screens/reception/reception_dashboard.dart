@@ -14,7 +14,7 @@ import 'discharge_screen.dart';
 import 'doctor_management_screen.dart';
 import 'ipd_screen.dart';
 import 'opd_screen.dart';
-import 'patient_directory.dart';
+import 'patient_management.dart';
 
 class ReceptionDashboard extends StatefulWidget {
   const ReceptionDashboard({super.key});
@@ -144,8 +144,8 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
                 ),
 
                 _buildSidebarItem(
-                  title: "Patient directory",
-                  menu: ReceptionPanelMenu.patientDirectory,
+                  title: "Patient management",
+                  menu: ReceptionPanelMenu.patientManagement,
                   icon: Icons.people_outline,
                 ),
 
@@ -260,8 +260,8 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
         case ReceptionPanelMenu.ipd:
           return IPDScreen();
 
-        case ReceptionPanelMenu.patientDirectory:
-          return const PatientDirectory();
+        case ReceptionPanelMenu.patientManagement:
+          return PatientManagement();
 
         case ReceptionPanelMenu.discharge:
           return const DischargeScreen();

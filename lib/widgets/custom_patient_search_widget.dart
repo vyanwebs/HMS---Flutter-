@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../controllers/all_patients_search_controllers.dart';
 import '../models/patient_search_model.dart';
 import '../utils/text.dart';
+import 'patient_avatar_widget.dart';
 
 class CustomAllPatientSearchField extends StatefulWidget {
   final Function(PatientSearchModel?) onChanged;
@@ -78,7 +79,11 @@ class _CustomAllPatientSearchFieldState extends State<CustomAllPatientSearchFiel
                 final patient = controller.patients[index];
 
                 return ListTile(
-                  leading: const CircleAvatar(),
+                  leading: PatientAvatar(
+                    name: patient.name,
+                    imageUrl: patient.avatar.url,
+                    googleDriveLink: patient.avatar.googleDriveLink,
+                  ),
                   title: AppText(patient.name),
 
                   subtitle: AppText(

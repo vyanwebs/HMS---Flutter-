@@ -36,7 +36,7 @@ enum ReceptionPanelMenu implements PanelMenu {
   dashboard('Dashboard'),
   inbox('Inbox'),
   appointments('Appointments'),
-  patientDirectory('Patient Directory'),
+  patientManagement('Patient Management'),
   ipd('IPD'),
   opd('OPD'),
   discharge('Discharge'),

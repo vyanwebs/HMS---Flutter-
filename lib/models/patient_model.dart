@@ -23,6 +23,7 @@ class PatientModel {
   final int weight;
 
   // Admission details
+  final String currentAdmissionPriorityLevel;
   final String currentAdmissionType;
   final String currentAdmissionStatus;
   final String currentDoctorAssigned;
@@ -99,6 +100,7 @@ class PatientModel {
     required this.registeredBy,
     required this.registeredByStaffId,
     required this.admissionIds,
+    required this.currentAdmissionPriorityLevel,
     required this.currentAdmissionCode,
     required this.currentAdmissionId,
     required this.currentBedAssign,
@@ -142,6 +144,7 @@ class PatientModel {
       language: json['language'] ?? '',
       weight: json['weight'] ?? 0,
 
+      currentAdmissionPriorityLevel: json['currentAdmissionPriorityLevel'] ?? '',
       currentAdmissionType: json['currentAdmissionType'] ?? '',
       currentAdmissionStatus: json['currentAdmissionStatus'] ?? '',
       currentDoctorAssigned: json['currentDoctorAssigned'] ?? '',
@@ -227,6 +230,7 @@ class PatientModel {
       'registeredBy': registeredBy,
       'registeredByStaffId': registeredByStaffId,
       'admissionIds': admissionIds,
+      'currentAdmissionPriorityLevel': currentAdmissionPriorityLevel,
       'currentAdmissionCode': currentAdmissionCode,
       'currentAdmissionId': currentAdmissionId,
       'currentBedAssign': currentBedAssign,
@@ -262,6 +266,7 @@ class PatientModel {
     String? nationality,
     String? language,
     int? weight,
+    String? currentAdmissionPriorityLevel,
     String? currentAdmissionType,
     String? currentAdmissionStatus,
     String? currentDoctorAssigned,
@@ -319,6 +324,7 @@ class PatientModel {
       registeredBy: registeredBy ?? this.registeredBy,
       registeredByStaffId: registeredByStaffId ?? this.registeredByStaffId,
       admissionIds: admissionIds ?? this.admissionIds,
+      currentAdmissionPriorityLevel: currentAdmissionPriorityLevel ?? this.currentAdmissionPriorityLevel,
       currentAdmissionCode: currentAdmissionCode ?? this.currentAdmissionCode,
       currentAdmissionId: currentAdmissionId ?? this.currentAdmissionId,
       currentBedAssign: currentBedAssign ?? this.currentBedAssign,
