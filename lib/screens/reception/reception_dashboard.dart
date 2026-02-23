@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hms/screens/reception/external_doctor_screen.dart';
+import 'package:hms/screens/reception/track_patient_screen.dart';
 
 import '../../controllers/Reception/opd_registration_controller.dart';
 import '../../controllers/panel_navigation_controller.dart';
@@ -166,6 +168,18 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
                 ),
 
                 _buildSidebarItem(
+                  title: "Track patients",
+                  menu: ReceptionPanelMenu.track_patient,
+                  icon: Icons.medical_services_outlined,
+                ),
+
+                _buildSidebarItem(
+                  title: "External Doctor",
+                  menu: ReceptionPanelMenu.externaldoctor,
+                  icon: Icons.medical_services_outlined,
+                ),
+
+                _buildSidebarItem(
                   title: "Appointments",
                   menu: ReceptionPanelMenu.appointments,
                   icon: Icons.calendar_today_outlined,
@@ -268,6 +282,12 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
 
         case ReceptionPanelMenu.doctors:
           return const DoctorManagementScreen();
+
+        case ReceptionPanelMenu.track_patient:
+          return const TrackPatientsScreen();
+
+        case ReceptionPanelMenu.externaldoctor:
+          return const ExternalDoctorScreen();
 
         case ReceptionPanelMenu.billing:
           return const BillingScreen();
