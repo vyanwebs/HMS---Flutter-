@@ -41,6 +41,8 @@ enum ReceptionPanelMenu implements PanelMenu {
   opd('OPD'),
   discharge('Discharge'),
   doctors('Doctors'),
+  track_patient('Track Patients'),
+  externaldoctor('External Doctor'),
   billing('Billing'),
   analysis('Analysis'),
   settings('Settings');

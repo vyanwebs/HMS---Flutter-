@@ -73,4 +73,9 @@ String filterSymptomsApi = "$baseUrl/api/symptoms/name";
 String followupVitalsApi = "$baseUrl/api/vital";
 String getalldoctorApi = "$baseUrl/api/doctor/get-all";
 String deletedoctorApi = "$baseUrl/api/doctor/delete";
+String createexternaldoctorApi = "$baseUrl/api/external-doctor/create";
+String getallexternaldoctorApi = "$baseUrl/api/doctor/get-doctor-by-name-type?type=external";
+String getallpatientApi = "$baseUrl/api/patient/getPatientUsingQuery";
+String trackpatientcardsApi = "$baseUrl/api/patient/get-patient-track-dashboard-cards";
+String deletepatientsApi = "$baseUrl/api/patient/delete-multiple";
 
