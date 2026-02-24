@@ -15,8 +15,9 @@ class PatientManagementController extends GetxController {
   final isAssignedTab = true.obs;
 
   /// ================= DATA =================
-  final allPatients = <PatientModel>[].obs;
+  final opdPatients = <PatientModel>[].obs;
   final patients = <PatientModel>[].obs;
+  final ipdPatients = <PatientModel>[].obs;
 
   /// ================= STATS =================
   final totalPatients = 0.obs;
@@ -27,7 +28,16 @@ class PatientManagementController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchOPDPatients();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    isLoading.value = true;
+    await fetchOPDPatients();
+    await fetchIPDPatients();
+    isLoading.value = false;
+    _calculateStats();
+    _applyFilter();
   }
 
   /// =====================================================
@@ -35,29 +45,44 @@ class PatientManagementController extends GetxController {
   /// =====================================================
   Future<void> fetchOPDPatients() async {
     try {
-      isLoading.value = true;
 
       final helper = NetworkHelper(url: getAllOPDPatientsApi);
+      final response = await helper.get(auth: true);
+
+      if (response["success"] == true) {
+        opdPatients.value =
+            (response["data"] as List)
+                .map((e) => PatientModel.fromJson(e))
+                .toList();
+      }
+
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  // ==================== FETCH ADMITTED PATIENTS ===============
+  Future<void> fetchIPDPatients() async {
+    try {
+      isLoading.value = true;
+
+      final helper = NetworkHelper(
+        url: getAllIPDPatientsWithDiagnosisApi,
+      );
 
       final response = await helper.get(auth: true);
 
       if (response["success"] == true) {
-
         final List list = response["data"];
 
-        allPatients.value = list.map((e) => PatientModel.fromJson(e)).toList();
-
-        _calculateStats();
-        _applyFilter();
+        ipdPatients.value = list.map((e) => PatientModel.fromJson(e)).toList();
       }
-
     } catch (e) {
-      print("OPD Fetch Error: $e");
+      print("IPD Fetch Error: $e");
     } finally {
       isLoading.value = false;
     }
   }
-
   // ================== TRANSFER PATIENT =================
   Future<void> transferPatient({
     required String patientMongoId,
@@ -123,16 +148,11 @@ class PatientManagementController extends GetxController {
   /// =====================================================
   void _calculateStats() {
 
-    totalPatients.value = allPatients.length;
+    totalPatients.value = opdPatients.length + ipdPatients.length;
 
-    assignedPatients.value = allPatients.where((p) =>
-        p.currentAdmissionStatus == "PENDING" ||
-        p.currentAdmissionStatus == "CONFIRMED" ||
-        p.currentAdmissionStatus == "DISCHARGE_REQUESTED"
-    ).length;
+    assignedPatients.value = opdPatients.length;
 
-    admittedPatients.value = allPatients.where((p) => p.currentAdmissionStatus == "ADMITTED"
-    ).length;
+    admittedPatients.value = ipdPatients.length;
   }
 
   /// =====================================================
@@ -147,17 +167,13 @@ class PatientManagementController extends GetxController {
 
     if (isAssignedTab.value) {
 
-      /// Assigned Patients
-      patients.assignAll(
-        allPatients.where((p) => p.currentAdmissionStatus != "ADMITTED"),
-      );
+      /// Assigned Patients → OPD LIST
+      patients.assignAll(opdPatients);
 
     } else {
 
-      /// Admitted Patients
-      patients.assignAll(
-        allPatients.where((p) => p.currentAdmissionStatus == "ADMITTED"),
-      );
+      /// Admitted Patients → IPD LIST
+      patients.assignAll(ipdPatients);
     }
   }
 
@@ -166,18 +182,19 @@ class PatientManagementController extends GetxController {
   /// =====================================================
   void searchPatients(String query) {
 
+    final source = isAssignedTab.value ? opdPatients : ipdPatients;
+
     if (query.isEmpty) {
       _applyFilter();
       return;
     }
 
-    final result = allPatients.where((p) =>
-      p.name.toLowerCase().contains(query.toLowerCase()) ||
-      p.patientId.toLowerCase().contains(query.toLowerCase()) ||
-      p.mobileNumber.contains(query)
-    ).toList();
-
-    patients.assignAll(result);
+    patients.assignAll(
+      source.where((p) =>
+          p.name.toLowerCase().contains(query.toLowerCase()) ||
+          p.patientId.toLowerCase().contains(query.toLowerCase()) ||
+          p.mobileNumber.contains(query)),
+    );
   }
 
   /// =====================================================
@@ -195,8 +212,48 @@ class PatientManagementController extends GetxController {
   /// ACTIONS
   /// =====================================================
   
-  Future<void> admitPatient(PatientModel patient) async {
-    print("Admit -> ${patient.name}");
-    // TODO: Admit API
+  Future<void> admitPatient({
+    required String patientMongoId,
+    required String ward,
+    String? preferredBed,
+    required String diagnosis,
+    required String priority,
+    String? notes,
+  }) async {
+
+    LoadingOverlayService.show(
+      message: "Submitting admission request...",
+    );
+
+    try {
+
+      final helper = NetworkHelper(url: "");
+
+      final response = await helper.postData(
+        auth: true,
+        body: {
+          "patientMongoId": patientMongoId,
+          "ward": ward,
+          "preferredBed": preferredBed ?? "",
+          "diagnosis": diagnosis,
+          "priority": priority,
+          "notes": notes ?? "",
+        },
+      );
+
+      if (response["success"] == true) {
+        AppSnackbar.show(
+          title: "Success",
+          message: "Admission request created",
+          type: AppSnackType.success,
+        );
+
+        await fetchOPDPatients();
+        await fetchIPDPatients();
+      }
+
+    } finally {
+      LoadingOverlayService.hide();
+    }
   }
 }

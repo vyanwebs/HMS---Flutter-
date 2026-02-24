@@ -5,10 +5,13 @@ import 'package:get/get.dart';
 import '../../controllers/Reception/patient_management_controller.dart';
 import '../../models/patient_model.dart';
 import '../../utils/buttons.dart';
+import '../../utils/date_formatter.dart';
 import '../../utils/snackbar.dart';
+import '../../utils/string_utils.dart';
 import '../../utils/text.dart';
 import '../../widgets/doctor_panel/stat_card_widget.dart';
-import '../../widgets/search_doctor_widget.dart';
+import '../../widgets/order_labs_dialog.dart';
+import '../../widgets/transfer_patient_widget.dart';
 
 class PatientManagement extends StatelessWidget {
   PatientManagement({super.key});
@@ -39,7 +42,13 @@ class PatientManagement extends StatelessWidget {
           
               const SizedBox(height: 20),
           
-              Expanded(child: _patientsTable()),
+              Expanded(
+                child: Obx(
+                  () => controller.isAssignedTab.value
+                    ? _assignedPatientsTable()
+                    : _admittedPatientsTable(),
+                ),
+              ),
             ],
           ),
         ),
@@ -196,7 +205,9 @@ class PatientManagement extends StatelessWidget {
     );
   }
 
-  Widget _patientsTable() {
+  // =================== Assigned Patients ====================
+
+  Widget _assignedPatientsTable() {
     return Obx(
       () => Container(
         decoration: BoxDecoration(
@@ -318,7 +329,17 @@ class PatientManagement extends StatelessWidget {
                   const SizedBox(width: 12),
                   AppButton(
                     text: "Admit",
-                    onPressed: () {},
+                    onPressed: () {
+                      showDialog(
+                        context: Get.context!,
+                        barrierDismissible: false,
+                        builder: (_) => AdmitPatientDialog(
+                          patientName: p.name,
+                          patientId: p.patientId,
+                          patientMongoId: p.id,
+                        ),
+                      );
+                    },
                     icon: Icons.person_add_alt,
                     iconIsLast: false,
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -329,6 +350,218 @@ class PatientManagement extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  // =================== Admitted Patients ====================
+  Widget _admittedPatientsTable() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Column(
+        children: [
+      
+          /// HEADER
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            decoration: const BoxDecoration(
+              color: Color(0xffF3F4F6),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+            ),
+            child: const Row(
+              children: [
+                Expanded(flex: 1, child: AppText("Patient Details")),
+                Expanded(child: AppText("Ward / Bed")),
+                Expanded(child: AppText("Admission Date")),
+                Expanded(flex: 1, child: AppText("Diagnosis")),
+                Expanded(flex: 1, child: AppText("Status")),
+                Expanded(flex: 2, child: AppText("Actions", textAlign: TextAlign.center,)),
+              ],
+            ),
+          ),
+      
+          /// LIST
+          Expanded(
+            child: ListView.builder(
+              itemCount: controller.patients.length,
+              itemBuilder: (_, i) => _admittedPatientRow(controller.patients[i]),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _admittedPatientRow(PatientModel p) {
+
+    final ward = extractWardFromBedAssign(p.currentBedAssign);
+    final bed = extractBedNumber(p.currentBedAssign);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+      ),
+      child: Row(
+        children: [
+      
+          /// PATIENT DETAILS
+          Expanded(
+            flex: 1,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AppText(p.name, fontWeight: FontWeight.w600),
+                const SizedBox(height: 4),
+                AppText(
+                  "${p.patientId}\n${p.age}Y • ${p.gender}",
+                  fontSize: 12,
+                  color: Colors.grey,
+                ),
+              ],
+            ),
+          ),
+      
+          /// WARD BED
+          Expanded(
+            child: AppText("$ward / Bed $bed"),
+          ),
+      
+          /// DATE
+          Expanded(
+            child: AppText(dateFromDateTime(p.registeredAt)),
+          ),
+      
+          /// DIAGNOSIS
+          Expanded(
+            flex: 1,
+            child: AppText(
+              p.diagnosis?.diagnoses.isNotEmpty == true
+                ? p.diagnosis!.diagnoses.map((e) => e.name).join(", ")
+                : "-",
+              maxLines: 3,
+            ),
+          ),
+          const SizedBox(width: 4,),
+      
+          /// STATUS
+          Expanded(flex: 1, child: _admitStatusChip(p.currentAdmissionStatus)),
+      
+          /// ACTIONS
+          Expanded(
+            flex: 2,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+      
+                /// ORDER LABS
+                InkWell(
+                  onTap: () {
+                    showDialog(
+                      context: Get.context!,
+                      builder: (_) => OrderLabsDialog(
+                        patientName: p.name,
+                        patientId: p.patientId,
+                      ),
+                    );
+                  },
+                  child: _actionButton("Order Labs")
+                ),
+      
+                const SizedBox(width: 8),
+      
+                /// DISCHARGE
+                AppButton(
+                  text: "Discharge",
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  onPressed: () {},
+                ),
+      
+                const SizedBox(width: 6),
+                
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert),
+                  color: Colors.white,
+
+                  onSelected: (value) {
+                    if (value == "transfer") {
+                      showDialog(
+                        context: Get.context!,
+                        barrierDismissible: false,
+                        builder: (_) => TransferPatientDialog(
+                          patientName: p.name,
+                          patientId: p.patientId,
+                          patientMongoId: p.id,
+                        ),
+                      );
+                    }
+                  },
+
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: "transfer",
+                      child: Row(
+                        children: [
+                          Icon(Icons.compare_arrows, size: 18),
+                          SizedBox(width: 10),
+                          Text("Transfer Patient"),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _admitStatusChip(String? status) {
+
+    final map = {
+      "PENDING": Colors.orange,
+      "ADMISSION_REQUESTED": Colors.deepPurple,
+      "CONFIRMED": Colors.blue,
+      "DISCHARGE_REQUESTED": Colors.green,
+    };
+
+    final color = map[status?.toUpperCase()] ?? Colors.grey;
+
+    return Row(
+      children: [
+        Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: color.withValues(alpha: 0.4)),
+          ),
+          child: AppText(
+            status?.replaceAll("_", " ") ?? "-",
+            fontSize: 12,
+            color: color,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _actionButton(String text) {
+    return Container(
+      padding:
+          const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: AppText(text, fontSize: 12),
     );
   }
 
@@ -362,70 +595,57 @@ class PatientManagement extends StatelessWidget {
     );
   }
 
-  Widget _tag(String text, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color.withValues(alpha: 0.4)),
-      ),
-      child: AppText(
-        text,
-        fontSize: 11,
-        color: color,
-      ),
-    );
-  }
-
 }
 
-class TransferPatientDialog extends StatefulWidget {
+class AdmitPatientDialog extends StatefulWidget {
   final String patientName;
   final String patientId;
   final String patientMongoId;
 
-  const TransferPatientDialog({
+  const AdmitPatientDialog({
     super.key,
     required this.patientName,
     required this.patientId,
-    required this.patientMongoId
+    required this.patientMongoId,
   });
 
   @override
-  State<TransferPatientDialog> createState() => _TransferPatientDialogState();
+  State<AdmitPatientDialog> createState() => _AdmitPatientDialogState();
 }
 
-class _TransferPatientDialogState extends State<TransferPatientDialog> {
+class _AdmitPatientDialogState extends State<AdmitPatientDialog> {
 
-  final TextEditingController searchController = TextEditingController();
+  /// CONTROLLERS
+  final diagnosisController = TextEditingController();
+  final bedController = TextEditingController();
+  final notesController = TextEditingController();
 
-  final TextEditingController reasonController = TextEditingController();
+  String? selectedWard;
+  String priority = "ROUTINE";
 
-  int selectedDoctor = 0;
-  String? doctorName;
-  String? staffId;
+  final wards = [
+    "General Ward",
+    "ICU",
+    "CCU",
+    "Private Room",
+  ];
 
-  final FocusNode doctorFocus = FocusNode();
-  final FocusNode reasonFocus = FocusNode();
-  final FocusNode submitFocus = FocusNode();
+  /// ================= SUBMIT =================
+  Future<void> _submit() async {
 
-  @override
-  void dispose() {
-    doctorFocus.dispose();
-    reasonFocus.dispose();
-    submitFocus.dispose();
-    searchController.dispose();
-    reasonController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _submitTransfer() async {
-
-    if (doctorName == null || staffId == null) {
+    if (selectedWard == null) {
       AppSnackbar.show(
-        title: "Doctor Required",
-        message: "Please select doctor",
+        title: "Ward Required",
+        message: "Please select ward",
+        type: AppSnackType.warning,
+      );
+      return;
+    }
+
+    if (diagnosisController.text.trim().isEmpty) {
+      AppSnackbar.show(
+        title: "Diagnosis Required",
+        message: "Enter preliminary diagnosis",
         type: AppSnackType.warning,
       );
       return;
@@ -435,11 +655,13 @@ class _TransferPatientDialogState extends State<TransferPatientDialog> {
 
     Navigator.pop(context);
 
-    await controller.transferPatient(
+    await controller.admitPatient(
       patientMongoId: widget.patientMongoId,
-      doctorName: doctorName!,
-      staffId: staffId!,
-      reason: reasonController.text,
+      ward: selectedWard!,
+      preferredBed: bedController.text,
+      diagnosis: diagnosisController.text,
+      priority: priority,
+      notes: notesController.text,
     );
   }
 
@@ -453,110 +675,199 @@ class _TransferPatientDialogState extends State<TransferPatientDialog> {
       child: Actions(
         actions: {
           ActivateIntent: CallbackAction<ActivateIntent>(
-            onInvoke: (_) => _submitTransfer(),
+            onInvoke: (_) => _submit(),
           ),
           DismissIntent: CallbackAction<DismissIntent>(
             onInvoke: (_) => Navigator.pop(context),
           ),
         },
-        child: Focus(
-          autofocus: true,
-          child: Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            backgroundColor: Colors.white,
+        child: Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
             child: SizedBox(
-              width: 520,
-              child: Padding(
-                padding: const EdgeInsets.all(22),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-          
-                    /// TITLE
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const AppText(
-                          "Transfer Patient to Another Doctor",
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        IconButton(
-                          onPressed: () => Navigator.pop(context),
-                          icon: const Icon(Icons.close),
-                        )
-                      ],
-                    ),
-          
-                    AppText(
-                      "Patient: ${widget.patientName} (${widget.patientId})",
-                      color: Colors.grey,
-                    ),
-          
-                    const SizedBox(height: 20),
-          
-                    /// SEARCH
-                    const AppText("Search Doctor *"),
-                    const SizedBox(height: 8),
-          
-                    DoctorSearchField(
-                      focusNode: doctorFocus,
-                      onDoctorSelected: (doctor) {
-                        doctorName = doctor.name;
-                        staffId = doctor.staffId;
-
-                        /// auto move to reason field
-                        reasonFocus.requestFocus();
-                      },
-                    ),
-          
-                    const SizedBox(height: 18),
-          
-                    const AppText("Reason for Transfer (Optional)"),
-                    const SizedBox(height: 8),
-          
-                    TextField(
-                      controller: reasonController,
-                      focusNode: reasonFocus,
-                      textInputAction: TextInputAction.done,
-                      onSubmitted: (_) => _submitTransfer(),
-                      maxLines: 3,
-                      decoration: InputDecoration(
-                        hintText: "Enter reason for transfer...",
-                        filled: true,
-                        fillColor: const Color(0xffF5F6F7),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+              width: 560,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                          
+                  /// HEADER
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const AppText(
+                        "Confirm IPD Admission Request",
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
                       ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close),
+                      )
+                    ],
+                  ),
+                          
+                  AppText(
+                    "Patient: ${widget.patientName} (${widget.patientId})",
+                    color: Colors.grey,
+                  ),
+                          
+                  const SizedBox(height: 18),
+                          
+                  /// INFO BOX
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.orange),
                     ),
-          
-                    const SizedBox(height: 22),
-          
-                    /// ACTIONS
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                    child: const Row(
                       children: [
-                        AppButton(
-                          text: "Cancel",
-                          onPressed: () => Navigator.pop(context),
-                          isOutlined: true,
-                        ),
-                        const SizedBox(width: 12),
-                        AppButton(
-                          text: "Transfer Patient",
-                          icon: Icons.swap_horiz,
-                          iconIsLast: false,
-                          onPressed: _submitTransfer,
+                        Icon(Icons.info_outline, color: Colors.orange),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: AppText(
+                            "This will create a pending admission request "
+                            "sent to Reception for bed assignment.",
+                            color: Colors.orange,
+                            maxLines: 2,
+                          ),
                         ),
                       ],
-                    )
-                  ],
-                ),
+                    ),
+                  ),
+                          
+                  const SizedBox(height: 18),
+                          
+                  /// WARD
+                  const AppText("Select Ward *"),
+                  const SizedBox(height: 6),
+                          
+                  DropdownButtonFormField<String>(
+                    value: selectedWard,
+                    items: wards
+                        .map((w) => DropdownMenuItem(
+                              value: w,
+                              child: Text(w),
+                            ))
+                        .toList(),
+                    onChanged: (v) => setState(() => selectedWard = v),
+                    decoration: const InputDecoration(
+                      hintText: "Select a ward",
+                    ),
+                  ),
+                          
+                  const SizedBox(height: 16),
+                          
+                  /// BED
+                  const AppText("Preferred Bed (Optional)"),
+                  const SizedBox(height: 6),
+                          
+                  TextField(
+                    controller: bedController,
+                    decoration: const InputDecoration(
+                      hintText: "e.g. CCU-101",
+                    ),
+                  ),
+                          
+                  const SizedBox(height: 16),
+                          
+                  /// DIAGNOSIS
+                  const AppText("Preliminary Diagnosis *"),
+                  const SizedBox(height: 6),
+                          
+                  TextField(
+                    controller: diagnosisController,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      hintText: "Enter preliminary diagnosis...",
+                    ),
+                  ),
+                          
+                  const SizedBox(height: 18),
+                          
+                  /// PRIORITY
+                  const AppText("Priority Level *"),
+                  const SizedBox(height: 10),
+                          
+                  Row(
+                    children: [
+                      _priorityButton("ROUTINE"),
+                      _priorityButton("URGENT"),
+                      _priorityButton("EMERGENCY"),
+                    ],
+                  ),
+                          
+                  const SizedBox(height: 18),
+                          
+                  /// NOTES
+                  const AppText("Additional Notes"),
+                  const SizedBox(height: 6),
+                          
+                  TextField(
+                    controller: notesController,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      hintText: "Any special instructions...",
+                    ),
+                  ),
+                          
+                  const SizedBox(height: 24),
+                          
+                  /// ACTIONS
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      AppButton(
+                        text: "Cancel",
+                        onPressed: () => Navigator.pop(context),
+                        isOutlined: true,
+                      ),
+                      const SizedBox(width: 12),
+                      AppButton(
+                        text: "Submit Admission Request",
+                        onPressed: _submit,
+                      ),
+                    ],
+                  )
+                ],
               ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// PRIORITY BUTTON
+  Widget _priorityButton(String value) {
+    final selected = priority == value;
+
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.only(right: 8),
+        child: InkWell(
+          onTap: () => setState(() => priority = value),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: selected
+                  ? Colors.blue.withOpacity(.15)
+                  : Colors.grey.shade100,
+              border: Border.all(
+                color: selected ? Colors.blue : Colors.grey.shade300,
+              ),
+            ),
+            child: AppText(
+              value.capitalizeFirst!,
+              color: selected ? Colors.blue : Colors.black87,
             ),
           ),
         ),

@@ -1,4 +1,5 @@
 import 'avatar_model.dart';
+import 'diagnosis_model.dart';
 import 'patient_vitals_model.dart';
 
 class PatientModel {
@@ -21,6 +22,8 @@ class PatientModel {
   final String nationality;
   final String language;
   final int weight;
+
+  final DiagnosisModel? diagnosis;
 
   // Admission details
   final String currentAdmissionPriorityLevel;
@@ -46,7 +49,7 @@ class PatientModel {
   final String registeredByStaffId;
   final List<String> admissionIds;
 
-  final int currentAdmissionCode;
+  final String? currentAdmissionCode;
   final String currentAdmissionId;
 
   final String currentBedAssign;
@@ -96,12 +99,14 @@ class PatientModel {
     required this.image,
     required this.timeAgo,
 
+    this.diagnosis,
+
     required this.role,
     required this.registeredBy,
     required this.registeredByStaffId,
     required this.admissionIds,
     required this.currentAdmissionPriorityLevel,
-    required this.currentAdmissionCode,
+    this.currentAdmissionCode,
     required this.currentAdmissionId,
     required this.currentBedAssign,
     required this.roomNumber,
@@ -124,7 +129,9 @@ class PatientModel {
 
   // ================= FROM JSON =================
   factory PatientModel.fromJson(Map<String, dynamic> json) {
-    final updated = DateTime.parse(json['updatedAt']);
+    final updated = json['updatedAt'] != null
+      ? DateTime.parse(json['updatedAt'])
+      : DateTime.now();
     return PatientModel(
       id: json['_id'] ?? '',
       patientId: json['patientId'] ?? '',
@@ -154,16 +161,22 @@ class PatientModel {
       visitCount: json['visitCount'] ?? 0,
 
       updatedAt: updated,
-      registeredAt: DateTime.parse(json['registeredAt']),
+      registeredAt: json['registeredAt'] != null
+        ? DateTime.parse(json['registeredAt'])
+        : updated,
 
       image: '', // UI fallback (set later)
       timeAgo: json['timeAgo'] ?? _timeAgo(updated),
+
+      diagnosis: json['diagnosisData'] is Map<String, dynamic>
+      ? DiagnosisModel.fromJson(json['diagnosisData'])
+      : null,
 
       role: json['role'] ?? '',
       registeredBy: json['registeredBy'] ?? '',
       registeredByStaffId: json['registeredByStaffId'] ?? '',
       admissionIds: List<String>.from(json['admissionIds'] ?? []),
-      currentAdmissionCode: json['currentAdmissionCode'] ?? 0,
+      currentAdmissionCode: json['currentAdmissionCode']?.toString(),
       currentAdmissionId: json['currentAdmissionId'] ?? '',
       currentBedAssign: json['currentBedAssign'] ?? '',
       roomNumber: json['roomNumber'] ?? '',
@@ -239,6 +252,14 @@ class PatientModel {
       'avatar': avatar?.toJson(),
       'currentVitalsReport': currentVitalsReport?.toJson(),
 
+      'diagnosis': diagnosis == null ? null : {
+        '_id': diagnosis!.id,
+        'diagnoses': diagnosis!.diagnoses
+            .map((e) => {'_id': e.id, 'name': e.name})
+            .toList(),
+        'diagnosedAt': diagnosis!.diagnosedAt?.toIso8601String(),
+      },
+
       'patientType': patientType,
       'ipdDepositAmount': ipdDepositAmount,
       'currentIPDCode': currentIPDCode,
@@ -283,13 +304,15 @@ class PatientModel {
     String? registeredBy,
     String? registeredByStaffId,
     List<String>? admissionIds,
-    int? currentAdmissionCode,
+    String? currentAdmissionCode,
     String? currentAdmissionId,
     String? currentBedAssign,
     String? roomNumber,
     String? bedNumber,
     PatientAvatarModel? avatar,
     PatientVitalsModel? currentVitalsReport,
+
+    DiagnosisModel? diagnosis,
   }) {
     return PatientModel(
       id: id ?? this.id,
@@ -338,7 +361,8 @@ class PatientModel {
       patientType: '',
       ipdDepositAmount: ipdDepositAmount,
       currentIPDCode: currentIPDCode,
-      currentBill: ''
+      currentBill: '',
+      diagnosis: diagnosis ?? this.diagnosis,
     );
   }
 

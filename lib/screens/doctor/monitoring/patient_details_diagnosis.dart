@@ -258,7 +258,7 @@ class _PatientDetailsDiagnosisState extends State<PatientDetailsDiagnosis> {
                   ),
                   const SizedBox(height: 4),
                   AppText(
-                    _formatTime(row.diagnosedAt),
+                    row.diagnosedAt != null ? _formatTime(row.diagnosedAt!) : "N/A",
                     fontSize: 11,
                     color: Colors.grey,
                   ),
@@ -272,12 +272,12 @@ class _PatientDetailsDiagnosisState extends State<PatientDetailsDiagnosis> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AppText(
-                    _formatDate(row.diagnosedAt),
+                    row.diagnosedAt != null ? _formatDate(row.diagnosedAt!) : "N/A",
                     fontWeight: FontWeight.w500,
                   ),
                   const SizedBox(height: 4),
                   AppText(
-                    _formatTime(row.diagnosedAt),
+                    row.diagnosedAt != null ? _formatTime(row.diagnosedAt!) : "N/A",
                     fontSize: 11,
                     color: Colors.grey,
                   ),
@@ -645,7 +645,7 @@ class _DiagnosisRowData {
   final String recordId;
   final String diagnosisItemId;
   final String diagnosisName;
-  final DateTime diagnosedAt;
+  final DateTime? diagnosedAt;
 
   _DiagnosisRowData({
     required this.recordId,
