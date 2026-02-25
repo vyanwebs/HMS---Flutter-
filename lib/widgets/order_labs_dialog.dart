@@ -106,8 +106,10 @@ class OrderLabsDialog extends StatelessWidget {
         Expanded(
           child: Obx(
             () => ListView(
-            children: controller.filteredTests.map(_testTile).toList(),
-          )),
+              padding: const EdgeInsets.only(right: 20),
+              children: controller.filteredTests.map(_testTile).toList(),
+            )
+          ),
         )
       ],
     );
@@ -142,44 +144,47 @@ class OrderLabsDialog extends StatelessWidget {
     return Obx(() {
       final selected = test.selected.value;
 
-      return InkWell(
-        onTap: () => controller.toggleTest(test),
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: selected
-              ? Colors.blue.withValues(alpha: 0.08)
-              : Colors.grey.shade100,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: selected ? Colors.blue : Colors.grey.shade300,
-            ),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    AppText(
-                      test.name,
-                      fontWeight: FontWeight.w500
-                    ),
-                    AppText(
-                      "₹${test.price}",
-                      color: Colors.grey
-                    ),
-                  ],
-                ),
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: InkWell(
+          onTap: () => controller.toggleTest(test),
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: selected
+                ? Colors.blue.withValues(alpha: 0.08)
+                : Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: selected ? Colors.blue : Colors.grey.shade300,
               ),
-
-              if (selected)
-                const Icon(
-                  Icons.check_circle,
-                  color: Colors.blue
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AppText(
+                        test.name,
+                        fontWeight: FontWeight.w500
+                      ),
+                      AppText(
+                        "₹${test.price}",
+                        color: Colors.grey
+                      ),
+                    ],
+                  ),
                 ),
-            ],
+        
+                if (selected)
+                  const Icon(
+                    Icons.check_circle,
+                    color: Colors.blue
+                  ),
+              ],
+            ),
           ),
         ),
       );
