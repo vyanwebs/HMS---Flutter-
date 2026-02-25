@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-import 'controllers/Doctor/patient_search_controllers.dart';
-import 'controllers/panel_navigation_controller.dart';
+import 'bindings/app_binding.dart';
 import 'screens/splash_screen.dart';
 import 'utils/constants.dart';
 
@@ -14,8 +14,6 @@ import 'utils/constants.dart';
 // );
 
 void main() {
-  Get.put(PanelNavigationController(), permanent: true);
-  Get.put(PatientSearchController(), permanent: true);
   runApp(const MyApp());
 }
 
@@ -26,11 +24,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: AppConstants.appName,
+      initialBinding: AppBinding(),
       debugShowCheckedModeBanner: false,
       // useInheritedMediaQuery: true,
       // locale: DevicePreview.locale(context),
       // builder: DevicePreview.appBuilder,
       theme: ThemeData(
+        textTheme: GoogleFonts.poppinsTextTheme(),
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.info),
         primaryColor: AppColors.primary,
         primarySwatch: Colors.blue,

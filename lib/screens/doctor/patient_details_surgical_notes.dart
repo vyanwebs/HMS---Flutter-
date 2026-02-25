@@ -58,7 +58,11 @@ class PatientDetailsSurgicalNotes extends StatelessWidget {
       ),
       child: Row(
         children: [
-          PatientAvatar(patient: patient,),
+          PatientAvatar(
+            name: patient.name,
+            imageUrl: patient.avatar?.url,
+            googleDriveLink: patient.avatar?.googleDriveLink,
+          ),
           const SizedBox(width: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,

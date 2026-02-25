@@ -23,6 +23,7 @@ class _PatientHistoryState extends State<PatientHistory> {
 
   @override
   void dispose() {
+    searchController.clearSearch();
     _searchController.dispose();
     super.dispose();
   }

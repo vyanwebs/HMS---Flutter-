@@ -52,8 +52,8 @@ class PatientSearchController extends GetxController {
 
       final encoded = Uri.encodeQueryComponent(name);
       final url = name.isEmpty
-          ? getPatientByNameApi
-          : "$getPatientByNameApi?name=$encoded";
+        ? getPatientByNameApi
+        : "$getPatientByNameApi?name=$encoded";
 
       final helper = NetworkHelper(url: url);
       final response = await helper.get(auth: true);

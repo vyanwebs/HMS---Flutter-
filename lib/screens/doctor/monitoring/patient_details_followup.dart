@@ -242,7 +242,9 @@ class _PatientDetailsFollowUpsState extends State<PatientDetailsFollowUps> {
                 Row(
                   children: [
                     PatientAvatar(
-                      patient: widget.patient,
+                      name: widget.patient.name,
+                      imageUrl: widget.patient.avatar?.url,
+                      googleDriveLink: widget.patient.avatar?.googleDriveLink,
                     ),
                     const SizedBox(width: 16),
                     Column(

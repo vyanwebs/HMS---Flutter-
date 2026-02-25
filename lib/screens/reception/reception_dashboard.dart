@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hms/screens/reception/external_doctor_screen.dart';
+import 'package:hms/screens/reception/track_patient_screen.dart';
 
 import '../../controllers/Reception/opd_registration_controller.dart';
 import '../../controllers/panel_navigation_controller.dart';
@@ -11,10 +13,10 @@ import '../main_dashboard.dart';
 import 'analysis_screen.dart';
 import 'billing.dart';
 import 'discharge_screen.dart';
-import 'doctors_screen.dart';
+import 'doctor_management_screen.dart';
 import 'ipd_screen.dart';
 import 'opd_screen.dart';
-import 'patient_directory.dart';
+import 'patient_management.dart';
 
 class ReceptionDashboard extends StatefulWidget {
   const ReceptionDashboard({super.key});
@@ -144,8 +146,8 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
                 ),
 
                 _buildSidebarItem(
-                  title: "Patient directory",
-                  menu: ReceptionPanelMenu.patientDirectory,
+                  title: "Patient management",
+                  menu: ReceptionPanelMenu.patientManagement,
                   icon: Icons.people_outline,
                 ),
 
@@ -162,6 +164,18 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
                 _buildSidebarItem(
                   title: "Doctors",
                   menu: ReceptionPanelMenu.doctors,
+                  icon: Icons.medical_services_outlined,
+                ),
+
+                _buildSidebarItem(
+                  title: "Track patients",
+                  menu: ReceptionPanelMenu.track_patient,
+                  icon: Icons.medical_services_outlined,
+                ),
+
+                _buildSidebarItem(
+                  title: "External Doctor",
+                  menu: ReceptionPanelMenu.externaldoctor,
                   icon: Icons.medical_services_outlined,
                 ),
 
@@ -258,16 +272,22 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
           return OPDScreen();
 
         case ReceptionPanelMenu.ipd:
-          return const IPDScreen();
+          return IPDScreen();
 
-        case ReceptionPanelMenu.patientDirectory:
-          return const PatientDirectory();
+        case ReceptionPanelMenu.patientManagement:
+          return PatientManagement();
 
         case ReceptionPanelMenu.discharge:
           return const DischargeScreen();
 
         case ReceptionPanelMenu.doctors:
-          return const DoctorsScreen();
+          return const DoctorManagementScreen();
+
+        case ReceptionPanelMenu.track_patient:
+          return const TrackPatientsScreen();
+
+        case ReceptionPanelMenu.externaldoctor:
+          return const ExternalDoctorScreen();
 
         case ReceptionPanelMenu.billing:
           return const BillingScreen();

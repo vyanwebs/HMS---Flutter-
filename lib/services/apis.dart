@@ -1,6 +1,6 @@
 bool isProd = true;
 
-String baseUrl = isProd ? "https://docnex-hms.onrender.com" : "https://docnex-hms.onrender.com";
+String baseUrl = isProd ? "https://docnex-backend.onrender.com" : "https://docnex-hms.onrender.com";
 
 // ============== Doctor Panel ===============
 
@@ -71,3 +71,17 @@ String fetchAllSymptomsApi = "$baseUrl/api/symptoms/fetch-all-symptoms";
 String deleteSymptomsApi = "$baseUrl/api/symptoms";
 String filterSymptomsApi = "$baseUrl/api/symptoms/name";
 String followupVitalsApi = "$baseUrl/api/vital";
+String searchPatientsByNameApi = "$baseUrl/api/patient/get-by-name";
+String getAllDoctorsApi = "$baseUrl/api/doctor/get-all";
+String deletedoctorApi = "$baseUrl/api/doctor/delete";
+String createPatientApi = "$baseUrl/api/patient/createPatientByPhoneNumber";
+String updatePatientByIdApi = "$baseUrl/api/patient/update-by-id";
+String getAllOPDPatientsApi = "$baseUrl/api/patient/get-opd-patients";
+String getDoctorByNameApi = "$baseUrl/api/doctor/getDoctorByName";
+String transferPatientToDoctorApi = "$baseUrl/api/patient-doctor-assignment/re-assign";
+String createexternaldoctorApi = "$baseUrl/api/external-doctor/create";
+String getallexternaldoctorApi = "$baseUrl/api/doctor/get-doctor-by-name-type?type=external";
+String getallpatientApi = "$baseUrl/api/patient/getPatientUsingQuery";
+String trackpatientcardsApi = "$baseUrl/api/patient/get-patient-track-dashboard-cards";
+String deletepatientsApi = "$baseUrl/api/patient/delete-multiple";
+
