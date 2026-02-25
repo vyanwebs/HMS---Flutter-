@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hms/screens/reception/appointment_view.dart';
 import 'package:hms/screens/reception/external_doctor_screen.dart';
 import 'package:hms/screens/reception/track_patient_screen.dart';
 
@@ -288,6 +289,9 @@ class _ReceptionDashboardState extends State<ReceptionDashboard> {
 
         case ReceptionPanelMenu.externaldoctor:
           return const ExternalDoctorScreen();
+
+        case ReceptionPanelMenu.appointments:
+          return  AppointmentManagementView();
 
         case ReceptionPanelMenu.billing:
           return const BillingScreen();

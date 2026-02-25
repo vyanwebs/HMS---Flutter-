@@ -84,4 +84,8 @@ String getallexternaldoctorApi = "$baseUrl/api/doctor/get-doctor-by-name-type?ty
 String getallpatientApi = "$baseUrl/api/patient/getPatientUsingQuery";
 String trackpatientcardsApi = "$baseUrl/api/patient/get-patient-track-dashboard-cards";
 String deletepatientsApi = "$baseUrl/api/patient/delete-multiple";
+String doctorbyappointApi = "$baseUrl/api/doctor/getDoctorByName";
+String getappointmentbydoctorApi = "$baseUrl/api/appointment/getAppointmentsByPatientAndDate";
+String createappointmentApi = "$baseUrl/api/appointment/create";
+String uppdateappointmentApi = "$baseUrl/api/appointment/create";
 
